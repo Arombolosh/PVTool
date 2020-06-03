@@ -52,8 +52,7 @@ void Energy::calcPVEnergy(const std::vector<double> &absTemp, const std::vector<
 
 	if(absTemp.size() != rad.size())
 		throw IBK::Exception(IBK::FormatString("Size of both Vectors are not equal"), "calcPVEnergy");
-	bool writeConsole=false;
-	bool writeConsole2 = false;
+
 
 
 	//Energie berechnen für jeden Zeitpunkt der mit Temp. und Strahlung (und AirMass) gegeben ist.
@@ -107,9 +106,9 @@ void Energy::calcPVEnergy(const std::vector<double> &absTemp, const std::vector<
 		double m_i = 0;
 		double volt = -0.01;
 		double eps =1E-10;
-		//ToDo Katja
-		if(writeConsole)
-			std::cout << "pMax (MPP) [W]" << "\t" << "voltage [V]" << "\t" << "current [A]" << std::endl;
+
+        IBK::IBK_Message(IBK::FormatString("pMax (MPP) [W]\tvoltage [V]\tcurrent [A]\n"),IBK::MSG_DEBUG,FUNC_ID,IBK::VL_DEVELOPER);
+
 
 		double m_uMpp=volt;				//Save Voltage at Maximum Power
 		double m_iMpp=m_i;				//Save Current at Maximum Power
@@ -129,12 +128,13 @@ void Energy::calcPVEnergy(const std::vector<double> &absTemp, const std::vector<
 			pMax = std::fmax(P,pMax); //Find Maximum
 
 			if (pMax>P) {//std::abs(Pold - Pmax) < 0.0001  ) { //Wenn neues Maximum gefunden wurde
-				if(writeConsole)
-					std::cout << pMax << "\t" << m_uMpp << "\t" << m_iMpp << std::endl;
+
+                IBK::IBK_Message(IBK::FormatString("pMax\tm_uMpp\tm_iMpp\n"),IBK::MSG_DEBUG,FUNC_ID,IBK::VL_DEVELOPER);
+
 				break;
 			}
-			if(writeConsole2)
-				std::cout << P << "\t" << volt << "\t" << m_i << std::endl;
+            IBK::IBK_Message(IBK::FormatString("P\tvolt\tm_i\n"),IBK::MSG_DEBUG,FUNC_ID,IBK::VL_DEVELOPER);
+
 			m_uMpp=volt;  //Save Voltage at Maximum Power
 			m_iMpp=m_i;  //Save Current at Maximum Power
 			//Pold=Pmax;
