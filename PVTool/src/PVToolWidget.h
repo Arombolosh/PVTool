@@ -15,6 +15,9 @@ public:
 	explicit PVToolWidget(QWidget *parent = nullptr);
 	~PVToolWidget();
 
+private slots:
+	void on_radioButton_WeatherComboBox_toggled(bool checked);
+
 private:
 	Ui::PVToolWidget *ui;
 };
