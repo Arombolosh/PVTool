@@ -179,27 +179,27 @@ std::string val2string(const T val, const int precision, const std::size_t width
 template <class T>
 T string2val(const std::string& str) {
 	T val;
-	if (str=="1.#QNAN")
-		return std::numeric_limits<T>::quiet_NaN();
 	std::stringstream strm(str);
 	if (!(strm >> val))
 		throw IBK::Exception(IBK::FormatString("Could not convert '%1' into value.").arg(str), "[string2val]");
 	return val;
 }
 
-/*! Attempts to extract a numerical value from a string.
-	\code
-	double val = string2val<double>("2.5");
-	\endcode
-*/
-template <class T>
-T string2valChecked(const std::string& str) {
-	T val;
+
+template <>
+inline double string2val<double>(const std::string& str) {
+	double val;
 	if (str=="1.#QNAN")
-		return std::numeric_limits<T>::quiet_NaN();
-	std::stringstream strm(str);
-	if (!(strm >> val) || !strm.eof())
-		throw IBK::Exception(IBK::FormatString("Could not convert '%1' into value.").arg(str), "[string2valChecked]");
+		return std::numeric_limits<double>::quiet_NaN();
+	size_t pos;
+	try {
+		val = std::stod(str, &pos); // may throw std::out_of_range or std::invalid_argument
+		if (str.find_first_not_of(" \t\n", pos) != std::string::npos)
+			throw std::exception();
+	}
+	catch (...) {
+		throw IBK::Exception(IBK::FormatString("Could not convert '%1' into value.").arg(str), "[IBK::string2val]");
+	}
 	return val;
 }
 
@@ -211,8 +211,6 @@ T string2valChecked(const std::string& str) {
 */
 template <class T>
 T string2valDef(const std::string& str, const T& def) {
-	if (str=="1.#QNAN")
-		return std::numeric_limits<T>::quiet_NaN();
 	std::stringstream strm(str);
 	T val;
 	if (!(strm >> val))
@@ -220,15 +218,38 @@ T string2valDef(const std::string& str, const T& def) {
 	return val;
 }
 
+/*! Attempts to extract a numerical value from a string.
+	Returns the def value in case of non valid string.
+	\code
+	double val = string2val<double>("2.5", 0.0);
+	\endcode
+*/
+template <>
+inline double string2valDef<double>(const std::string& str, const double & def) {
+	if (str=="1.#QNAN")
+		return std::numeric_limits<double>::quiet_NaN();
+	std::stringstream strm(str);
+	double val;
+	size_t pos;
+	try {
+		val = std::stod(str, &pos);  // may throw std::out_of_range or std::invalid_argument
+		if (str.find_first_not_of(" \t\n", pos) != std::string::npos)
+			return def;
+	} catch (...) {
+		return def;
+	}
+	return val;
+}
+
+
 /*! Converts a string with white-space separated values into a vector.
-	The vector 'vec' is expected to be empty upon start.
+	The vector 'vec' is emptied upon start.
 
 	\note The individual numbers are appended using push_back() to the vector. In order to
 	improve performance, you may want to call reserve() on the vector if
 	you know the approximate/exact number of numbers in the string.
 
-	\todo check performance C / C++ version and think about two functions - one with locale support (c++ stream)
-		and one with . as decimal point always (C implementation).
+	This function throws an IBK::Exception in case of invalid numbers in string.
 */
 void string2valueVector(const std::string & str, std::vector<double> & vec);
 
@@ -372,6 +393,15 @@ bool string_nocase_less(const std::string& lhs, const std::string& rhs);
 */
 std::size_t string_nocase_find(const std::string& str, const std::string& substr);
 
+/*! Explodes the string 'str' into a vector of substrings, using the 'delimiter' as separation char.
+	\warning This function is not really fast, because of the temporary vector created.
+
+	\param str Original string
+	\param delim Separation character
+	\param maxTokens Maximum number of tokens to extract (i.e. max size of returned vector), rest is discarded.
+*/
+std::vector<std::string> explode(const std::string & str, char delim, int maxTokens = -1);
+
 /*! Explodes the string 'str' into substrings (stored in the string list
 	'tokens'), which were separated by 'delim' characters.
 	\param str Original string
@@ -381,8 +411,6 @@ std::size_t string_nocase_find(const std::string& str, const std::string& substr
 	\sa ExplodeFlags
 */
 size_t explode(const std::string& str, std::vector<std::string>& tokens, const std::string& delims, int explodeFlags);
-
-
 
 /*! Explodes the string 'str' into substrings (stored in the string list
 	'tokens'), which were separated by 'delim' characters.

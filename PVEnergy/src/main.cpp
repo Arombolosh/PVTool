@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) {
 
 	// set message verbosity level
 	try {
-		int verbosityLevel = IBK::string2valChecked<int>(args.option("verbosity-level"));
+		int verbosityLevel = IBK::string2val<int>(args.option("verbosity-level"));
 		IBK::MessageHandlerRegistry::instance().messageHandler()->setConsoleVerbosityLevel(3/*verbosityLevel*/);
 	} catch (IBK::Exception & ex) {
 		ex.writeMsgStackToError();
@@ -153,15 +153,15 @@ int main(int argc, char* argv[]) {
 
 	//read PV module data
 	try {
-		manuData.m_vmp =	IBK::string2valChecked<double>(argv[1]);
-		manuData.m_imp =	IBK::string2valChecked<double>(argv[2]);
-		manuData.m_voc =	IBK::string2valChecked<double>(argv[3]);
-		manuData.m_isc =	IBK::string2valChecked<double>(argv[4]);
-		manuData.m_alpha =	IBK::string2valChecked<double>(argv[5]);
-		manuData.m_beta =	IBK::string2valChecked<double>(argv[6]);
-		manuData.m_gamma =	IBK::string2valChecked<double>(argv[7]);
-		manuData.m_nSer =	IBK::string2valChecked<int>(argv[8]);
-		manuData.m_refTemp =	IBK::string2valChecked<double>(argv[9]);
+		manuData.m_vmp =	IBK::string2val<double>(argv[1]);
+		manuData.m_imp =	IBK::string2val<double>(argv[2]);
+		manuData.m_voc =	IBK::string2val<double>(argv[3]);
+		manuData.m_isc =	IBK::string2val<double>(argv[4]);
+		manuData.m_alpha =	IBK::string2val<double>(argv[5]);
+		manuData.m_beta =	IBK::string2val<double>(argv[6]);
+		manuData.m_gamma =	IBK::string2val<double>(argv[7]);
+		manuData.m_nSer =	IBK::string2val<int>(argv[8]);
+		manuData.m_refTemp =	IBK::string2val<double>(argv[9]);
 
 		// TODO : material is not taken into account yet; Default monoSi
 		if (args.args()[10] == "monoSi") {
@@ -204,8 +204,8 @@ int main(int argc, char* argv[]) {
 	else {
 		double temp, rad;
 		try {
-			temp = IBK::string2valChecked<double>(args.args()[11]); // K
-			rad = IBK::string2valChecked<double>(args.args()[12]); // W/m2
+			temp = IBK::string2val<double>(args.args()[11]); // K
+			rad = IBK::string2val<double>(args.args()[12]); // W/m2
 		}
 		catch (IBK::Exception  &ex) {
 			ex.writeMsgStackToError();

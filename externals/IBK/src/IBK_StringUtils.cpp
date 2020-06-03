@@ -72,55 +72,65 @@
 namespace IBK {
 
 void string2valueVector(const std::string & origStr, std::vector<double> & vec) {
+	FUNCID(IBK::string2valueVector);
+	// algorithm is simple - search for white-space delimiters and replace the first white-space after each non-white space
+	// substr with \0 and remember its position, then parse all the substrings
 
-//#define USE_C_VERSION
-#ifdef USE_C_VERSION
-	std::string str = origStr;
-	const char * valstr = str.c_str();
-	const char * number_start = valstr;
-	bool have_decimal = false;
-	const char DecimalPoint = '.';
-	while (*valstr != 0) {
-		const char & ch = *valstr;
-		if (have_decimal) {
-			if (ch == ' ' ||  ch == '\t') {
-				// set string end
-				*(char*)valstr = 0;
-				// append number
-				double v = std::atof(number_start);
-				number_start = valstr + 1;
-				vec.push_back(v);
-				have_decimal = false;
+	vec.clear();
+	size_t strsize = origStr.size();
+	if (strsize == 0)
+		return; // empty string - no data in vector
+
+	std::string str(origStr);
+	size_t pos = 0;
+	size_t numberStart = 0;
+
+	bool inNumber = false;
+
+	// process entire string, search until we toggle from "whitespace" to "number" and remember starting position of number
+	// then continue until we toggle from "number" to "whitespace" and try to convert the string in-between
+	while (pos < strsize) {
+		char ch = str[pos];
+		// do we have a whitespace char?
+		if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r') {
+			// toggle to "whitespace mode"?
+			if (inNumber) {
+				inNumber = false;
+				// change character to \0
+				str[pos] = 0;
+				// try to parse from begin of number to this position
+				size_t charCount;
+				try {
+					double val = std::stod(str.data()+numberStart, &charCount);
+					if (charCount != pos - numberStart)
+						throw std::exception();
+					vec.push_back(val);
+				} catch (...) {
+					throw IBK::Exception(IBK::FormatString("'%1' at character pos #2 is not a valid number.").arg(str.data()+numberStart).arg(numberStart), FUNC_ID);
+				}
 			}
 		}
 		else {
-			if ((ch >= '0' && ch <= '9') || ch == DecimalPoint) {
-				have_decimal = true;
+			// toggle to "number" mode?
+			if (!inNumber) {
+				numberStart = pos;
+				inNumber = true;
 			}
 		}
-		++valstr;
+		++pos;
 	}
-	have_decimal = false;
-	// don't forget last number, check if last string contains a number
-	const char * numptr = number_start;
-	while (*numptr != 0) {
-		if ((*numptr >= '0' && *numptr <= '9') || *numptr == DecimalPoint) {
-			have_decimal = true;
-			break;
+	// if we are still in number mode at end of string, then try to parse the last number
+	if (inNumber) {
+		size_t charCount;
+		try {
+			double val = std::stod(str.data()+numberStart, &charCount);
+			if (charCount != pos - numberStart)
+				throw;
+			vec.push_back(val);
+		} catch (...) {
+			throw IBK::Exception(IBK::FormatString("'%1' at character pos #2 is not a valid number.").arg(str.data()+numberStart).arg(numberStart), FUNC_ID);
 		}
-		++numptr;
 	}
-	if (have_decimal) {
-		vec.push_back(std::atof(number_start));
-	}
-
-#else // USE_C_VERSION
-	// C++ Version below is factor 3 slower than version above.
-	std::stringstream valstrm(origStr);
-	double val;
-	while (valstrm >> val)
-		vec.push_back(val);
-#endif // USE_C_VERSION
 }
 // ---------------------------------------------------------------------------
 
@@ -301,6 +311,25 @@ std::pair<unsigned int, double> extractFromParenthesis(const std::string & src,
 	return defaultValue;
 }
 // ---------------------------------------------------------------------------
+
+std::vector<std::string> explode(const std::string & str, char delim, int maxTokens) {
+	std::vector<std::string> tokens;
+	std::string tmp;
+	for (std::string::const_iterator it=str.begin(); it!=str.end(); ++it) {
+		if (*it!=delim)
+			tmp+=*it;
+		else {
+			if (tmp.empty()) continue;
+			tokens.push_back(tmp);
+			if (maxTokens != -1 && tokens.size() >= (size_t)maxTokens)
+				return tokens;
+			tmp.clear();
+		}
+	}
+	if (tmp.size())
+		tokens.push_back(tmp);
+	return tokens;
+}
 
 
 size_t explode(const std::string& str, std::vector<std::string>& tokens, const std::string& delims, int explodeFlags) {
