@@ -31,14 +31,14 @@ RESOURCES += \
 	../../resources/PVTool.qrc
 
 SOURCES += \
-	../../src/PCM_Material.cpp \
+	../../../PVEnergy/src/PVTool_Energy.cpp \
 	../../src/PVTButtonBar.cpp \
 	../../src/PVTDebugApplication.cpp \
 	../../src/PVToolWidget.cpp \
 	../../src/main.cpp
 
 HEADERS += \
-	../../src/PCM_Material.h \
+	../../../PVEnergy/src/PVTool_Energy.h \
 	../../src/PVTButtonBar.h \
 	../../src/PVTDebugApplication.h \
 	../../src/PVToolWidget.h

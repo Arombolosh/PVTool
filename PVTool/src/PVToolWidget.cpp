@@ -5,6 +5,7 @@
 #include <QDoubleValidator>
 #include <QIntValidator>
 #include <QDir>
+#include <QMessageBox>
 
 #include <IBK_assert.h>
 #include <MM_Material.h>
@@ -15,6 +16,7 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 {
 	m_ui->setupUi(this);
 
+	// TODO : working directory should normally not be the install directory, since this is likely to be read-only.
 	m_ui->lineEdit_Directory->setText(QDir().currentPath());
 	m_ui->radioButton_WeatherComboBox->setChecked(true);
 	on_radioButton_WeatherComboBox_toggled(true);
@@ -107,20 +109,18 @@ void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked)
 	m_ui->lineEdit_beta->setEnabled(!checked);
 	m_ui->lineEdit_gamma->setEnabled(!checked);
 	m_ui->lineEdit_nSer->setEnabled(!checked);
-
-
 }
 
-void PVToolWidget::on_pushButton_EPW_clicked()
-{
+
+void PVToolWidget::on_pushButton_EPW_clicked() {
 	QString fpath = QFileDialog::getOpenFileName(this,tr("Öffne Wetterdatei"),QString(),tr("EnergyPlus Weather Files (*.epw)"));
 	if(fpath.isEmpty())
 		return;
 	m_ui->lineEdit_EPWFile->setText(fpath);
 }
 
-void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index)
-{
+
+void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 	IBK_ASSERT(m_pvModule.size() > index);
 
 	m_ui->lineEdit_iSC->setText(QString("%L1").arg(m_pvModule[index].m_isc));
@@ -133,29 +133,34 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index)
 	m_ui->lineEdit_gamma->setText(QString("%L1").arg(m_pvModule[index].m_gamma));
 }
 
-void PVToolWidget::on_pushButton_RunSimu_clicked()
-{
-	//Climate
-	std::string weatherName;	//name des wetters für die template.d6o datei
-	if(m_ui->radioButton_WeatherComboBox->isChecked()){
+
+void PVToolWidget::on_pushButton_RunSimu_clicked() {
+	// Climate data file
+	std::string weatherName;
+	if (m_ui->radioButton_WeatherComboBox->isChecked()){
 		weatherName = m_ui->comboBox_WeatherFile->itemText(m_ui->comboBox_WeatherFile->currentIndex()).toStdString() + ".c6b";
+		// Note: we can rely on the file to exist, since this is built-in stuff
 	}
 	else {
-		//rum kopieren noch einfügen
-		IBK::Path weatherPath;		//der pfad ist fürs kopieren wichtig; leer falls das klima aus der combobox gewählt wurde
-		weatherPath = m_ui->lineEdit_EPWFile->text().toStdString();
-
-
-		weatherName = weatherPath.filename().c_str();
+		// get path to user-defined climate data file
+		IBK::Path weatherPath(m_ui->lineEdit_EPWFile->text().toStdString());
+		// check if file exists
+		if (!weatherPath.exists()) {
+			QMessageBox::critical(this, QString(), tr("Die ausgewählte Klimadatei '%1' existiert nicht.").arg(m_ui->lineEdit_EPWFile->text()));
+			return;
+		}
+		weatherName = weatherPath.filename().str();
 	}
 
+	// TODO : check all the other input for meaningful values
+
+	// populate manufacturing data with input values
 	PVTOOL::Energy pvtool;
-	//pvtool.m_manuData = PVTOOL::Energy::ManufactureData();
-	//PV Module
-	if(m_ui->radioButton_PVDatabase->isChecked()){
+	if (m_ui->radioButton_PVDatabase->isChecked()){
 		pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
 	}
 	else {
+		// TODO : instead of toDouble() use locale-aware
 		pvtool.m_manuData.m_isc = m_ui->lineEdit_iSC->text().toDouble();
 		pvtool.m_manuData.m_imp = m_ui->lineEdit_iMPP->text().toDouble();
 		pvtool.m_manuData.m_vmp = m_ui->lineEdit_uMPP->text().toDouble();
@@ -166,6 +171,42 @@ void PVToolWidget::on_pushButton_RunSimu_clicked()
 		pvtool.m_manuData.m_nSer = m_ui->lineEdit_nSer->text().toInt();
 		pvtool.m_manuData.m_name = "UserInput";
 	}
+
+	// now pre-calculate manufacturing parameter set
+	try {
+		pvtool.calcPhysicalParameterFromManufactureData();
+	}
+	catch (IBK::Exception & ex) {
+		QMessageBox::critical(this, QString(), tr("Bei der Berechnung der PV-Panel-Kenngrößen aus den Eingabedaten ist ein Fehler aufgetreten."));
+		return;
+	}
+
+	// we now have the input data to start our variation/optimization run
+	// but we first need the paths to the external tools 'CmdDiscretize' and 'DelphinSolver.exe'
+
+	// for now hard-coded, same directory as executable PVTool.exe
+	const QString CMDDISCPATH = qApp->applicationDirPath() + "/CmdDiscretize";
+	const QString DELPHINPATH = qApp->applicationDirPath() + "/DelphinSolver";
+
+	// we need a project directory/working directory
+	QString workingDir = m_ui->lineEdit_Directory->text();
+	// check, if the directory exists
+	if (!QFileInfo(workingDir).exists()) {
+		int res = QMessageBox::question(this, QString(), tr("Arbeitsverzeichnis existiert nicht, soll es erstellt werden?"),
+							  QMessageBox::Ok | QMessageBox::Cancel);
+		if (res == QMessageBox::Cancel)
+			return;
+		if (!QDir().mkpath(workingDir)) {
+			QMessageBox::critical(this, QString(), tr("Konnte das Arbeitsverzeichnis nicht erstellen. Möglicherweise fehlen die Zugriffsrechte?"));
+			return;
+		}
+	}
+
+
+	// read the template files into memory
+
+
+#if 0
 
 	//PCM-> Material (PCM) kopieren aus Vorgabedateien
 	//Wärmedämmung (Insulation) erstellen aus Vorgaben
@@ -187,6 +228,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked()
 
 	//IBK::Path insuFilename (path / ("Insulation_" + IBK::val2string(insulation.m_id) + ".m6"));
 
+#endif
 	//template datei bearbeiten und an richtige stelle kopieren alle weiteren dateien kopieren/erstellen
 	//string ersetzen d6p datei ersetzen (klima insulation pcm dicken)
 
