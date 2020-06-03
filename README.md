@@ -4,6 +4,7 @@ A tool for dimensioning PV panels with PCM layers to increase efficiency
 ## Functionality overview
 
 ... TODO
+... Test Stephan
 
 ## Directory Structure
 
