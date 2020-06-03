@@ -3,6 +3,10 @@
 
 #include <QWidget>
 
+#include <IBK_Path.h>
+
+#include <PVTool_Energy.h>
+
 namespace Ui {
 class PVToolWidget;
 }
@@ -17,10 +21,9 @@ public:
 
 
 
-
-	std::vector<std::string>	m_weatherNames;
-	std::vector<std::string>	m_pvModuleNames;
-	std::vector<std::string>	m_pcmNames;
+	std::vector<std::string>						m_weatherNames;
+	std::vector<PVTOOL::Energy::ManufactureData>	m_pvModule;
+	std::vector<std::string>						m_pcmNames;
 
 private slots:
 	void on_radioButton_WeatherComboBox_toggled(bool checked);
@@ -33,8 +36,13 @@ private slots:
 
 	void on_pushButton_RunSimu_clicked();
 
+	void on_pushButton_Directory_clicked();
+
 private:
-	Ui::PVToolWidget *ui;
+	Ui::PVToolWidget *m_ui;
+
+
+	std::vector<std::pair<std::string,IBK::Path>>	m_weather;
 };
 
 #endif // PVTOOLWIDGET_H

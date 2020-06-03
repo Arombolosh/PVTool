@@ -7,11 +7,7 @@
 namespace PVTOOL {
 
 
-Energy::Energy() {
-//	double m_egRef = module6par().bandgap();			//Materialabhängig ToDo Katja
 
-
-}
 
 void Energy::calcPhysicalParameterFromManufactureData(double eps) {
 	FUNCID(Energy::calcPhysicalParameterFromManufactureData);

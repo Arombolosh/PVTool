@@ -13,6 +13,21 @@ public:
 	/*! Manufacture dataset for PV module under STC.*/
 	struct ManufactureData{
 
+		ManufactureData(){}
+
+		ManufactureData(double vmp, double imp, double voc, double isc, double alpha, double beta, double gamma, int nSer, std::string name):
+			m_vmp(vmp),
+			m_imp(imp),
+			m_voc(voc),
+			m_isc(isc),
+			m_alpha(alpha),
+			m_beta(beta),
+			m_gamma(gamma),
+			m_nSer(nSer),
+			m_refTemp(25+273.15),
+			m_name(name)
+		{}
+
 		int				m_material;			///<Material der Zellen				[-]
 		double			m_vmp;				///<Spannung im Max Power Point		[V]
 		double			m_imp;				///<Strom im Max Power Point		[A]
@@ -25,6 +40,7 @@ public:
 		double			m_gamma;			///<Temperaturkoeff. Leistung		[%/K]
 		int				m_nSer;				///<Zellen pro Modul.				[-]
 		double			m_refTemp;			///<Referencetemperature			[K]
+		std::string		m_name;				///<Name of the PV panel
 
 		/*! Calculates the coeff. alphaIsc and betaVoc */
 		void calcCoefficients(){
@@ -59,7 +75,9 @@ public:
 
 
 	/*! C'tor. */
-	Energy();
+	Energy(){
+		m_manuData = ManufactureData();
+	}
 
 	/*! Produces calculation parameters from manufacture dataset for pv-module.
 		In case of errors, throws an IBK::Exception.
