@@ -109,11 +109,11 @@ MessageHandler::~MessageHandler() {
 
 
 void MessageHandler::setConsoleVerbosityLevel(int verbosity) {
-	m_requestedConsoleVerbosityLevel = verbosity;
+	m_requestedConsoleVerbosityLevel = (verbosity_levels_t)verbosity;
 }
 
 void MessageHandler::setLogfileVerbosityLevel(int verbosity) {
-	m_requestedLogfileVerbosityLevel = verbosity;
+	m_requestedLogfileVerbosityLevel = (verbosity_levels_t)verbosity;
 }
 
 
@@ -190,7 +190,7 @@ void MessageHandler::msg(const std::string& msg, msg_type_t t, const char * func
 
 #if 1
 	// do nothing if verbosity level is not high enough
-	if (t != MSG_DEBUG &&
+	if (t != MSG_DEBUG && t != MSG_ERROR &&
 			verbose_level > m_requestedLogfileVerbosityLevel &&
 			verbose_level > m_requestedConsoleVerbosityLevel)
 	{

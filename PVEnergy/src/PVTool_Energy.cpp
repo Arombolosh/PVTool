@@ -60,7 +60,7 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 
 	//not enough radiation
 	if (rad<=5){
-		IBK::IBK_Message(IBK::FormatString("%1\t%2\t%3\n").arg(0).arg(0).arg(0),IBK::MSG_DEBUG, FUNC_ID,IBK::VL_DEVELOPER);
+		IBK::IBK_Message(IBK::FormatString("%1\t%2\t%3\n").arg(0).arg(0).arg(0),IBK::MSG_PROGRESS, FUNC_ID,IBK::VL_DEVELOPER);
 		return 0;
 	}
 
@@ -81,7 +81,7 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	double volt = -0.01;
 	double eps =1E-10;
 
-	IBK::IBK_Message(IBK::FormatString("pMax (MPP) [W]\tvoltage [V]\tcurrent [A]\n"),IBK::MSG_DEBUG,FUNC_ID,IBK::VL_DEVELOPER);
+	IBK::IBK_Message(IBK::FormatString("pMax (MPP) [W]\tvoltage [V]\tcurrent [A]\n"),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 
 
 	double uMpp=volt;				//Save Voltage at Maximum Power
@@ -103,11 +103,11 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 
 		if (pMax>P) {//std::abs(Pold - Pmax) < 0.0001  ) { //Wenn neues Maximum gefunden wurde
 
-			IBK::IBK_Message(IBK::FormatString("pMax\tm_uMpp\tm_iMpp\n"),IBK::MSG_DEBUG,FUNC_ID,IBK::VL_DEVELOPER);
+			IBK::IBK_Message(IBK::FormatString("pMax = %1 \tuMpp = %2 \tiMpp = 3\n").arg(pMax).arg(uMpp).arg(iMpp),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 
 			break;
 		}
-		IBK::IBK_Message(IBK::FormatString("P\tvolt\tm_i\n"),IBK::MSG_DEBUG,FUNC_ID,IBK::VL_DEVELOPER);
+		IBK::IBK_Message(IBK::FormatString("P = %1 \tvolt = %2 \tcurrent = 3\n").arg(P).arg(volt).arg(current),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 
 		uMpp=volt;  //Save Voltage at Maximum Power
 		iMpp=current;  //Save Current at Maximum Power

@@ -3,6 +3,8 @@
 
 #include <IBK_assert.h>
 #include <IBK_messages.h>
+#include <IBK_MessageHandlerRegistry.h>
+
 #include <IBK_ArgParser.h>
 #include <DATAIO_DataIO.h>
 
@@ -87,13 +89,16 @@ void writeResultData(const IBK::Path &path, const IBK::UnitVector &result){
 
 
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
+	FUNCID(main);
+
 	IBK::ArgParser args;
 
 	args.m_appname = "PVEnergy";
 	//option for values double, string, etc.
 	args.addOption('f', "path", "Input path for d6o result folder.", "","");
+	args.addOption(0, "verbosity-level", "Sets verbosity of tool output.", "<0..4>", "1");
+
 	//flags for bool
 	args.addFlag('v', "version", "Displays current version");
 
@@ -109,6 +114,16 @@ int main(int argc, char* argv[])
 		return EXIT_SUCCESS;
 	}
 
+	// set message verbosity level
+	try {
+		int verbosityLevel = IBK::string2valChecked<int>(args.option("verbosity-level"));
+		IBK::MessageHandlerRegistry::instance().messageHandler()->setConsoleVerbosityLevel(verbosityLevel);
+	} catch (IBK::Exception & ex) {
+		ex.writeMsgStackToError();
+		IBK::IBK_Message("Invalid argument to 'verbosity-level'.", IBK::MSG_ERROR, FUNC_ID);
+		return EXIT_FAILURE;
+	}
+
 	// Example command lines:
 	// pv_tool.exe vmp imp voc isc alpha beta gamma nSer refTemp Material T Rad
 	// pv_tool.exe vmp imp voc isc alpha beta gamma nSer refTemp Material -f path
@@ -119,13 +134,13 @@ int main(int argc, char* argv[])
 	// case filepath?
 	if (args.hasOption('f')) {
 		if (args.args().size() != 12 ) {
-			IBK::IBK_Message("Invalid command line, use --help.", IBK::MSG_ERROR);
+			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -f=<> option. Use --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
 		}
 	}
 	else {
 		if (args.args().size() != 13 ) {
-			IBK::IBK_Message("Invalid command line, use --help.", IBK::MSG_ERROR);
+			IBK::IBK_Message("Invalid command line, 12 positional arguments expected. U --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
 		}
 	}
@@ -145,66 +160,68 @@ int main(int argc, char* argv[])
 		manuData.m_gamma =	IBK::string2valChecked<double>(argv[7]);
 		manuData.m_nSer =	IBK::string2valChecked<int>(argv[8]);
 		manuData.m_refTemp =	IBK::string2valChecked<double>(argv[9]);
-	}
-	catch (IBK::Exception  &ex) {
-		std::cout << "PV-Data invalid!" << std::endl;
-		std::cout << ex.what() << std::endl;
-		return EXIT_FAILURE;
-	}
 
-	//material is not taken into account yet; Default monoSi
-	if(std::strcmp(argv[10], "monoSi")==0){
-		manuData.m_material = 0;
-	}
-	else {
-		manuData.m_material = 0;
-	}
-
-	//finished read PV module data
-	//read temperature and radiation data
-	IBK::UnitVector tempVec, radVec, pvEnergyVec;
-	try {
-		IBK::Path path;
-		if(std::strcmp(argv[11], "-f") == 0){
-			path = IBK::Path(argv[12]);
-
-			extractDataFromD6Results(path, tempVec, radVec);
+		// TODO : material is not taken into account yet; Default monoSi
+		if (args.args()[10] == "monoSi") {
+			manuData.m_material = 0;
 		}
 		else {
-			try {
-				tempVec.set(1,IBK::string2val<double>(argv[11]), "K");
-				radVec.set(1,IBK::string2val<double>(argv[12]), "W/m2");
-			} catch (IBK::Exception  &ex) {
-				std::cout << "Temperature or radiation invalid!" << std::endl;
-				std::cout << ex.what() << std::endl;
-				ex.writeMsgStackToError();
-				return EXIT_FAILURE;
-			}
+			manuData.m_material = 0;
 		}
 
-	} catch (IBK::Exception &ex) {
-		std::cout << ex.what() << std::endl;
-	}
-
-	tempVec.convert(IBK::Unit("K"));
-	radVec.convert(IBK::Unit("W/m2"));
-	pvEnergyVec.m_unit = IBK::Unit("W");
-
-	//Calculation of physical PV data
-	try {
+		// compute derived parameters, may throw an exception
 		pvtool.calcPhysicalParameterFromManufactureData();
-		pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, pvEnergyVec.m_data);
-
-	} catch (IBK::Exception  &ex) {
-		std::cout << "PV calculation did not succeed!" << std::endl;
-		std::cout << ex.what() << std::endl;
+	}
+	catch (IBK::Exception  &ex) {
 		ex.writeMsgStackToError();
+		IBK::IBK_Message("Invalid PV-data provided as command line arguments.", IBK::MSG_ERROR, FUNC_ID);
 		return EXIT_FAILURE;
 	}
-	writeResultData(IBK::Path("c:/temp/"), pvEnergyVec);
 
-	std::cout << "Program Exit" << std::endl;
 
+	// read temperature and radiation data from d6o files
+	IBK::UnitVector tempVec, radVec, pvEnergyVec;
+	if (args.hasOption('f')) {
+		try {
+			// attempt to read input data from d6o files in given directory
+			extractDataFromD6Results(IBK::Path(args.option('f')), tempVec, radVec);
+			// convert to required unit (may throw if source unit mismatches)
+			tempVec.convert(IBK::Unit("K"));
+			radVec.convert(IBK::Unit("W/m2"));
+			pvEnergyVec.m_unit = IBK::Unit("W");
+			pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, pvEnergyVec.m_data);
+			// calculation of physical PV data
+			writeResultData(IBK::Path("c:/temp/"), pvEnergyVec);
+		}
+		catch (IBK::Exception &ex) {
+			ex.writeMsgStackToError();
+			IBK::IBK_Message("Error during energy calculation!", IBK::MSG_ERROR, FUNC_ID);
+			return EXIT_FAILURE;
+		}
+	}
+	else {
+		double temp, rad;
+		try {
+			temp = IBK::string2valChecked<double>(args.args()[11]); // K
+			rad = IBK::string2valChecked<double>(args.args()[12]); // W/m2
+		}
+		catch (IBK::Exception  &ex) {
+			ex.writeMsgStackToError();
+			IBK::IBK_Message("Temperature or radiation invalid on command line!", IBK::MSG_ERROR, FUNC_ID);
+			return EXIT_FAILURE;
+		}
+		// calculation for a single value
+		try {
+			double pvEnergy = pvtool.calcPVEnergy(temp, rad);
+			// for scalar value variant, dump out result in english number format onto the console
+			std::cout << pvEnergy << std::endl;
+		}
+		catch (IBK::Exception  &ex) {
+			ex.writeMsgStackToError();
+			IBK::IBK_Message("Error during energy calculation!", IBK::MSG_ERROR, FUNC_ID);
+			return EXIT_FAILURE;
+		}
+	}
 
 	return EXIT_SUCCESS;
 }
