@@ -1,0 +1,23 @@
+D6MARLZ! 006.001
+
+[IDENTIFICATION]
+  NAME                     = DE: Polytetrafluorethylenkunststoffe (PTFE) |EN: Polytetrafluoroethylene (PTFE) |IT: Politetrafluoroetilene (PTFE)
+  AQUISITION_ID            = 764
+  PRODUCER                 = DE: DIN EN ISO 10456:2010-05 |EN: DIN EN ISO 10456:2010-05 |IT: DIN EN ISO 10456:2010-05
+  LABORATORY               = DE: Literatur |EN: Literature |IT: Letteratura
+  DATE                     = 13.10.2017
+  COLOUR                   = #ffaaaa00
+  FLAGS                    = AIR_TIGHT VAPOR_TIGHT WATER_TIGHT 
+  CATEGORY                 = MISC
+  DBTYPE                   = 1,4,5,7,21
+  HATCHING                 = 13
+
+
+[STORAGE_BASE_PARAMETERS]
+  RHO                      = 2200 kg/m3
+  CE                       = 1000 J/kgK
+
+
+[TRANSPORT_BASE_PARAMETERS]
+  LAMBDA                   = 0.25 W/mK
+

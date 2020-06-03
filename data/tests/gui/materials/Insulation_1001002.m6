@@ -1,0 +1,21 @@
+D6MARLZ! 006.001
+
+[IDENTIFICATION]
+  NAME                     = DE: Insulation
+  AQUISITION_ID            = -1
+  PRODUCER                 = DE: PVTool
+  PRODUCT_ID               = DE: PVTool
+  DATE                     = 02.06.20
+  COLOUR                   = #ff5020a0
+  CATEGORY                 = INSULATION
+  HATCHING                 = 13
+
+
+[STORAGE_BASE_PARAMETERS]
+  RHO                      = 35 kg/m3
+  CE                       = 35 J/kgK
+
+
+[TRANSPORT_BASE_PARAMETERS]
+  LAMBDA                   = 0.035 W/mK
+

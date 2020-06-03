@@ -1,0 +1,28 @@
+D6MARLZ! 006.001
+
+[IDENTIFICATION]
+  NAME                     = DE: Aluminium-Folie |EN: Aluminium Foil |IT: Foglio d'alluminio |RU: Алюминивая фольга
+  AQUISITION_ID            = -1
+  LABORATORY               = DE: Literatur |EN: Literature |IT: Letteratura |RU: Литертура
+  DATE                     = 27.01.17
+  COLOUR                   = #ff404060
+  FLAGS                    = AIR_TIGHT VAPOR_TIGHT WATER_TIGHT 
+  CATEGORY                 = FOILS MISC
+  DBTYPE                   = 1,4,5,7,8
+  HATCHING                 = 13
+
+
+[STORAGE_BASE_PARAMETERS]
+  RHO                      = 2800 kg/m3
+  CE                       = 897 J/kgK
+  THETA_POR                = 2e-06 m3/m3
+  THETA_EFF                = 1.5e-06 m3/m3
+  THETA_80                 = 1e-08 m3/m3
+
+
+[TRANSPORT_BASE_PARAMETERS]
+  LAMBDA                   = 235 W/mK
+  AW                       = 0 kg/m2s05
+  MEW                      = 10000 -
+  KLEFF                    = 0 s
+

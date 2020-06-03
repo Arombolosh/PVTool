@@ -1,0 +1,30 @@
+D6MARLZ! 006.001
+
+[IDENTIFICATION]
+  NAME                     = DE: Glas |EN: Glass |IT: Vetro |RU: Стекло
+  AQUISITION_ID            = -1
+  LABORATORY               = DE: Literatur Annex 14 Vol 3 |EN: Literature Annex 14 Vol 3 |IT: Letteratura Annex 14 Vol 3 |RU: Литература Annex 14 том 3
+  DATE                     = 08.04.14
+  COLOUR                   = #ff404060
+  FLAGS                    = AIR_TIGHT VAPOR_TIGHT WATER_TIGHT 
+  CATEGORY                 = MISC
+  COMMENTS                 = DE: Spiegelglas und Fensterglas |EN: Plate and sheet glass |IT: Vetro per specchi e vetro per finestre |RU: Зеркальное и оконное стекло
+  DBTYPE                   = 1,4,5,7,21
+  HATCHING                 = 13
+
+
+[STORAGE_BASE_PARAMETERS]
+  RHO                      = 2400 kg/m3
+  CE                       = 1000 J/kgK
+  THETA_POR                = 1.6e-06 m3/m3
+  THETA_EFF                = 1.5e-06 m3/m3
+  THETA_CAP                = 1.4e-06 m3/m3
+  THETA_80                 = 1.5e-08 m3/m3
+
+
+[TRANSPORT_BASE_PARAMETERS]
+  LAMBDA                   = 0.8 W/mK
+  AW                       = 1e-06 kg/m2s05
+  MEW                      = 200000 -
+  KLEFF                    = 0 s
+
