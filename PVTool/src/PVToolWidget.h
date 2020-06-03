@@ -18,6 +18,8 @@ public:
 private slots:
 	void on_radioButton_WeatherComboBox_toggled(bool checked);
 
+	void on_radioButton_PVDatabase_toggled(bool checked);
+
 private:
 	Ui::PVToolWidget *ui;
 };
