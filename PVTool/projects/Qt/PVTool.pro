@@ -32,13 +32,15 @@ RESOURCES += \
 
 SOURCES += \
 	../../src/PCM_Material.cpp \
-	../../src/PVT_DebugApplication.cpp \
+	../../src/PVTButtonBar.cpp \
+	../../src/PVTDebugApplication.cpp \
 	../../src/PVToolWidget.cpp \
 	../../src/main.cpp
 
 HEADERS += \
 	../../src/PCM_Material.h \
-	../../src/PVT_DebugApplication.h \
+	../../src/PVTButtonBar.h \
+	../../src/PVTDebugApplication.h \
 	../../src/PVToolWidget.h
 
 FORMS += \

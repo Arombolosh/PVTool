@@ -82,8 +82,6 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP30"));
 	//einschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(false);
-
-
 }
 
 PVToolWidget::~PVToolWidget()

@@ -3,8 +3,6 @@
 #include <MM_Material.h>
 
 
-
-
 void PCM_Material::createM6File(const IBK::Path &path )
 {
 	readInputs();

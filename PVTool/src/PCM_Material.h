@@ -4,8 +4,7 @@
 #include <IBK_Parameter.h>
 #include <IBK_LinearSpline.h>
 
-class PCM_Material
-{
+class PCM_Material {
 public:
 
 	enum Parameters{

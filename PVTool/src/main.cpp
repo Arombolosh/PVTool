@@ -7,7 +7,7 @@
 #include <IBK_configuration.h>
 #include <IBK_ArgParser.h>
 
-#include "PVT_DebugApplication.h"
+#include "PVTDebugApplication.h"
 #include "PVToolWidget.h"
 
 #include <memory>

@@ -1,4 +1,4 @@
-#include "PVT_DebugApplication.h"
+#include "PVTDebugApplication.h"
 
 #include <IBK_Exception.h>
 #include <IBK_messages.h>
