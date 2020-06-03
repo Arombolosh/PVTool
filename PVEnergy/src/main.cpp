@@ -33,8 +33,8 @@ void helpDocumentation(){
 
 void extractDataFromD6Results(const IBK::Path & path, IBK::UnitVector &temp, IBK::UnitVector &rad){
 	//ToDo hier müssen die richtigen Datei geladen werden
-	temp = readDataIO( path /"results/temp.d6o");
-	rad = readDataIO(path / "results/rad.d6o");
+	temp = readDataIO( path /"results/TMean.d6o");
+	rad = readDataIO(path / "results/GlobalRadition.d6o");
 	temp.convert(IBK::Unit("K"));
 	rad.convert(IBK::Unit("W/m2"));
 /*
@@ -66,6 +66,7 @@ void extractDataFromD6Results(const IBK::Path & path, IBK::UnitVector &temp, IBK
 }
 
 void writeResultData(const IBK::Path &path, const IBK::UnitVector &result){
+	std::cout<< "write d6o files."  <<std::endl;
 	DATAIO::DataIO data;
 	std::vector<std::vector<double>> resDataIO(result.size());
 	for(size_t i=0; i<result.size(); ++i){
@@ -101,6 +102,7 @@ int main(int argc, char* argv[]) {
 
 	//flags for bool
 	args.addFlag('v', "version", "Displays current version");
+	//args.addFlag('f', "path", "Displays current version");
 
 	args.parse(argc, argv);
 
@@ -117,7 +119,7 @@ int main(int argc, char* argv[]) {
 	// set message verbosity level
 	try {
 		int verbosityLevel = IBK::string2valChecked<int>(args.option("verbosity-level"));
-		IBK::MessageHandlerRegistry::instance().messageHandler()->setConsoleVerbosityLevel(verbosityLevel);
+		IBK::MessageHandlerRegistry::instance().messageHandler()->setConsoleVerbosityLevel(3/*verbosityLevel*/);
 	} catch (IBK::Exception & ex) {
 		ex.writeMsgStackToError();
 		IBK::IBK_Message("Invalid argument to 'verbosity-level'.", IBK::MSG_ERROR, FUNC_ID);
@@ -133,7 +135,7 @@ int main(int argc, char* argv[]) {
 
 	// case filepath?
 	if (args.hasOption('f')) {
-		if (args.args().size() != 12 ) {
+		if (args.args().size() != 11 ) {
 			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -f=<> option. Use --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
 		}

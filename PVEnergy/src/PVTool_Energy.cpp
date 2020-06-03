@@ -54,6 +54,7 @@ void Energy::calcPhysicalParameterFromManufactureData(double eps) {
 double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	FUNCID(Energy::calcPVEnergy);
 
+	IBK::IBK_Message(IBK::FormatString("pMax (MPP) [W]\tvoltage [V]\tcurrent [A]\n"),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 	//not enough radiation
 	if (rad<=5){
 		IBK::IBK_Message(IBK::FormatString("%1\t%2\t%3\n").arg(0).arg(0).arg(0),IBK::MSG_PROGRESS, FUNC_ID,IBK::VL_DEVELOPER);
@@ -77,13 +78,13 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	double volt = -0.01;
 	double eps =1E-10;
 
-	IBK::IBK_Message(IBK::FormatString("pMax (MPP) [W]\tvoltage [V]\tcurrent [A]\n"),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 
 
 	double uMpp=volt;				//Save Voltage at Maximum Power
 	double iMpp=current;			//Save Current at Maximum Power
-	for (size_t j=0; j<int(2*m_manuData.m_voc / 0.01); ++j) {
-		volt += 0.01;
+	double stepInc = 0.1;
+	for (size_t j=0; j<int(2*m_manuData.m_voc / stepInc); ++j) {
+		volt += stepInc;
 		for(size_t i= 0; i<1000; ++i)
 		{
 			double i0 = current;
@@ -99,11 +100,11 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 
 		if (pMax>P) {//std::abs(Pold - Pmax) < 0.0001  ) { //Wenn neues Maximum gefunden wurde
 
-			IBK::IBK_Message(IBK::FormatString("pMax = %1 \tuMpp = %2 \tiMpp = 3\n").arg(pMax).arg(uMpp).arg(iMpp),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
+			IBK::IBK_Message(IBK::FormatString("pMax = %1 \tuMpp = %2 \tiMpp = %3\n").arg(pMax).arg(uMpp).arg(iMpp),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DETAILED);
 
 			break;
 		}
-		IBK::IBK_Message(IBK::FormatString("P = %1 \tvolt = %2 \tcurrent = 3\n").arg(P).arg(volt).arg(current),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
+		IBK::IBK_Message(IBK::FormatString("P = %1 \tvolt = %2 \tcurrent = %3\n").arg(P).arg(volt).arg(current),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 
 		uMpp=volt;  //Save Voltage at Maximum Power
 		iMpp=current;  //Save Current at Maximum Power
