@@ -2,11 +2,15 @@
 #include <limits>
 
 #include <IBK_assert.h>
+#include <IBK_messages.h>
+#include <IBK_ArgParser.h>
 #include <DATAIO_DataIO.h>
 
 #include "PVTool_Energy.h"
 
-#include "PCM_Material.h"
+//#include "PCM_Material.h"
+
+const char * const LONG_VERSION = "1.0.0";
 
 IBK::UnitVector readDataIO(const IBK::Path &filename){
 	DATAIO::DataIO data;
@@ -85,6 +89,29 @@ void writeResultData(const IBK::Path &path, const IBK::UnitVector &result){
 
 int main(int argc, char* argv[])
 {
+	IBK::ArgParser args;
+
+
+
+	args.m_appname = "PVEnergy";
+	//option for values double, string, etc.
+	args.addOption('p', "path", "Input path for d6o result files.", "","");
+	//flags for bool
+	args.addFlag('v', "version", "Displays current version");
+	args.addFlag('e', "enable", "enables something", "true");
+
+	args.parse(argc, argv);
+
+	//help
+	if(args.handleDefaultFlags(std::cout)){
+		return EXIT_SUCCESS;
+	}
+
+	if(args.flagEnabled('v')){
+		IBK::IBK_Message(IBK::FormatString("PVEnergy version: %1 \n").arg(LONG_VERSION));
+		return EXIT_SUCCESS;
+	}
+
 	//32.24 9.27 39.75 9.76 0.00013 -0.0031 -0.41 60 298.15 monoSi 30 300
 
 	//PCM_Material pcm;
