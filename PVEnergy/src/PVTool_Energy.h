@@ -2,13 +2,13 @@
 #define PVTOOL_ENERGY_H
 
 #include <IBK_UnitVector.h>
+
 #include <6par_solve.h>
 
 namespace PVTool {
 
-
-class Energy
-{
+/*! Utility class to calculate */
+class Energy {
 public:
 	/*! Manufacture dataset for PV module under STC.*/
 	struct ManufactureData{
@@ -58,21 +58,36 @@ public:
 	};
 
 
-	/*! Produces calculation parameters from manufacture dataset for pv-module. Returns the errors from the SAM-Lib.
-		0 -> no errors. */
+	/*! Produces calculation parameters from manufacture dataset for pv-module.
+		In case of errors, throws an IBK::Exception.
+	*/
 	void calcPhysicalParameterFromManufactureData( double eps = 1E-7);
 
+	/*! Calculates the electrical energy in [W] for a given temperature and solar radiation load.
+		This function is called from calcPVEnergy().
+
+		\param absTol Absolute temperature [K]
+		\param rad Imposed radiation on the PV module. [W/m2]
+
+		\return Returns usable energy in [W].
+	*/
+	double calcPVEnergy(double absTemp, double rad) const;
+
 	/*! Calculates the produced energy of the PV module for all timepoints
-	 *	inputs:
-	 *		absolute temperature [K]
-	 *		radiation imposed on the PV module. [W/m2]*/
+		\param absTol absolute temperature [K]
+		\param rad imposed radiation on the PV module. [W/m2]
+		\param energyPV Computed usable energy in [W].
+	*/
 	void calcPVEnergy(const std::vector<double> &absTemp, const std::vector<double> &rad, std::vector<double> &energyPV) const;
 
 	ManufactureData				m_manuData;			///< manufacture dataset for pv module
 	PhysicalDataPV				m_pvData;			///< pv calculation parameters for physical equation
+
 private:
 
 };
-}
+
+
+} // namespace PVTool
 
 #endif // PVTOOL_ENERGY_H
