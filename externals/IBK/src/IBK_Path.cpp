@@ -1378,6 +1378,7 @@ bool Path::remove(const IBK::Path & p, bool quiet) {
 #else
 
 	// delete path
+	// TODO : use posix rm function
 	IBK::FormatString cmd("rm -rf \"%1\"");
 	std::string str = cmd.arg(p).str();
 	if ( std::system( str.c_str() ) )
@@ -1405,10 +1406,12 @@ bool Path::copy(const IBK::Path & source, const IBK::Path & target){
 	if ( source.isFile() ) {
 
 		// check if target allready exists
+#ifdef IBK_PATH_WARN_IF_OVERWRITING
 		if ( target.exists() && target.isFile() ){
-			/// \todo think about this code
+			// This should be a warning with lower message verbosity
 			IBK::IBK_Message( IBK::FormatString("We will overwrite %1").arg(target), MSG_WARNING, FUNC_ID );
 		}
+#endif //  IBK_PATH_WARN_IF_OVERWRITING
 
 		if ( target.exists() && target.isDirectory() ){
 

@@ -50,6 +50,9 @@ extern const char * const VERSION;
 /*! The seconds in each of the twelve months. */
 extern unsigned int SECONDS_PER_MONTH[12];
 
+/*! The seconds up to the given month. */
+extern unsigned int SECONDS_UNTIL_MONTH[12];
+
 /*! The abbreviated names of the months for date In/Output. */
 extern const char * const MONTH_NAMES[12];
 
@@ -80,8 +83,8 @@ enum materialDBTypes {
 
 /*! Default placeholder name to be used to reference the project directory. */
 extern const char * const PLACEHOLDER_PROJECT_DIR;
-/*! Default placeholder name to be used to reference the root directory of all databases. */
-extern const char * const PLACEHOLDER_DATABASE_ROOT;
+/*! Default placeholder name to be used to reference the installation location of the GUI/solver binary. */
+extern const char * const PLACEHOLDER_INSTALL_DIR;
 /*! Default placeholder name to be used to reference the material database directory. */
 extern const char * const PLACEHOLDER_MATERIALS_DIR;
 /*! Default placeholder name to be used to reference the climate database directory. */

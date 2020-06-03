@@ -144,6 +144,8 @@ void set_console_text_color(ConsoleColor c);
 			for IBK-Message system.
 */
 
+extern const char * const TERMINAL_CODES[16];
+
 } // namespace IBK
 
 #endif // IBK_messagesH

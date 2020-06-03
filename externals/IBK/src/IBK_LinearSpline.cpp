@@ -244,9 +244,9 @@ double LinearSpline::value(double x) const {
 	// thus testing this is not sufficient in make spline, and we need to fix the implementation right here if
 	// new types are added to ExtrapolationMethod enum
 //	if (m_extrapolationMethod > EM_Constant) {
-	IBK_ASSERT_X( (m_extrapolationMethod <= EM_Constant), "Invalid or unknown extrapolation method!" )
+	IBK_ASSERT_X( (m_extrapolationMethod <= EM_Constant), "Invalid or unknown extrapolation method!" );
 //	}
-	IBK_ASSERT_X( m_valid, "Linear spline not properly initialized. Call makeSpline() first!" )
+	IBK_ASSERT_X( m_valid, "Linear spline not properly initialized. Call makeSpline() first!" );
 
 	if (m_xStep != 0) {
 		if (x>m_xMax) {
@@ -296,7 +296,7 @@ double LinearSpline::value(double x) const {
 
 double LinearSpline::nonInterpolatedValue(double x) const {
 
-	IBK_ASSERT_X( m_valid, "Linear spline not properly initialized. Call makeSpline() first!" )
+	IBK_ASSERT_X( m_valid, "Linear spline not properly initialized. Call makeSpline() first!" );
 
 	if (m_x.size() == 1)
 		return m_y[0];

@@ -208,6 +208,12 @@ void Time::decomposeTOY(unsigned int& day, unsigned int & hour, unsigned int & m
 // ---------------------------------------------------------------------------
 
 
+double Time::secondsUntil(const Time& other) const {
+	return other.m_sec - m_sec + (other.m_year - m_year)*SECONDS_PER_YEAR;
+}
+// ---------------------------------------------------------------------------
+
+
 Time& Time::operator-=(const Time& rhs) {
 	// convert this->m_year to rhs.m_year
 	while (m_year < rhs.m_year) {
@@ -541,6 +547,27 @@ IBK::Time Time::fromDateTimeFormat(const std::string & formatted_time) {
 // ---------------------------------------------------------------------------
 
 
+IBK::Time Time::fromDateTimeFormat2(const std::string & formatted_time) {
+	// parse full date format
+	std::string str = formatted_time;
+	std::replace(str.begin(), str.end(), ':', ' ');
+	std::replace(str.begin(), str.end(), '-', ' ');
+	std::stringstream strm(str);
+
+	int day;
+	int month;
+	int year;
+	int hour, min, sec;
+	if (strm >> year >> month >> day >> hour >> min >> sec) {
+		--day;
+		--month;
+		return IBK::Time(year, month, day, hour*3600 + min*60 + sec);
+	}
+	return IBK::Time();
+}
+// ---------------------------------------------------------------------------
+
+
 IBK::Time Time::fromTOY(const std::string & formatted_time, TOYFormat format) {
 	std::string str = formatted_time;
 	std::replace(str.begin(), str.end(), ':', ' ');
@@ -609,6 +636,155 @@ IBK::Time Time::fromTOY(const std::string & formatted_time, TOYFormat format) {
 }
 // ---------------------------------------------------------------------------
 
+Time::TimeFormatInfo Time::formatInfo(const std::string& format) {
+	Time::TimeFormatInfo res;
+	const char* strOrg = format.c_str();
+	const char* str = format.c_str();
+	while(*str != '\0') {
+		if(*str == 'y' && res.m_year4Start == -1 && res.m_year2Start == -1) {
+			int start = (int)(str - strOrg);
+			int i=1;
+			while(*(++str) == 'y') ++i;
+			if(i == 4)
+				res.m_year4Start = start;
+			if(i == 2)
+				res.m_year2Start = start;
+		}
+		if(*str == 'M' && res.m_monthStart == -1) {
+			int start = (int)(str - strOrg);
+			int i=1;
+			while(*(++str) == 'M') ++i;
+			if(i == 2)
+				res.m_monthStart = start;
+		}
+		if(*str == 'd' && res.m_dayStart == -1) {
+			int start = (int)(str - strOrg);
+			int i=1;
+			while(*(++str) == 'd') ++i;
+			if(i == 2)
+				res.m_dayStart = start;
+		}
+		if(*str == 'h' && res.m_hourStart == -1) {
+			int start = (int)(str - strOrg);
+			int i=1;
+			while(*(++str) == 'h') ++i;
+			if(i == 2)
+				res.m_hourStart = start;
+		}
+		if(*str == 'm' && res.m_minuteStart == -1) {
+			int start = (int)(str - strOrg);
+			int i=1;
+			while(*(++str) == 'm') ++i;
+			if(i == 2)
+				res.m_minuteStart = start;
+		}
+		if(*str == 's' && res.m_secondStart == -1) {
+			int start = (int)(str - strOrg);
+			int i=1;
+			while(*(++str) == 's') ++i;
+			if(i == 2)
+				res.m_secondStart = start;
+		}
+
+		++str;
+	}
+	if(res.m_year4Start > -1 && res.m_year2Start > -1)
+		return Time::TimeFormatInfo();
+	return res;
+}
+
+Time Time::fromString(const std::string & formatted_time, const TimeFormatInfo& formatInfo, bool useLeapYear) {
+	if(!formatInfo.valid())
+		return Time();
+
+	Time result;
+
+	const char* str = formatted_time.c_str();
+	while(isspace(*str)) ++str;
+	const char* strStart = str;
+	if(formatInfo.m_year4Start > -1) {
+		str += formatInfo.m_year4Start;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		char ch3 = *(str+2);
+		char ch4 = *(str+3);
+		if(!isdigit(ch1) || !isdigit(ch2) || !isdigit(ch3) || !isdigit(ch4))
+			return Time();
+		result.m_year = (ch1 - 48) * 1000 + (ch2 - 48) * 100 + (ch3 - 48) * 10 + (ch4 - 48);
+	}
+	str = strStart;
+	if(formatInfo.m_year2Start > -1) {
+		str += formatInfo.m_year2Start;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		if(!isdigit(ch1) || !isdigit(ch2))
+			return Time();
+		result.m_year = 2000 + (ch1 - 48) * 10 + (ch2 - 48);
+	}
+	str = strStart;
+
+	if(formatInfo.m_monthStart > -1) {
+		str += formatInfo.m_monthStart;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		if(!isdigit(ch1) || !isdigit(ch2))
+			return Time();
+		int month = (ch1 - 48) * 10 + (ch2 - 48);
+		if(month > 1) {
+			result.m_sec += SECONDS_UNTIL_MONTH[month-1];
+			if(month > 2 && useLeapYear)
+				result.m_sec += 86400;
+		}
+	}
+	str = strStart;
+
+	if(formatInfo.m_dayStart > -1) {
+		str += formatInfo.m_dayStart;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		if(!isdigit(ch1) || !isdigit(ch2))
+			return Time();
+		int day = (ch1 - 48) * 10 + (ch2 - 48) - 1;
+		result.m_sec += day * 86400;
+	}
+	str = strStart;
+
+	if(formatInfo.m_hourStart > -1) {
+		str += formatInfo.m_hourStart;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		if(!isdigit(ch1) || !isdigit(ch2))
+			return Time();
+		int hour = (ch1 - 48) * 10 + (ch2 - 48);
+		result.m_sec += hour * 3600;
+	}
+	str = strStart;
+
+	if(formatInfo.m_minuteStart > -1) {
+		str += formatInfo.m_minuteStart;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		if(!isdigit(ch1) || !isdigit(ch2))
+			return Time();
+		int minute = (ch1 - 48) * 10 + (ch2 - 48);
+		result.m_sec += minute * 60;
+	}
+	str = strStart;
+
+	if(formatInfo.m_secondStart > -1) {
+		str += formatInfo.m_secondStart;
+		char ch1 = *str;
+		char ch2 = *(str+1);
+		if(!isdigit(ch1) || !isdigit(ch2))
+			return Time();
+		int seconds = (ch1 - 48) * 10 + (ch2 - 48);
+		result.m_sec += seconds;
+	}
+	str = strStart;
+
+	return result;
+}
+
 
 // *** STATIC FUNCTIONS ***
 
@@ -674,6 +850,7 @@ const char * Time::suitableSpeedUnit(double sec) {
 	return "s/s";
 }
 // ---------------------------------------------------------------------------
+
 
 std::string Time::dateRFC2822(const std::string& timeFormat ) {
 	const char * const FUNC_ID = "[Time::dateRFC2822]";
@@ -771,9 +948,6 @@ Time Time::operator+(double s) const {
 	return newTime+=(s);
 }
 
-double Time::operator-(const Time& rhs) {
-	return m_sec - rhs.m_sec + (m_year - rhs.m_year)*SECONDS_PER_YEAR;
-}
 
 */
 
