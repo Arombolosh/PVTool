@@ -27,12 +27,10 @@
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 
 # IBK Git-ignore
-/bin/
 debug/
 debug_x64/
 release/
@@ -41,14 +39,6 @@ lib_x64/
 lib/
 moc/
 ui/
-build*/
-cmake_local/
-VC8/
-VC9/
-VC10/
-VC12/
-VC14/
-BCB2007/
 .svn/
 
 Makefile.Debug
@@ -63,4 +53,3 @@ Makefile
 *.autosave
 *.lib
 *.pdb
-/externals/lib_x64/
