@@ -91,8 +91,6 @@ int main(int argc, char* argv[])
 {
 	IBK::ArgParser args;
 
-
-
 	args.m_appname = "PVEnergy";
 	//option for values double, string, etc.
 	args.addOption('p', "path", "Input path for d6o result files.", "","");
@@ -129,8 +127,8 @@ int main(int argc, char* argv[])
 		helpDocumentation();
 	}
 	else {
-		PVTool::Energy pvtool;
-		PVTool::Energy::ManufactureData &manuData = pvtool.m_manuData;
+		PVTOOL::Energy pvtool;
+		PVTOOL::Energy::ManufactureData &manuData = pvtool.m_manuData;
 		//read PV module data
 		try {
 			manuData.m_vmp =	IBK::string2val<double>(argv[1]);

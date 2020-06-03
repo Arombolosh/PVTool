@@ -5,7 +5,7 @@
 
 #include <6par_solve.h>
 
-namespace PVTool {
+namespace PVTOOL {
 
 /*! Utility class to calculate */
 class Energy {
@@ -58,6 +58,9 @@ public:
 	};
 
 
+	/*! C'tor. */
+	Energy();
+
 	/*! Produces calculation parameters from manufacture dataset for pv-module.
 		In case of errors, throws an IBK::Exception.
 	*/
@@ -71,7 +74,7 @@ public:
 
 		\return Returns usable energy in [W].
 	*/
-	double calcPVEnergy(double absTemp, double rad) const;
+	double calcPVEnergy(double absTemp, double rad, double airMass = 1.5) const;
 
 	/*! Calculates the produced energy of the PV module for all timepoints
 		\param absTol absolute temperature [K]
@@ -84,10 +87,20 @@ public:
 	PhysicalDataPV				m_pvData;			///< pv calculation parameters for physical equation
 
 private:
+	//Bedingungen nach Reference Modell
+	//jetzt grad STC
+
+	double m_radiationRef		= 1000;		//in W/m2
+	double m_cellTemperatureRef = 25+273.15;	// in K
+	double m_airMassRef			= 1.5;			//AM: 1,5 (AM stands for Air Mass, the thickness of the atmosphere; at the equator, air mass = 1, in Europe approx. 1,5)
+
+	//constants
+	double m_sigma				= 8.617333262E-5;					//Boltzmann Konstante in eV/K
+	double m_egRef = module6par().bandgap();			//Materialabhängig ToDo Katja
 
 };
 
 
-} // namespace PVTool
+} // namespace PVTOOL
 
 #endif // PVTOOL_ENERGY_H
