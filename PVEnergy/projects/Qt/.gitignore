@@ -1,3 +1,5 @@
 *.pro.user
 /build-*
 /Makefile.PVEnergy
+/Makefile.PVEnergy.Debug
+/Makefile.PVEnergy.Release

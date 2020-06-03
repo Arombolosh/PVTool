@@ -1,3 +1,5 @@
 *.pro.user
 /DataIO.pro.user
 /Makefile.DataIO
+/Makefile.DataIO.Debug
+/Makefile.DataIO.Release
