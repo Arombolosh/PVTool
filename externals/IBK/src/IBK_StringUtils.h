@@ -188,6 +188,22 @@ T string2val(const std::string& str) {
 }
 
 /*! Attempts to extract a numerical value from a string.
+	\code
+	double val = string2val<double>("2.5");
+	\endcode
+*/
+template <class T>
+T string2valChecked(const std::string& str) {
+	T val;
+	if (str=="1.#QNAN")
+		return std::numeric_limits<T>::quiet_NaN();
+	std::stringstream strm(str);
+	if (!(strm >> val) || !strm.eof())
+		throw IBK::Exception(IBK::FormatString("Could not convert '%1' into value.").arg(str), "[string2valChecked]");
+	return val;
+}
+
+/*! Attempts to extract a numerical value from a string.
 	Returns the def value in case of non valid string.
 	\code
 	double val = string2val<double>("2.5", 0.0);

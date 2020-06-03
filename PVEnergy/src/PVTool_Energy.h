@@ -2,13 +2,13 @@
 #define PVTOOL_ENERGY_H
 
 #include <IBK_UnitVector.h>
+
 #include <6par_solve.h>
 
-namespace PVTool {
+namespace PVTOOL {
 
-
-class Energy
-{
+/*! Utility class to calculate */
+class Energy {
 public:
 	/*! Manufacture dataset for PV module under STC.*/
 	struct ManufactureData{
@@ -58,21 +58,49 @@ public:
 	};
 
 
-	/*! Produces calculation parameters from manufacture dataset for pv-module. Returns the errors from the SAM-Lib.
-		0 -> no errors. */
+	/*! C'tor. */
+	Energy();
+
+	/*! Produces calculation parameters from manufacture dataset for pv-module.
+		In case of errors, throws an IBK::Exception.
+	*/
 	void calcPhysicalParameterFromManufactureData( double eps = 1E-7);
 
+	/*! Calculates the electrical energy in [W] for a given temperature and solar radiation load.
+		This function is called from calcPVEnergy().
+
+		\param absTol Absolute temperature [K]
+		\param rad Imposed radiation on the PV module. [W/m2]
+
+		\return Returns usable energy in [W].
+	*/
+	double calcPVEnergy(double absTemp, double rad, double airMass = 1.5) const;
+
 	/*! Calculates the produced energy of the PV module for all timepoints
-	 *	inputs:
-	 *		absolute temperature [K]
-	 *		radiation imposed on the PV module. [W/m2]*/
+		\param absTol absolute temperature [K]
+		\param rad imposed radiation on the PV module. [W/m2]
+		\param energyPV Computed usable energy in [W].
+	*/
 	void calcPVEnergy(const std::vector<double> &absTemp, const std::vector<double> &rad, std::vector<double> &energyPV) const;
 
 	ManufactureData				m_manuData;			///< manufacture dataset for pv module
 	PhysicalDataPV				m_pvData;			///< pv calculation parameters for physical equation
+
 private:
+	//Bedingungen nach Reference Modell
+	//jetzt grad STC
+
+	double m_radiationRef		= 1000;		//in W/m2
+	double m_cellTemperatureRef = 25+273.15;	// in K
+	double m_airMassRef			= 1.5;			//AM: 1,5 (AM stands for Air Mass, the thickness of the atmosphere; at the equator, air mass = 1, in Europe approx. 1,5)
+
+	//constants
+	double m_sigma				= 8.617333262E-5;					//Boltzmann Konstante in eV/K
+	double m_egRef = module6par().bandgap();			//Materialabhängig ToDo Katja
 
 };
-}
+
+
+} // namespace PVTOOL
 
 #endif // PVTOOL_ENERGY_H
