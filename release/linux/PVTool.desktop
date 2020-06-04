@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.1
+Type=Application
+Name=PVTool
+Icon=PVTool-0.1/resources/PVTool-64.png
+Path=PVTool-0.1/bin
+Exec=PVTool-0.1/bin/PVTool
+StartupNotify=false
+StartupWMClass=PVTool
+OnlyShowIn=Unity;
+X-UnityGenerated=true
+Name[de_DE]=PVTool 0.1
+

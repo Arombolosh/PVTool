@@ -1,0 +1,78 @@
+[Setup]
+Compression=lzma
+SolidCompression=true
+OutputDir=.
+UsePreviousAppDir=false
+UsePreviousGroup=false
+InternalCompressLevel=ultra
+
+AppName=PVTool 64-Bit
+AppVerName=PVTool ${Version} 64-Bit
+AppVersion=${LongVersion}
+DefaultDirName={pf}\IBK\PVTool ${Version}
+DefaultGroupName=IBK\PVTool ${Version} 64-Bit
+OutputBaseFilename=${OutputFileBasename}
+VersionInfoVersion=${LongVersion}
+VersionInfoDescription=PVTool 64-Bit
+UninstallDisplayIcon={app}\PVTool.exe
+
+AppPublisher=MasterSim Developers
+AppPublisherURL=https://github.com/Arombolosh/PVTool
+AppSupportURL=https://github.com/Arombolosh/PVTool
+AppUpdatesURL=https://github.com/Arombolosh/PVTool
+VersionInfoCompany=Bauklimatik Dresden
+VersionInfoCopyright=${CurrentYear} Andreas Nicolai
+AppCopyright=${CurrentYear} Andreas Nicolai
+LicenseFile=..\..\LICENSE
+ArchitecturesInstallIn64BitMode=x64
+
+
+[Files]
+
+; Program files
+Source: ..\..\bin\release_x64\PVTool.exe; DestDir: {app}
+Source: VC14_x64\msvcp140.dll; DestDir: {app}
+Source: VC14_x64\vcruntime140.dll; DestDir: {app}
+
+Source: VC14_x64\Qt5Core.dll; DestDir: {app}
+Source: VC14_x64\Qt5Gui.dll; DestDir: {app}
+Source: VC14_x64\Qt5Widgets.dll; DestDir: {app}
+
+Source: VC14_x64\platforms\qwindows.dll; DestDir: {app}\platforms
+Source: VC14_x64\styles\qwindowsvistastyle.dll; DestDir: {app}\styles
+
+; Translation files
+Source: ..\..\PVTool\resources\translations\*.qm; DestDir: {app}\resources\translations
+
+; Documentation
+
+; Examples
+Source: ..\..\data\examples\win64\*; DestDir: {app}\resources\examples; Flags: recursesubdirs
+
+; Auxiliary files
+Source: ..\..\doc\LICENSE ; DestDir: {app}\resources;
+
+
+[InstallDelete]
+Name: {app}; Type: filesandordirs
+
+[UninstallDelete]
+Name: {app}; Type: filesandordirs
+
+[Icons]
+Name: {group}\PVTool ${Version} 64-Bit; Filename: {app}\PVTool.exe; WorkingDir: {app}; IconIndex: 0
+
+[Registry]
+Root: HKCR; Subkey: .pvt; ValueType: string; ValueData: PVTool.Project; Flags: uninsdeletekey deletekey
+Root: HKCR; Subkey: PVTool.Project; ValueType: string; ValueData: PVTool Project File; Flags: uninsdeletekey deletekey
+Root: HKCR; Subkey: PVTool.Project\shell\open\command; ValueType: string; ValueData: """{app}\PVTool.exe"" ""%1"""; Flags: uninsdeletekey deletekey
+
+[Run]
+Filename: {app}\PVTool.exe; WorkingDir: {app}; Flags: postinstall unchecked; Description: Starte PVTool ${Version} 64-Bit; Languages: Deutsch
+Filename: {app}\PVTool.exe; WorkingDir: {app}; Flags: postinstall unchecked; Description: Run PVTool ${Version} 64-Bit; Languages: English
+
+[Languages]
+Name: English; MessagesFile: compiler:Default.isl
+Name: Deutsch; MessagesFile: compiler:Languages\German.isl
+
+
