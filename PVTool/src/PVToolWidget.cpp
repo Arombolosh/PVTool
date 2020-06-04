@@ -1,6 +1,7 @@
 #include "PVToolWidget.h"
 #include "ui_PVToolWidget.h"
 
+#include <QDebug>
 #include <QFileDialog>
 #include <QDoubleValidator>
 #include <QIntValidator>
@@ -329,10 +330,10 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	}
 	else {
 		m_progressDlg->setMaximum(m_waitingProjects.count());
-		m_progressDlg->show();
 	}
 	m_progressDlg->setValue(0);
 	m_progressDlg->setWindowModality(Qt::WindowModal);
+	m_progressDlg->show();
 	startNextDELPHINSim();
 }
 
@@ -347,8 +348,11 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 
 
 void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus status) {
-	if (status == QProcess::Crashed) {
-		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation."));
+	if (status == QProcess::Crashed || exitCode != 0) {
+		IBK::Path logFile(IBK::Path(m_completedProjects.back().toStdString()).withoutExtension() / "log/screenlog.txt");
+		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation, siehe Logdatei '%1'")
+							  .arg(QString::fromStdString(logFile.str())));
+		m_progressDlg->hide();
 		return;
 	}
 //	m_progressDlg->setValue(m_finis)
@@ -412,7 +416,7 @@ void PVToolWidget::startNextDELPHINSim() {
 	// configure process
 	if (m_cmdLineProcess == nullptr) {
 		m_cmdLineProcess = new QProcess(this);
-		connect(m_cmdLineProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT());
+		connect(m_cmdLineProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(onSimulationJobFinished(int, QProcess::ExitStatus)));
 	}
 
 #ifdef Q_OS_LINUX
