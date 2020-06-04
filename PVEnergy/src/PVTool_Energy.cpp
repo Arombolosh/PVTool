@@ -14,7 +14,7 @@ void Energy::calcPhysicalParameterFromManufactureData(double eps) {
 
 	m_manuData.calcCoefficients();
 	//input parameters
-	module6par m6par(m_manuData.m_material,
+	module6par m6par(module6par::monoSi,
 					 m_manuData.m_vmp,
 					 m_manuData.m_imp,
 					 m_manuData.m_voc,

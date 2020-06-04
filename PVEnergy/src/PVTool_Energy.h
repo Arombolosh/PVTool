@@ -16,6 +16,7 @@ public:
 		ManufactureData(){}
 
 		ManufactureData(double vmp, double imp, double voc, double isc, double alpha, double beta, double gamma, int nSer, std::string name):
+			m_material(module6par::monoSi),
 			m_vmp(vmp),
 			m_imp(imp),
 			m_voc(voc),
@@ -44,8 +45,8 @@ public:
 
 		/*! Calculates the coeff. alphaIsc and betaVoc */
 		void calcCoefficients(){
-			m_alphaIsc = m_alpha * m_isc;
-			m_betaVoc = m_beta * m_voc;
+			m_alphaIsc = m_alpha * m_isc*0.01;
+			m_betaVoc = m_beta * m_voc*0.01;
 		}
 
 		void testValues(){
@@ -54,8 +55,8 @@ public:
 			m_imp = 9.27;
 			m_voc = 39.75;
 			m_isc = 9.76;
-			m_alpha = 0.00043;
-			m_beta = -0.0031;
+			m_alpha = 0.043;
+			m_beta = -0.31;
 			m_gamma = -0.41;
 			m_nSer = 60;
 			m_refTemp = 25+273.15;
