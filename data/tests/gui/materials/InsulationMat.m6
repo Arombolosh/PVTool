@@ -1,0 +1,19 @@
+D6MARLZ! 006.001
+
+[IDENTIFICATION]
+  NAME                     = DE: Dämmung |EN: Insulation |FR: laine minérale |IT: Lana minerale |RU: Минеральная шерсть
+  LABORATORY               = EN: Generik
+  DATE                     = 04.06.20
+  COLOUR                   = #ff409020
+  FLAGS                    = WATER_TIGHT 
+  CATEGORY                 = INSULATION
+  HATCHING                 = 13
+
+
+[STORAGE_BASE_PARAMETERS]
+  RHO                      = ${RHO} kg/m3
+  CE                       = ${CE} J/kgK
+
+
+[TRANSPORT_BASE_PARAMETERS]
+  LAMBDA                   = ${LAMBDA} W/mK
