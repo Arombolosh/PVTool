@@ -9,7 +9,7 @@ User selects:
 - insulation material
 - PV panel (from database or using own parameters)
 
-Simulation predicts energy production (annual integral) for various PCM layer thicknesses and optimum of revenue increaes in contrast to increased installation costs.
+Simulation predicts energy production (annual integral) for various PCM layer thicknesses and determines optimum of revenue increase in contrast to installation costs.
 
 ## Directory Structure
 
