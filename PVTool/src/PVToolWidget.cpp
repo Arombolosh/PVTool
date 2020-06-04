@@ -10,6 +10,7 @@
 #include <QSettings>
 #include <QProcess>
 #include <QProgressDialog>
+#include <QLocale>
 
 #include <IBK_assert.h>
 
@@ -17,6 +18,31 @@
 
 #include "PVTConstants.h"
 #include "PVTDirectories.h"
+
+bool convertFromText(const QString & text, double & value) {
+	// try converting using the current locale
+	bool ok;
+	double val = QLocale().toDouble(text, &ok);
+	// if this didn't work, fall back to c-locale
+	if (!ok) {
+		val = text.toDouble(&ok);
+		// still no success?
+		if (!ok) {
+#if 0
+	// inform user of error
+			lineEdit->selectAll();
+			lineEdit->setFocus();
+			QMessageBox::critical(parent, QString(), tr("'%1' ist ein ungültiger Wert.").arg(text));
+#endif
+			return false;
+		}
+	}
+	value = val; // only store value if correctly parsed
+
+
+	return true;
+}
+
 
 PVToolWidget::PVToolWidget(QWidget *parent) :
 	QWidget(parent),
@@ -165,7 +191,7 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// Climate data file
 	// we need a project directory/working directory
-	IBK::Path weatherDirectory( (PVTDirectories::resourcesRootDir() + "/DB_climate").toStdString());
+	IBK::Path weatherDirectory( (PVTDirectories::resourcesRootDir() + "/DB_Climate").toStdString());
 	IBK::Path weatherPath;
 	QString workingDir = m_ui->lineEdit_Directory->text();
 	IBK::Path workingDirectory( workingDir.toStdString() );
@@ -192,7 +218,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	}
 	bool success = IBK::Path::copy(weatherPath, weatherTargetDir / weatherName);
 	if (!success) {
-		QMessageBox::critical(this, QString(), tr("Konnte Projektverzeichnis nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
+		QMessageBox::critical(this, QString(), tr("Konnte Klimadatei '%2' nicht ins Arbeitsverzeichnis '%1' kopieren.")
+							  .arg(QString::fromStdString(weatherTargetDir.str())).arg(QString::fromStdString(weatherPath.str())) );
 		return;
 	}
 	// TODO : check all the other input for meaningful values
@@ -355,8 +382,8 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 		m_progressDlg->hide();
 		return;
 	}
-//	m_progressDlg->setValue(m_finis)
-
+	m_progressDlg->setValue(m_completedProjects.size());
+	startNextDELPHINSim();
 }
 
 
