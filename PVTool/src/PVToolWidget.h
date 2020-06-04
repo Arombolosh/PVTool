@@ -68,6 +68,9 @@ private:
 	/*! Evaluate simulation results. */
 	void evaluateResults();
 
+	/*! Run PV energy calculation*/
+	void runPVEnergy();
+
 	Ui::PVToolWidget	*m_ui;
 
 	QProgressDialog		*m_progressDlg;
@@ -76,6 +79,13 @@ private:
 	/*! Contains list of all ready and discretized DELPHIN Projects to run (full file paths). */
 	QStringList			m_waitingProjects;
 	QStringList			m_completedProjects;
+
+	/*! PV module data. */
+	PVTOOL::Energy					m_pvtool;
+
+	/*! Delphin results.*/
+	std::vector<IBK::UnitVector>	m_temperature;
+	std::vector<IBK::UnitVector>	m_radiation;
 
 };
 

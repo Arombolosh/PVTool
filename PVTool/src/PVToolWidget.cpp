@@ -16,6 +16,8 @@
 
 #include <fstream>
 
+#include <DataIO>
+
 #include "PVTConstants.h"
 #include "PVTDirectories.h"
 
@@ -225,26 +227,25 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// TODO : check all the other input for meaningful values
 
 	// populate manufacturing data with input values
-	PVTOOL::Energy pvtool;
 	if (m_ui->radioButton_PVDatabase->isChecked()){
-		pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
+		m_pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
 	}
 	else {
 		// TODO : instead of toDouble() use locale-aware
-		pvtool.m_manuData.m_isc = m_ui->lineEdit_iSC->text().toDouble();
-		pvtool.m_manuData.m_imp = m_ui->lineEdit_iMPP->text().toDouble();
-		pvtool.m_manuData.m_vmp = m_ui->lineEdit_uMPP->text().toDouble();
-		pvtool.m_manuData.m_voc	 = m_ui->lineEdit_uOC->text().toDouble();
-		pvtool.m_manuData.m_alpha = m_ui->lineEdit_alpha->text().toDouble();
-		pvtool.m_manuData.m_beta = m_ui->lineEdit_beta->text().toDouble();
-		pvtool.m_manuData.m_gamma = m_ui->lineEdit_gamma->text().toDouble();
-		pvtool.m_manuData.m_nSer = m_ui->lineEdit_nSer->text().toInt();
-		pvtool.m_manuData.m_name = "UserInput";
+		m_pvtool.m_manuData.m_isc = m_ui->lineEdit_iSC->text().toDouble();
+		m_pvtool.m_manuData.m_imp = m_ui->lineEdit_iMPP->text().toDouble();
+		m_pvtool.m_manuData.m_vmp = m_ui->lineEdit_uMPP->text().toDouble();
+		m_pvtool.m_manuData.m_voc	 = m_ui->lineEdit_uOC->text().toDouble();
+		m_pvtool.m_manuData.m_alpha = m_ui->lineEdit_alpha->text().toDouble();
+		m_pvtool.m_manuData.m_beta = m_ui->lineEdit_beta->text().toDouble();
+		m_pvtool.m_manuData.m_gamma = m_ui->lineEdit_gamma->text().toDouble();
+		m_pvtool.m_manuData.m_nSer = m_ui->lineEdit_nSer->text().toInt();
+		m_pvtool.m_manuData.m_name = "UserInput";
 	}
 
 	// now pre-calculate manufacturing parameter set
 	try {
-		pvtool.calcPhysicalParameterFromManufactureData();
+		m_pvtool.calcPhysicalParameterFromManufactureData();
 	}
 	catch (IBK::Exception & ex) {
 		QMessageBox::critical(this, QString(), tr("Bei der Berechnung der PV-Panel-Kenngrößen aus den Eingabedaten ist ein Fehler aufgetreten."));
@@ -341,15 +342,16 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
 	//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
 	//	discCmdLine << projectFile << "-o="+projectDiscFile;
+		std::string discFilename = "project" + IBK::val2string(i) + "-disc.d6p";
 		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p") <<
-					   QString::fromStdString("-o=project" + IBK::val2string(i) + "-disc.d6p") << "-q";
+					   QString::fromStdString("-o=" + discFilename) << "-q";
 		QProcess p;
 		int res = p.execute(CMDDISCPATH, discCmdLine);
 		if (res != 0) {
 			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
 			return;
 		}
-		m_waitingProjects.append(QString::fromStdString(d6ProjectPath.str()));
+		m_waitingProjects.append(QString::fromStdString((d6ProjectPath.parentPath() / discFilename).str()));
 	}
 
 	if (m_progressDlg == nullptr) {
@@ -362,6 +364,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	m_progressDlg->setWindowModality(Qt::WindowModal);
 	m_progressDlg->show();
 	startNextDELPHINSim();
+	runPVEnergy();
+
 }
 
 
@@ -469,5 +473,54 @@ void PVToolWidget::startNextDELPHINSim() {
 void PVToolWidget::evaluateResults() {
 	// process ready results
 	//m_completedProjects.
+
+	std::vector<IBK::Path> projectPaths;
+	projectPaths.reserve(m_completedProjects.size());
+	for(auto p : m_completedProjects){
+		IBK::Path tmp (p.toStdString());
+		IBK::Path tmp2(tmp.parentPath() / tmp.filename().withoutExtension() / "results/");
+		//read temperature and radiation data
+
+		DATAIO::DataIO temp, rad;
+		temp.read(tmp2 / "TMean.d6o");
+		IBK::UnitVector unitVec;
+		unitVec.m_data = temp.columnValues(0);
+		unitVec.m_unit = IBK::Unit(temp.m_valueUnit);
+		unitVec.convert(IBK::Unit("K"));
+		m_temperature.push_back(unitVec);
+
+
+		rad.read(tmp2 / "GlobalRadition.d6o");
+		unitVec = IBK::UnitVector ();
+		unitVec.m_data = rad.columnValues(0);
+		unitVec.m_unit = IBK::Unit(rad.m_valueUnit);
+		unitVec.convert(IBK::Unit("W/m2"));
+		m_radiation.push_back(unitVec);
+	}
+
 }
+
+void PVToolWidget::runPVEnergy()
+{
+	std::vector<std::vector<double>> energyRes(m_temperature.size());
+	try {
+		for (size_t i=0; i<m_temperature.size(); ++i)
+			m_pvtool.calcPVEnergy(m_temperature[i].m_data,m_radiation[i].m_data, energyRes[i]);
+	} catch (IBK::Exception &ex) {
+		QMessageBox::critical(this, QString(), tr("%1").arg(ex.what()));
+		return;
+	}
+
+
+	//sum up all value of one vector
+	std::vector<double> summedValues(m_temperature.size(),0);
+	for(size_t i=0; i<energyRes.size();++i){
+		for (size_t j=0; j<energyRes[i].size(); ++j)
+			summedValues[i] += energyRes[i][j];
+	}
+
+
+}
+
+
 
