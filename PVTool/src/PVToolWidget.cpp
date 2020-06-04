@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QSettings>
 #include <QProcess>
+#include <QProgressDialog>
 
 #include <IBK_assert.h>
 
@@ -307,16 +308,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		return;
 	}
 
-	//template datei bearbeiten und an richtige stelle kopieren alle weiteren dateien kopieren/erstellen
-	//string ersetzen d6p datei ersetzen (klima insulation pcm dicken)
-
-	// discre. aufrufen
-
-	//d6 solver mit der neuen d6p datei starten
-
-	//pvtool anwerfen mit pfadübergabe von delphin ausgaben und aus gui exportierten pv daten
-
-	//ergebnisse sammeln
+	m_waitingProjects.append("project.d6p");
 }
 
 
