@@ -134,6 +134,93 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 }
 
 
+void readD6pFile(const IBK::Path &filename, double pcmThick, double insuThick,
+				 const std::string &namePCM,const std::string &nameInsu,const std::string &nameClimate){
+
+	std::ifstream in;
+	in.open(filename.c_str());
+	std::string line;
+	unsigned int counter=0;
+	while (std::getline(in, line)) {
+
+		std::string nameToReplace = "${CLIMATE}";
+		size_t len = nameToReplace.length();
+		size_t pos = line.find(nameToReplace);
+		if(pos != std::string::npos){	//name with extension
+			line.replace(pos, len, nameClimate);
+			++counter;
+		}
+		nameToReplace = "${PCM}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){	//name without extension
+			line.replace(pos, len, namePCM + ".m6");
+			++counter;
+		}
+		nameToReplace = "${INSULATION}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){	//name without extension
+			line.replace(pos, len, nameInsu + ".m6");
+			++counter;
+		}
+		nameToReplace = "${PCMThick}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(pcmThick));
+			++counter;
+		}
+		nameToReplace = "${INSULATIONThick}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(insuThick));
+			++counter;
+		}
+
+		if(counter==5)
+			break;
+	}
+	//schreiben der datei
+}
+
+void readM6File(const IBK::Path &filename, double rho, double ce,double lambda){
+
+	std::ifstream in;
+	in.open(filename.c_str());
+	std::string line;
+	unsigned int counter=0;
+	while (std::getline(in, line)) {
+
+		std::string nameToReplace = "${RHO}";
+		size_t len = nameToReplace.length();
+		size_t pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(rho));
+			++counter;
+		}
+		nameToReplace = "${CE}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(ce));
+			++counter;
+		}
+		nameToReplace = "${LAMBDA}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(lambda));
+			++counter;
+		}
+
+		if(counter==3)
+			break;
+	}
+	//schreiben der datei
+}
+
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// Climate data file
 	std::string weatherName;
@@ -204,6 +291,17 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 
 	// read the template files into memory
+
+	IBK::Path filenameD6p(""), filenameM6("");
+	//pcm thickness total - 2 cells of pcm
+	//total cells for pcm is 3
+	//variance 0.01 to 0.03
+	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
+	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
+	readD6pFile(filenameD6p,pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(),"InuslationMat", weatherName);
+	readM6File(filenameM6, m_ui->doubleSpinBox_Density->value(),
+			   m_ui->doubleSpinBox_SpecHeatCapa->value(),
+			   m_ui->doubleSpinBox_Conductivity->value());
 
 
 #if 0

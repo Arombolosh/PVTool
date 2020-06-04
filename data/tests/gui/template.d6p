@@ -30,7 +30,7 @@
 			<Interval>
 				<IBK:Parameter name="Duration" unit="a">1</IBK:Parameter>
 			</Interval>
-			<ClimateDataFilePath>${Climate Database}/climate/${CLIMATE}</ClimateDataFilePath>			
+			<ClimateDataFilePath>${Climate Database}/${CLIMATE}</ClimateDataFilePath>			
 			<LambdaSelection>LambdaDry</LambdaSelection>
 		</SimulationParameter>
 	</Init>
