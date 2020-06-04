@@ -21,6 +21,10 @@ public:
 
 	std::vector<PVTOOL::Energy::ManufactureData>	m_pvModule;
 
+protected:
+
+	void closeEvent(QCloseEvent *event) override;
+
 private slots:
 	void on_radioButton_WeatherComboBox_toggled(bool checked);
 
@@ -40,7 +44,7 @@ private:
 		target file name.
 		\param m6template String containing template m6 file - will be modified in function, since we only need it once per simulation
 	*/
-	void readM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const;
+	void createM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const;
 
 	Ui::PVToolWidget *m_ui;
 

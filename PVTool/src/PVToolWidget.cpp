@@ -6,9 +6,11 @@
 #include <QIntValidator>
 #include <QDir>
 #include <QMessageBox>
+#include <QSettings>
 
 #include <IBK_assert.h>
-#include <MM_Material.h>
+
+#include <fstream>
 
 #include "PVTConstants.h"
 #include "PVTDirectories.h"
@@ -19,8 +21,11 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 {
 	m_ui->setupUi(this);
 
-	// TODO : working directory should normally not be the install directory, since this is likely to be read-only.
-	m_ui->lineEdit_Directory->setText(QDir().currentPath());
+	// read last used working directory from user-settings
+	QSettings settings(ORG_NAME, PROGRAM_NAME);
+	QString initialWorkingDirectory = settings.value("WorkingDirectory", QDir::homePath()).toString();
+	m_ui->lineEdit_Directory->setText(initialWorkingDirectory);
+
 	m_ui->radioButton_WeatherComboBox->setChecked(true);
 	on_radioButton_WeatherComboBox_toggled(true);
 
@@ -89,20 +94,34 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_PCMMaterials->blockSignals(false);
 }
 
-PVToolWidget::~PVToolWidget()
-{
+
+PVToolWidget::~PVToolWidget() {
 	delete m_ui;
 }
 
-void PVToolWidget::on_radioButton_WeatherComboBox_toggled(bool checked)
-{
+
+// *** protected
+
+void PVToolWidget::closeEvent(QCloseEvent * event) {
+	QWidget::closeEvent(event);
+
+	// store currently used working directory in settings
+	QSettings settings(ORG_NAME, PROGRAM_NAME);
+
+	settings.setValue("WorkingDirectory", m_ui->lineEdit_Directory->text());
+}
+
+
+// *** slots
+
+void PVToolWidget::on_radioButton_WeatherComboBox_toggled(bool checked) {
 	m_ui->comboBox_WeatherFile->setEnabled(checked);
 	m_ui->lineEdit_EPWFile->setEnabled(!checked);
 	m_ui->pushButton_EPW->setEnabled(!checked);
 }
 
-void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked)
-{
+
+void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked) {
 	m_ui->comboBox_PVModule->setEnabled(checked);
 	m_ui->lineEdit_iSC->setEnabled(!checked);
 	m_ui->lineEdit_uOC->setEnabled(!checked);
@@ -134,58 +153,6 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 	m_ui->lineEdit_uMPP->setText(QString("%L1").arg(m_pvModule[index].m_vmp));
 	m_ui->lineEdit_alpha->setText(QString("%L1").arg(m_pvModule[index].m_alpha));
 	m_ui->lineEdit_gamma->setText(QString("%L1").arg(m_pvModule[index].m_gamma));
-}
-
-
-void readD6pFile(const IBK::Path &filename, double pcmThick, double insuThick,
-				 const std::string &namePCM,const std::string &nameInsu,const std::string &nameClimate){
-
-	std::ifstream in;
-	in.open(filename.c_str());
-	std::string line;
-	unsigned int counter=0;
-	while (std::getline(in, line)) {
-
-		std::string nameToReplace = "${CLIMATE}";
-		size_t len = nameToReplace.length();
-		size_t pos = line.find(nameToReplace);
-		if(pos != std::string::npos){	//name with extension
-			line.replace(pos, len, nameClimate);
-			++counter;
-		}
-		nameToReplace = "${PCM}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){	//name without extension
-			line.replace(pos, len, namePCM + ".m6");
-			++counter;
-		}
-		nameToReplace = "${INSULATION}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){	//name without extension
-			line.replace(pos, len, nameInsu + ".m6");
-			++counter;
-		}
-		nameToReplace = "${PCMThick}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(pcmThick));
-			++counter;
-		}
-		nameToReplace = "${INSULATIONThick}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(insuThick));
-			++counter;
-		}
-
-		if(counter==5)
-			break;
-	}
-	//schreiben der datei
 }
 
 
@@ -355,6 +322,9 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 }
 
 
+
+// *** private functions
+
 void PVToolWidget::createM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce,double lambda) const {
 	m6Template = IBK::replace_string(m6Template, "${RHO}", IBK::val2string(rho));
 	m6Template = IBK::replace_string(m6Template, "${CE}", IBK::val2string(ce));
@@ -364,3 +334,58 @@ void PVToolWidget::createM6File(std::string & m6Template, const IBK::Path &targe
 	std::ofstream out(targetFileName.str());
 	out << m6Template << std::endl;
 }
+
+
+
+#if 0
+void readD6pFile(const IBK::Path &filename, double pcmThick, double insuThick,
+				 const std::string &namePCM,const std::string &nameInsu,const std::string &nameClimate){
+
+	std::ifstream in;
+	in.open(filename.c_str());
+	std::string line;
+	unsigned int counter=0;
+	while (std::getline(in, line)) {
+
+		std::string nameToReplace = "${CLIMATE}";
+		size_t len = nameToReplace.length();
+		size_t pos = line.find(nameToReplace);
+		if(pos != std::string::npos){	//name with extension
+			line.replace(pos, len, nameClimate);
+			++counter;
+		}
+		nameToReplace = "${PCM}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){	//name without extension
+			line.replace(pos, len, namePCM + ".m6");
+			++counter;
+		}
+		nameToReplace = "${INSULATION}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){	//name without extension
+			line.replace(pos, len, nameInsu + ".m6");
+			++counter;
+		}
+		nameToReplace = "${PCMThick}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(pcmThick));
+			++counter;
+		}
+		nameToReplace = "${INSULATIONThick}";
+		len = nameToReplace.length();
+		pos = line.find(nameToReplace);
+		if(pos != std::string::npos){
+			line.replace(pos, len, IBK::val2string(insuThick));
+			++counter;
+		}
+
+		if(counter==5)
+			break;
+	}
+	//schreiben der datei
+}
+#endif
