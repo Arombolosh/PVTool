@@ -34,8 +34,6 @@ bool convertDoubleFromText(const QString & text, double & value) {
 		}
 	}
 	value = val; // only store value if correctly parsed
-
-
 	return true;
 }
 
@@ -53,8 +51,6 @@ bool convertIntFromText(const QString & text, int & value) {
 		}
 	}
 	value = val; // only store value if correctly parsed
-
-
 	return true;
 }
 
@@ -64,7 +60,7 @@ bool convertLineEditinDouble(QWidget * const widget, QLabel * const label, QLine
 		lineEdit->setFocus();
 		palette.setColor(QPalette::Text,Qt::red);
 		lineEdit->setPalette(palette);
-		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'")
+		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGleitkommazahl wird benötigt.")
 							  .arg(lineEdit->text())
 							  .arg(label->text()));
 		return false;
@@ -82,7 +78,7 @@ bool convertLineEditinInt(QWidget * const widget, QLabel * const label, QLineEdi
 		lineEdit->setFocus();
 		palette.setColor(QPalette::Text,Qt::red);
 		lineEdit->setPalette(palette);
-		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'")
+		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGanzzahliger Wert wird benötigt.")
 							  .arg(lineEdit->text())
 							  .arg(label->text()));
 		return false;
@@ -137,20 +133,21 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	//einschalten von updates
 	m_ui->comboBox_WeatherFile->blockSignals(false);
 
-	m_ui->radioButton_PVDatabase->setChecked(true);
-	on_radioButton_PVDatabase_toggled(true);
-
 	//Data PV modules
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(31.4, 8.44, 38.3, 8.91, 0.05, -0.30, -0.43, 60, "aleo S19L265"));
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(31.5, 8.57, 38.3, 9.05, 0.05, -0.30, -0.43, 60, "aleo S19L270"));
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(32.24, 9.27, 39.75, 9.76, 0.043, -0.31, -0.41, 60, "NEMO 2.0 M295"));
 
-	//abschalten von updates
-	m_ui->comboBox_PVModule->blockSignals(true);
-
 	//todo schleife mit weather
 	for(auto &p : m_pvModule)
 		m_ui->comboBox_PVModule->addItem(QString().fromStdString(p.m_name));
+
+	m_ui->radioButton_PVDatabase->setChecked(true);
+	on_radioButton_PVDatabase_toggled(true);
+
+	//abschalten von updates
+	m_ui->comboBox_PVModule->blockSignals(true);
+
 	//einschalten von updates
 	m_ui->comboBox_PVModule->blockSignals(false);
 	on_comboBox_PVModule_currentIndexChanged(0);
@@ -206,15 +203,32 @@ void PVToolWidget::on_radioButton_WeatherComboBox_toggled(bool checked) {
 
 
 void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked) {
+
+	QList<QLineEdit *> allLineEdits = m_ui->groupBox_PVModule->findChildren<QLineEdit *>();
+	for (int i=0; i < allLineEdits.size(); i++)
+	{
+		allLineEdits.at(i)->setEnabled(!checked);
+	}
 	m_ui->comboBox_PVModule->setEnabled(checked);
-	m_ui->lineEdit_iSC->setEnabled(!checked);
-	m_ui->lineEdit_uOC->setEnabled(!checked);
-	m_ui->lineEdit_iMPP->setEnabled(!checked);
-	m_ui->lineEdit_uMPP->setEnabled(!checked);
-	m_ui->lineEdit_alpha->setEnabled(!checked);
-	m_ui->lineEdit_beta->setEnabled(!checked);
-	m_ui->lineEdit_gamma->setEnabled(!checked);
-	m_ui->lineEdit_nSer->setEnabled(!checked);
+	if(checked) {
+		QPalette palette;
+		palette.setColor(QPalette::Text, Qt::black);
+		for (int i=0; i < allLineEdits.size(); i++)
+		{
+			allLineEdits.at(i)->setPalette(palette);
+		}
+
+		unsigned int index = m_ui->comboBox_PVModule->currentIndex();
+
+		m_ui->lineEdit_iSC->setText(QString("%L1").arg(m_pvModule[index].m_isc));
+		m_ui->lineEdit_uOC->setText(QString("%L1").arg(m_pvModule[index].m_voc));
+		m_ui->lineEdit_beta->setText(QString("%L1").arg(m_pvModule[index].m_beta));
+		m_ui->lineEdit_iMPP->setText(QString("%L1").arg(m_pvModule[index].m_imp));
+		m_ui->lineEdit_nSer->setText(QString("%L1").arg(m_pvModule[index].m_nSer));
+		m_ui->lineEdit_uMPP->setText(QString("%L1").arg(m_pvModule[index].m_vmp));
+		m_ui->lineEdit_alpha->setText(QString("%L1").arg(m_pvModule[index].m_alpha));
+		m_ui->lineEdit_gamma->setText(QString("%L1").arg(m_pvModule[index].m_gamma));
+	}
 }
 
 
@@ -332,7 +346,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// check, if the directory exists
 	if (!QFileInfo(workingDir).exists()) {
 		int res = QMessageBox::question(this, QString(), tr("Arbeitsverzeichnis existiert nicht, soll es erstellt werden?"),
-							  QMessageBox::Ok | QMessageBox::Cancel);
+										QMessageBox::Ok | QMessageBox::Cancel);
 		if (res == QMessageBox::Cancel)
 			return;
 		if (!QDir().mkpath(workingDir)) {
@@ -376,24 +390,24 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	IBK::Path insulationM6Path( workingDirectory / "materials/InsulationMat.m6");
 
 	createM6File(m6Template, insulationM6Path, m_ui->doubleSpinBox_Density->value(),
-			   m_ui->doubleSpinBox_SpecHeatCapa->value(),
-			   m_ui->doubleSpinBox_Conductivity->value());
+				 m_ui->doubleSpinBox_SpecHeatCapa->value(),
+				 m_ui->doubleSpinBox_Conductivity->value());
 
 	// *** start variation loop
 	std::vector<double> pcmThick{0.01, 0.02, 0.03};	//thickness of pcm
 	for (size_t i=0; i<pcmThick.size(); ++i) {
 		IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2.d6p").arg(workingDirectory).arg(i).str());
 		pcmThick[i] -= 0.005; // pcm has 3 cells, two non adjustable cells are set to 5 mm
-	// - adjust PCM material layer thickness and write project template
+		// - adjust PCM material layer thickness and write project template
 		double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
 		createDelphinProject(d6Template, d6ProjectPath, pcmThick[i], insuThick,
 							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str());
 		// now run CmdDiscretize to generate discretized project file
 		QStringList discCmdLine;
 		QDir::setCurrent(workingDir);
-	//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
-	//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
-	//	discCmdLine << projectFile << "-o="+projectDiscFile;
+		//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
+		//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
+		//	discCmdLine << projectFile << "-o="+projectDiscFile;
 		std::string discFilename = "project" + IBK::val2string(i) + "-disc.d6p";
 		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p") <<
 					   QString::fromStdString("-o=" + discFilename) << "-q";
