@@ -209,9 +209,23 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// we now have the input data to start our variation/optimization run
 	// but we first need the paths to the external tools 'CmdDiscretize' and 'DelphinSolver.exe'
 
-	// for now hard-coded, same directory as executable PVTool.exe
-	const QString CMDDISCPATH = qApp->applicationDirPath() + "/CmdDiscretize";
-	const QString DELPHINPATH = qApp->applicationDirPath() + "/DelphinSolver";
+#ifdef Q_OS_LINUX
+	const QString CMDDISCPATH = PVTDirectories::resourcesRootDir() + "/binaries/linux64/CmdDiscretise";
+	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/linux64/DelphinSolver";
+#elif Q_OS_WIN
+	const QString CMDDISCPATH = PVTDirectories::resourcesRootDir() + "/binaries/win64/CmdDiscretise.exe";
+	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/win64/DelphinSolver.exe";
+#elif Q_OS_MAC
+	const QString CMDDISCPATH = PVTDirectories::resourcesRootDir() + "/binaries/darwin64/CmdDiscretise";
+	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/darwin64/DelphinSolver";
+#endif
+
+	if (!QFileInfo(CMDDISCPATH).exists()) {
+		QMessageBox::critical(this, QString(), tr("Kann CmdDiscretise-Tool nicht in '%1' finden.").arg(CMDDISCPATH));
+		return;
+	}
+
+	// TODO : Fehlermeldung DELPHIN
 
 	// we need a project directory/working directory
 	QString workingDir = m_ui->lineEdit_Directory->text();
@@ -274,42 +288,25 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
 	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
-    createDelphinProject(d6Template, d6ProjectPath, pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
-
+	createDelphinProject(d6Template, d6ProjectPath, pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
 
 	// now run CmdDiscretize to generate discretized project file
 	QStringList discCmdLine;
-	discCmdLine << QString::fromStdString(d6ProjectPath.str()) <<
+	QDir::setCurrent(workingDir);
 
-#if 0
-	IBK::Path filenameD6p(""), filenameM6("");
-	//pcm thickness total - 2 cells of pcm
-	//total cells for pcm is 3
-	//variance 0.01 to 0.03
+//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
+//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
+//	discCmdLine << projectFile << "-o="+projectDiscFile;
+	discCmdLine << "project.d6p" << "-o=project-disc.d6p";
 
+	QProcess p;
+	int res = p.execute(CMDDISCPATH, discCmdLine);
 
+	if (res != 0) {
+		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
+		return;
+	}
 
-	//PCM-> Material (PCM) kopieren aus Vorgabedateien
-	//Wärmedämmung (Insulation) erstellen aus Vorgaben
-
-	MM::Material insulation;
-	insulation.m_identification.m_name.setString("Insulation", "de");
-	insulation.m_identification.m_productId.setString("PVTool", "de");
-	insulation.m_identification.m_producer.setString("PVTool", "de");
-	insulation.m_identification.m_flags =
-			MM::MaterialIdentification::AIR_TIGHT &
-			MM::MaterialIdentification::WATER_TIGHT &
-			MM::MaterialIdentification::VAPOR_TIGHT;
-
-	insulation.m_identification.m_cat = MM::MaterialCategory::Insulations;
-	insulation.m_id = 1001002;
-	insulation.m_paraTransport[MM::Material::MP_LAMBDA] = IBK::Parameter("LAMBDA", m_ui->doubleSpinBox_Conductivity->text().toDouble(), IBK::Unit("W/mK"));
-	insulation.m_paraStorage[MM::Material::MP_RHO] = IBK::Parameter("RHO", m_ui->doubleSpinBox_Density->text().toDouble(), IBK::Unit("kg/m3"));
-	insulation.m_paraStorage[MM::Material::MP_CE] = IBK::Parameter("CE", m_ui->doubleSpinBox_SpecHeatCapa->text().toDouble(), IBK::Unit("J/kgK"));
-
-	//IBK::Path insuFilename (path / ("Insulation_" + IBK::val2string(insulation.m_id) + ".m6"));
-
-#endif
 	//template datei bearbeiten und an richtige stelle kopieren alle weiteren dateien kopieren/erstellen
 	//string ersetzen d6p datei ersetzen (klima insulation pcm dicken)
 
@@ -336,6 +333,7 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 // *** private functions
 
 void PVToolWidget::createM6File(const std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const {
+	FUNCID(PVToolWidget::createM6File);
 	std::string m6str = IBK::replace_string(m6Template, "${RHO}", IBK::val2string(rho));
 	m6str = IBK::replace_string(m6str, "${CE}", IBK::val2string(ce));
 	m6str = IBK::replace_string(m6str, "${LAMBDA}", IBK::val2string(lambda));
@@ -343,24 +341,26 @@ void PVToolWidget::createM6File(const std::string & m6Template, const IBK::Path 
 	// write file
 	std::ofstream out(targetFileName.str());
 	out << m6str << std::endl;
+	if (!out)
+		throw IBK::Exception("Error writing file.", FUNC_ID);
 }
 
 
 void PVToolWidget::createDelphinProject(const std::string & d6Template,
-                          const IBK::Path & d6ProjectFilePath,
-                          double pcmThickness,
-                          double insulationThickness,
+						  const IBK::Path & d6ProjectFilePath,
+						  double pcmThickness,
+						  double insulationThickness,
 						  const std::string & pcmMaterialFileName,
 						  const std::string & climateDataFileName)
 {
-    std::string d6str = IBK::replace_string(d6Template, "${PCMThick}", IBK::val2string(pcmThickness));
-    d6str = IBK::replace_string(d6str, "${INSULATIONThick}", IBK::val2string(insulationThickness));
-    d6str = IBK::replace_string(d6str, "${PCM}",pcmMaterialFileName);
-    d6str = IBK::replace_string(d6str, "${CLIMATE}", climateDataFileName);
+	std::string d6str = IBK::replace_string(d6Template, "${PCMThick}", IBK::val2string(pcmThickness));
+	d6str = IBK::replace_string(d6str, "${INSULATIONThick}", IBK::val2string(insulationThickness));
+	d6str = IBK::replace_string(d6str, "${PCM}",pcmMaterialFileName);
+	d6str = IBK::replace_string(d6str, "${CLIMATE}", climateDataFileName);
 
-    // write file
-    std::ofstream out(d6ProjectFilePath.str());
-    out << d6str << std::endl;
+	// write file
+	std::ofstream out(d6ProjectFilePath.str());
+	out << d6str << std::endl;
 
 }
 

@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <DelphinProject xmlns="http://www.bauklimatik-dresden.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:IBK="http://www.bauklimatik-dresden.de/IBK" xsi:schemaLocation="http://www.bauklimatik-dresden.de DelphinProject.xsd" fileVersion="6.1">
 	<ProjectInfo created="Di Jun 4 08:38:45 2019" lastEdited="Di Jun 2 09:10:20 2020">
-		<Comment>&#x0A;&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;</Comment>
 	</ProjectInfo>
 
 	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-	<!--TODO  DämmMaterial setzen	...	"InsulationMaterial" -->
-	<!--TODO  PCM setzen	...	"PCM" -->
-	<!--TODO  Delphin Climate/Materials Pfad setzen-->
-	<!--TODO  Dämmung Element; Dicke von Elementen  X(11) Y(1-4) & (10-11)  auf "Dickevorgegeben" setzen -->
-	<!--TODO  PCM Element (8,11)-(10,11) & (8,0)-(10,3); Dicke von Elementen X(8) , Y(0-3) und (11) auf "Dickevorgegeben - 5 mm" setzen -->
-	<!--TODO  Klima Reference name auf "Climate" setzen-->
-	
 
 	<!--DirectoryPlaceholders section defines strings to be substituted with directories-->
 	<DirectoryPlaceholders>
-		<!--<Placeholder name="Climate Database">C:/Program Files/IBK/Delphin 6.1/resources/DB_climate</Placeholder>-->			
 		<Placeholder name="Climate Database">${Project Directory}/climate</Placeholder>											
 		<Placeholder name="Material Database">${Project Directory}/materials</Placeholder>										
 		<Placeholder name="Database Root">${Project Directory}</Placeholder>
@@ -42,7 +33,7 @@
 		<MaterialReference name="Alu" color="#ffff0000" hatchCode="13">${Material Database}/AluminiumFoil_19.m6</MaterialReference>
 		<MaterialReference name="Polytetrafluorethylenkunststoffe (PTFE) [785]" color="#ffaaaa00" hatchCode="13">${Material Database}/PolytetrafluoroethylenePTFE_785.m6</MaterialReference>
 		<MaterialReference name="Glas" color="#ff404060" hatchCode="13">${Material Database}/Glass_72.m6</MaterialReference>
-		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Material Database}/${INSULATION}.m6</MaterialReference>											
+		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Material Database}/InsulationMat.m6</MaterialReference>											
 		<MaterialReference name="PCM" color="#ff00ff7f" hatchCode="13">${Project Directory}/materials/${PCM}.m6</MaterialReference>														
 		<MaterialReference name="Luftschicht 50 mm (vertikal) [18]" color="#ff5020a0" hatchCode="13">${Material Database}/AirGapVertical50mm_18.m6</MaterialReference>
 		<MaterialReference name="Polyvinylchlorid (PVC) [786]" color="#ffaaff00" hatchCode="13">${Material Database}/PolyvinylChloridePVC_786.m6</MaterialReference>
@@ -62,7 +53,7 @@
 	<Conditions>
 
 		<Interfaces>
-			<Interface name="Climate" type="EngineeringOutdoor">					<!--TODO  Klima auf "Climate" setzen-->
+			<Interface name="Climate" type="EngineeringOutdoor">
 				<IBK:Parameter name="Orientation" unit="Deg">180</IBK:Parameter>
 				<IBK:Parameter name="Inclination" unit="Deg">0</IBK:Parameter>
 				<IBK:Parameter name="OutdoorHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
