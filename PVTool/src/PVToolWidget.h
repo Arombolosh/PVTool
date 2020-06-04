@@ -2,6 +2,7 @@
 #define PVTOOLWIDGET_H
 
 #include <QWidget>
+#include <QProcess>
 
 #include <IBK_Path.h>
 
@@ -11,7 +12,8 @@ namespace Ui {
 	class PVToolWidget;
 }
 
-class QProcess;
+
+class QProgressDialog;
 
 /*! Main widget. */
 class PVToolWidget : public QWidget {
@@ -40,6 +42,9 @@ private slots:
 
 	void on_pushButton_Directory_clicked();
 
+	void onSimulationJobFinished(int status, QProcess::ExitStatus);
+	void onSimulationJobAborted();
+
 private:
 
 	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given
@@ -56,12 +61,21 @@ private:
 							  const std::string & pcmMaterialFileName,
 							  const std::string & climateDataFileName);
 
-	Ui::PVToolWidget *m_ui;
+	/*! Takes the next waiting job from m_waitingProjects and starts the process in slave mode.
+	*/
+	void startNextDELPHINSim();
 
+	/*! Evaluate simulation results. */
+	void evaluateResults();
+
+	Ui::PVToolWidget	*m_ui;
+
+	QProgressDialog		*m_progressDlg;
 	QProcess			*m_cmdLineProcess;
 
 	/*! Contains list of all ready and discretized DELPHIN Projects to run (full file paths). */
 	QStringList			m_waitingProjects;
+	QStringList			m_completedProjects;
 
 };
 

@@ -20,7 +20,8 @@
 PVToolWidget::PVToolWidget(QWidget *parent) :
 	QWidget(parent),
 	m_ui(new Ui::PVToolWidget),
-	m_cmdLineProcess(new QProcess(this))
+	m_progressDlg(nullptr),
+	m_cmdLineProcess(nullptr)
 {
 	m_ui->setupUi(this);
 
@@ -309,6 +310,17 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		}
 		m_waitingProjects.append(QString::fromStdString(d6ProjectPath.filename().str()));
 	}
+
+	if (m_progressDlg == nullptr) {
+		m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
+	}
+	else {
+		m_progressDlg->setMaximum(m_waitingProjects.count());
+		m_progressDlg->show();
+	}
+	m_progressDlg->setValue(0);
+	m_progressDlg->setWindowModality(Qt::WindowModal);
+	startNextDELPHINSim();
 }
 
 
@@ -318,6 +330,22 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 	if(fpath.isEmpty())
 		return;
 	m_ui->lineEdit_Directory->setText(fpath);
+}
+
+
+void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus status) {
+	if (status == QProcess::Crashed) {
+		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation."));
+		return;
+	}
+//	m_progressDlg->setValue(m_finis)
+
+}
+
+
+
+void PVToolWidget::onSimulationJobAborted() {
+	startNextDELPHINSim();
 }
 
 
@@ -356,4 +384,45 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 
 }
 
+
+void PVToolWidget::startNextDELPHINSim() {
+	if (m_waitingProjects.isEmpty() || m_progressDlg->wasCanceled()) {
+		m_progressDlg->hide();
+		evaluateResults();
+		return;
+	}
+
+	QString nextJobFile = m_waitingProjects.front();
+	m_waitingProjects.pop_front();
+	m_completedProjects.push_back(nextJobFile);
+
+	// configure process
+	if (m_cmdLineProcess == nullptr) {
+		m_cmdLineProcess = new QProcess(this);
+		connect(m_cmdLineProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT());
+	}
+
+#ifdef Q_OS_LINUX
+	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/linux64/DelphinSolver";
+#endif
+#ifdef Q_OS_WIN
+	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/win64/DelphinSolver.exe";
+#endif
+#ifdef Q_OS_MAC
+	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/darwin64/DelphinSolver";
+#endif
+	// existence of DELPHIN solver file was already tested
+
+	QStringList cmdLine;
+	cmdLine << nextJobFile;
+#ifdef Q_OS_WIN
+	cmdLine << "-x";
+#endif
+	m_cmdLineProcess->start(DELPHINPATH, cmdLine);
+}
+
+
+void PVToolWidget::evaluateResults() {
+	// process ready results
+}
 
