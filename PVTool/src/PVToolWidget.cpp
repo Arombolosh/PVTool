@@ -213,10 +213,14 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 #ifdef Q_OS_LINUX
 	const QString CMDDISCPATH = PVTDirectories::resourcesRootDir() + "/binaries/linux64/CmdDiscretise";
 	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/linux64/DelphinSolver";
-#elif Q_OS_WIN
+#endif
+
+#ifdef Q_OS_WIN
 	const QString CMDDISCPATH = PVTDirectories::resourcesRootDir() + "/binaries/win64/CmdDiscretise.exe";
 	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/win64/DelphinSolver.exe";
-#elif Q_OS_MAC
+#endif
+
+#ifdef Q_OS_MAC
 	const QString CMDDISCPATH = PVTDirectories::resourcesRootDir() + "/binaries/darwin64/CmdDiscretise";
 	const QString DELPHINPATH = PVTDirectories::resourcesRootDir() + "/binaries/darwin64/DelphinSolver";
 #endif
@@ -280,35 +284,31 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 			   m_ui->doubleSpinBox_SpecHeatCapa->value(),
 			   m_ui->doubleSpinBox_Conductivity->value());
 
-	IBK::Path d6ProjectPath( workingDirectory / "project.d6p");
-
 	// *** start variation loop
-	//
-	// in each loop we:
+	std::vector<double> pcmThick{0.01, 0.02, 0.03};	//thickness of pcm
+	for (size_t i=0; i<pcmThick.size(); ++i) {
+		IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2.d6p").arg(workingDirectory).arg(i).str());
+		pcmThick[i] -= 0.005; // pcm has 3 cells, two non adjustable cells are set to 5 mm
 	// - adjust PCM material layer thickness and write project template
-
-	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
-	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
-	createDelphinProject(d6Template, d6ProjectPath, pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
-
-	// now run CmdDiscretize to generate discretized project file
-	QStringList discCmdLine;
-	QDir::setCurrent(workingDir);
-
-//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
-//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
-//	discCmdLine << projectFile << "-o="+projectDiscFile;
-	discCmdLine << "project.d6p" << "-o=project-disc.d6p";
-
-	QProcess p;
-	int res = p.execute(CMDDISCPATH, discCmdLine);
-
-	if (res != 0) {
-		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
-		return;
+		double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
+		createDelphinProject(d6Template, d6ProjectPath, pcmThick[i], insuThick,
+							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
+		// now run CmdDiscretize to generate discretized project file
+		QStringList discCmdLine;
+		QDir::setCurrent(workingDir);
+	//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
+	//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
+	//	discCmdLine << projectFile << "-o="+projectDiscFile;
+		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p") <<
+					   QString::fromStdString("-o=project" + IBK::val2string(i) + "-disc.d6p") << "-q";
+		QProcess p;
+		int res = p.execute(CMDDISCPATH, discCmdLine);
+		if (res != 0) {
+			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
+			return;
+		}
+		m_waitingProjects.append(QString::fromStdString(d6ProjectPath.filename().str()));
 	}
-
-	m_waitingProjects.append("project.d6p");
 }
 
 
@@ -355,68 +355,5 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 	out << d6str << std::endl;
 
 }
-
-//int PVToolWidget::runInTerminal(const QString & executablePath, const QStringList & commandLineArgs) {
-
-//	std::unique_ptr<QProcess> myProcess (new QProcess(this));
-//	return myProcess->execute(executablePath, commandLineArgs);
-//	if (res != 0)
-//		throw IBK::Exception("Error running job.")
-//}
-
-
-
-#if 0
-void readD6pFile(const IBK::Path &filename, double pcmThick, double insuThick,
-				 const std::string &namePCM,const std::string &nameInsu,const std::string &nameClimate){
-
-	std::ifstream in;
-	in.open(filename.c_str());
-	std::string line;
-	unsigned int counter=0;
-	while (std::getline(in, line)) {
-
-		std::string nameToReplace = "${CLIMATE}";
-		size_t len = nameToReplace.length();
-		size_t pos = line.find(nameToReplace);
-		if(pos != std::string::npos){	//name with extension
-			line.replace(pos, len, nameClimate);
-			++counter;
-		}
-		nameToReplace = "${PCM}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){	//name without extension
-			line.replace(pos, len, namePCM + ".m6");
-			++counter;
-		}
-		nameToReplace = "${INSULATION}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){	//name without extension
-			line.replace(pos, len, nameInsu + ".m6");
-			++counter;
-		}
-		nameToReplace = "${PCMThick}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(pcmThick));
-			++counter;
-		}
-		nameToReplace = "${INSULATIONThick}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(insuThick));
-			++counter;
-		}
-
-		if(counter==5)
-			break;
-	}
-	//schreiben der datei
-}
-#endif
 
 
