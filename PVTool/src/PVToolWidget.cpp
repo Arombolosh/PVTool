@@ -163,22 +163,37 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// Climate data file
-	std::string weatherName;
+	// we need a project directory/working directory
+	IBK::Path weatherDirectory( (PVTDirectories::resourcesRootDir() + "/DB_climate").toStdString());
+	IBK::Path weatherPath;
+	QString workingDir = m_ui->lineEdit_Directory->text();
+	IBK::Path workingDirectory( workingDir.toStdString() );
 	if (m_ui->radioButton_WeatherComboBox->isChecked()){
-		weatherName = m_ui->comboBox_WeatherFile->itemText(m_ui->comboBox_WeatherFile->currentIndex()).toStdString() + ".c6b";
+		weatherPath = weatherDirectory / m_ui->comboBox_WeatherFile->itemText(m_ui->comboBox_WeatherFile->currentIndex()).toStdString() + ".c6b";
 		// Note: we can rely on the file to exist, since this is built-in stuff
 	}
 	else {
 		// get path to user-defined climate data file
-		IBK::Path weatherPath(m_ui->lineEdit_EPWFile->text().toStdString());
+		weatherPath = IBK::Path(m_ui->lineEdit_EPWFile->text().toStdString());
 		// check if file exists
 		if (!weatherPath.exists()) {
 			QMessageBox::critical(this, QString(), tr("Die ausgewählte Klimadatei '%1' existiert nicht.").arg(m_ui->lineEdit_EPWFile->text()));
 			return;
 		}
-		weatherName = weatherPath.filename().str();
 	}
-
+	IBK::Path weatherName =  weatherPath.filename();
+	IBK::Path weatherTargetDir = workingDirectory / "climate";
+	if( !weatherTargetDir.exists())
+		IBK::Path::makePath(weatherTargetDir);
+	if( !weatherTargetDir.exists()){
+		QMessageBox::critical(this, QString(), tr("Kann Zielklimaverzeichnis '%1' nicht erstellen.").arg(QString::fromStdString(weatherTargetDir.str())));
+		return;
+	}
+	bool success = IBK::Path::copy(weatherPath, weatherTargetDir / weatherName);
+	if (!success) {
+		QMessageBox::critical(this, QString(), tr("Konnte Projektverzeichnis nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
+		return;
+	}
 	// TODO : check all the other input for meaningful values
 
 	// populate manufacturing data with input values
@@ -233,8 +248,6 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	// TODO : Fehlermeldung DELPHIN
 
-	// we need a project directory/working directory
-	QString workingDir = m_ui->lineEdit_Directory->text();
 	// check, if the directory exists
 	if (!QFileInfo(workingDir).exists()) {
 		int res = QMessageBox::question(this, QString(), tr("Arbeitsverzeichnis existiert nicht, soll es erstellt werden?"),
@@ -271,8 +284,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// copy entire working directory
 
 	IBK::Path templateDirectory( (PVTDirectories::resourcesRootDir() + "/project_template").toStdString());
-	IBK::Path workingDirectory( workingDir.toStdString() );
-	bool success = IBK::Path::copy(templateDirectory, workingDirectory);
+
+	success = IBK::Path::copy(templateDirectory, workingDirectory);
 	if (!success) {
 		QMessageBox::critical(this, QString(), tr("Konnte Projektverzeichnis nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
 		return;
@@ -293,7 +306,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// - adjust PCM material layer thickness and write project template
 		double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
 		createDelphinProject(d6Template, d6ProjectPath, pcmThick[i], insuThick,
-							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
+							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str());
 		// now run CmdDiscretize to generate discretized project file
 		QStringList discCmdLine;
 		QDir::setCurrent(workingDir);
@@ -424,5 +437,6 @@ void PVToolWidget::startNextDELPHINSim() {
 
 void PVToolWidget::evaluateResults() {
 	// process ready results
+	//m_completedProjects.
 }
 
