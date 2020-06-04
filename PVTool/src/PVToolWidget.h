@@ -11,6 +11,8 @@ namespace Ui {
 	class PVToolWidget;
 }
 
+class QProcess;
+
 /*! Main widget. */
 class PVToolWidget : public QWidget {
 	Q_OBJECT
@@ -42,11 +44,24 @@ private:
 
 	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given
 		target file name.
-		\param m6template String containing template m6 file - will be modified in function, since we only need it once per simulation
+		\param m6template String containing template m6 file.
 	*/
-	void createM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const;
+	void createM6File(const std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const;
+
+	/*! Generates a DELPHIN project file. */
+	void createDelphinProject(const std::string & d6Template,
+							  const IBK::Path & d6ProjectPath,
+							  double insulationThickness,
+							  const std::string & pcmMaterialFileName,
+							  const std::string & climateDataFileName);
+
+	/*! Starts command in terminal and waits for job to finish. This is meant to be used for fast jobs, i.e. CmdDiscretize.
+	*/
+	int runInTerminal(const QString & executablePath, const QStringList & commandLineArgs);
 
 	Ui::PVToolWidget *m_ui;
+
+	QProcess			*m_cmdLineProcess;
 
 };
 

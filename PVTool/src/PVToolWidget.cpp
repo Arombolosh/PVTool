@@ -7,6 +7,7 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QSettings>
+#include <QProcess>
 
 #include <IBK_assert.h>
 
@@ -17,7 +18,8 @@
 
 PVToolWidget::PVToolWidget(QWidget *parent) :
 	QWidget(parent),
-	m_ui(new Ui::PVToolWidget)
+	m_ui(new Ui::PVToolWidget),
+	m_cmdLineProcess(new QProcess(this))
 {
 	m_ui->setupUi(this);
 
@@ -262,20 +264,24 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 			   m_ui->doubleSpinBox_SpecHeatCapa->value(),
 			   m_ui->doubleSpinBox_Conductivity->value());
 
+	IBK::Path d6ProjectPath( workingDirectory / "project.d6p");
 
 	// *** start variation loop
 	//
 	// in each loop we:
-	// - adjust PCM material layer thickness
+	// - adjust PCM material layer thickness and write project template
+
+	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
+	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
+	createDelphinProject(d6Template, d6ProjectPath, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
+
+
 
 #if 0
 	IBK::Path filenameD6p(""), filenameM6("");
 	//pcm thickness total - 2 cells of pcm
 	//total cells for pcm is 3
 	//variance 0.01 to 0.03
-	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
-	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
-	readD6pFile(filenameD6p,pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(),"InuslationMat", weatherName);
 
 
 
@@ -325,15 +331,33 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 
 // *** private functions
 
-void PVToolWidget::createM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce,double lambda) const {
-	m6Template = IBK::replace_string(m6Template, "${RHO}", IBK::val2string(rho));
-	m6Template = IBK::replace_string(m6Template, "${CE}", IBK::val2string(ce));
-	m6Template = IBK::replace_string(m6Template, "${LAMBDA}", IBK::val2string(lambda));
+void PVToolWidget::createM6File(const std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const {
+	std::string m6str = IBK::replace_string(m6Template, "${RHO}", IBK::val2string(rho));
+	m6str = IBK::replace_string(m6str, "${CE}", IBK::val2string(ce));
+	m6str = IBK::replace_string(m6str, "${LAMBDA}", IBK::val2string(lambda));
 
 	// write file
 	std::ofstream out(targetFileName.str());
-	out << m6Template << std::endl;
+	out << m6str << std::endl;
 }
+
+
+void PVToolWidget::createDelphinProject(const std::string & d6Template,
+						  const IBK::Path & d6ProjectPath,
+						  double insulationThickness,
+						  const std::string & pcmMaterialFileName,
+						  const std::string & climateDataFileName)
+{
+
+}
+
+//int PVToolWidget::runInTerminal(const QString & executablePath, const QStringList & commandLineArgs) {
+
+//	std::unique_ptr<QProcess> myProcess (new QProcess(this));
+//	return myProcess->execute(executablePath, commandLineArgs);
+//	if (res != 0)
+//		throw IBK::Exception("Error running job.")
+//}
 
 
 
@@ -389,3 +413,5 @@ void readD6pFile(const IBK::Path &filename, double pcmThick, double insuThick,
 	//schreiben der datei
 }
 #endif
+
+
