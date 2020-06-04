@@ -10,6 +10,8 @@
 #include "PVTDebugApplication.h"
 #include "PVToolWidget.h"
 
+#include "PVTConstants.h"
+
 #include <memory>
 #include <iostream>
 
@@ -23,6 +25,7 @@ int main(int argc, char *argv[]) {
 	const char * const FUNC_ID = "[main]";
 
 	PVTDebugApplication a(argc, argv);
+	a.setApplicationName(PROGRAM_NAME);
 
 	qInstallMessageHandler(qDebugMsgHandler);
 

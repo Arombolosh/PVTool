@@ -43,12 +43,12 @@ QString PVTDirectories::resourcesRootDir() {
 #if defined(Q_OS_WIN)
 	// in development mode, we have the resources in the data directory
 	// executables are build in bin/debug or bin/release
-	return installPath + "/../../PVTool/resources";
+	return installPath + "/../../data";
 #elif defined(Q_OS_MAC)
 	// in development mode, we have the resources outside the bundle
-	return installPath + "/../../../../PVTool/resources";
+	return installPath + "/../../../../data";
 #elif defined(Q_OS_UNIX)
-	return installPath + "/../../PVTool/resources";
+	return installPath + "/../../data";
 #endif
 
 #endif // IBK_DEPLOYMENT

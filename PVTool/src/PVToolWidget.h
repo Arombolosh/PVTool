@@ -35,6 +35,13 @@ private slots:
 	void on_pushButton_Directory_clicked();
 
 private:
+
+	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given
+		target file name.
+		\param m6template String containing template m6 file - will be modified in function, since we only need it once per simulation
+	*/
+	void readM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const;
+
 	Ui::PVToolWidget *m_ui;
 
 };

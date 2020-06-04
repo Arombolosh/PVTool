@@ -11,6 +11,7 @@
 #include <MM_Material.h>
 
 #include "PVTConstants.h"
+#include "PVTDirectories.h"
 
 PVToolWidget::PVToolWidget(QWidget *parent) :
 	QWidget(parent),
@@ -187,41 +188,6 @@ void readD6pFile(const IBK::Path &filename, double pcmThick, double insuThick,
 	//schreiben der datei
 }
 
-void readM6File(const IBK::Path &filename, double rho, double ce,double lambda){
-
-	std::ifstream in;
-	in.open(filename.c_str());
-	std::string line;
-	unsigned int counter=0;
-	while (std::getline(in, line)) {
-
-		std::string nameToReplace = "${RHO}";
-		size_t len = nameToReplace.length();
-		size_t pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(rho));
-			++counter;
-		}
-		nameToReplace = "${CE}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(ce));
-			++counter;
-		}
-		nameToReplace = "${LAMBDA}";
-		len = nameToReplace.length();
-		pos = line.find(nameToReplace);
-		if(pos != std::string::npos){
-			line.replace(pos, len, IBK::val2string(lambda));
-			++counter;
-		}
-
-		if(counter==3)
-			break;
-	}
-	//schreiben der datei
-}
 
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// Climate data file
@@ -291,9 +257,51 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		}
 	}
 
-
 	// read the template files into memory
+	// - project template
+	// - insulation template
 
+	IBK::Path d6pTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/template.d6p").toStdString());
+	IBK::Path m6TemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/InsulationMatTemplate.m6").toStdString());
+
+	std::string d6Template, m6Template;
+	{
+		std::ifstream in(d6pTemplatePath.str());
+		std::stringstream strm;
+		strm << in.rdbuf();
+		d6Template = strm.str();
+	}
+	{
+		std::ifstream in(m6TemplatePath.str());
+		std::stringstream strm;
+		strm << in.rdbuf();
+		m6Template = strm.str();
+	}
+
+	// copy entire working directory
+
+	IBK::Path templateDirectory( (PVTDirectories::resourcesRootDir() + "/project_template").toStdString());
+	IBK::Path workingDirectory( workingDir.toStdString() );
+	bool success = IBK::Path::copy(templateDirectory, workingDirectory);
+	if (!success) {
+		QMessageBox::critical(this, QString(), tr("Konnte Projektverzeichnis nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
+		return;
+	}
+
+	// adjust template insulation material and write to target directory
+	IBK::Path insulationM6Path( workingDirectory / "materials/InsulationMat.m6");
+
+	createM6File(m6Template, insulationM6Path, m_ui->doubleSpinBox_Density->value(),
+			   m_ui->doubleSpinBox_SpecHeatCapa->value(),
+			   m_ui->doubleSpinBox_Conductivity->value());
+
+
+	// *** start variation loop
+	//
+	// in each loop we:
+	// - adjust PCM material layer thickness
+
+#if 0
 	IBK::Path filenameD6p(""), filenameM6("");
 	//pcm thickness total - 2 cells of pcm
 	//total cells for pcm is 3
@@ -301,12 +309,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
 	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
 	readD6pFile(filenameD6p,pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(),"InuslationMat", weatherName);
-	readM6File(filenameM6, m_ui->doubleSpinBox_Density->value(),
-			   m_ui->doubleSpinBox_SpecHeatCapa->value(),
-			   m_ui->doubleSpinBox_Conductivity->value());
 
 
-#if 0
 
 	//PCM-> Material (PCM) kopieren aus Vorgabedateien
 	//Wärmedämmung (Insulation) erstellen aus Vorgaben
@@ -339,15 +343,24 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	//pvtool anwerfen mit pfadübergabe von delphin ausgaben und aus gui exportierten pv daten
 
 	//ergebnisse sammeln
-
-
 }
 
-void PVToolWidget::on_pushButton_Directory_clicked()
-{
+
+void PVToolWidget::on_pushButton_Directory_clicked() {
 	//vorinitalisierung von dem
 	QString fpath = QFileDialog::getExistingDirectory(this, tr("Setze Ausführungsordner"), QString());
 	if(fpath.isEmpty())
 		return;
 	m_ui->lineEdit_Directory->setText(fpath);
+}
+
+
+void PVToolWidget::createM6File(std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce,double lambda) const {
+	m6Template = IBK::replace_string(m6Template, "${RHO}", IBK::val2string(rho));
+	m6Template = IBK::replace_string(m6Template, "${CE}", IBK::val2string(ce));
+	m6Template = IBK::replace_string(m6Template, "${LAMBDA}", IBK::val2string(lambda));
+
+	// write file
+	std::ofstream out(targetFileName.str());
+	out << m6Template << std::endl;
 }
