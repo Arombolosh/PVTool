@@ -99,7 +99,6 @@ endif( APPLE )
 add_subdirectory( ../../externals/IBK/projects/cmake_local IBK )
 add_subdirectory( ../../externals/DataIO/projects/cmake_local DataIO )
 add_subdirectory( ../../externals/SAM/projects/cmake_local SAM )
-add_subdirectory( ../../externals/TiCPP/projects/cmake_local TiCPP )
 
 # -------------------------------------------------------------
 # Executables/applications
