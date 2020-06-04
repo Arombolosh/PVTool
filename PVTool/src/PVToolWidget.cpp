@@ -273,7 +273,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	double pcmThick = 0.03 - 0.005; // in m -> muss mit den variationen angepasst werden
 	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
-	createDelphinProject(d6Template, d6ProjectPath, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
+    createDelphinProject(d6Template, d6ProjectPath, pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
 
 
 
@@ -343,11 +343,20 @@ void PVToolWidget::createM6File(const std::string & m6Template, const IBK::Path 
 
 
 void PVToolWidget::createDelphinProject(const std::string & d6Template,
-						  const IBK::Path & d6ProjectPath,
-						  double insulationThickness,
+                          const IBK::Path & d6ProjectFilePath,
+                          double pcmThickness,
+                          double insulationThickness,
 						  const std::string & pcmMaterialFileName,
 						  const std::string & climateDataFileName)
 {
+    std::string d6str = IBK::replace_string(d6Template, "${PCMThick}", IBK::val2string(pcmThickness));
+    d6str = IBK::replace_string(d6str, "${INSULATIONThick}", IBK::val2string(insulationThickness));
+    d6str = IBK::replace_string(d6str, "${PCM}",pcmMaterialFileName);
+    d6str = IBK::replace_string(d6str, "${CLIMATE}", climateDataFileName);
+
+    // write file
+    std::ofstream out(d6ProjectFilePath.str());
+    out << d6str << std::endl;
 
 }
 

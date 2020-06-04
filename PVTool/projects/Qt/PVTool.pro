@@ -12,8 +12,8 @@ QT += xml core gui network printsupport widgets
 LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lIBK \
 	-lDataIO \
-	-lSAM \
-	-lMaterials
+        -lSAM
+
 
 INCLUDEPATH = \
 	../../src \

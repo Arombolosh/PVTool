@@ -44,16 +44,17 @@ private:
 
 	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given
 		target file name.
-		\param m6template String containing template m6 file.
+        \param m6Template String containing template m6 file.
 	*/
 	void createM6File(const std::string & m6Template, const IBK::Path &targetFileName, double rho, double ce, double lambda) const;
 
 	/*! Generates a DELPHIN project file. */
-	void createDelphinProject(const std::string & d6Template,
-							  const IBK::Path & d6ProjectPath,
-							  double insulationThickness,
-							  const std::string & pcmMaterialFileName,
-							  const std::string & climateDataFileName);
+    void createDelphinProject(const std::string & d6Template,
+                              const IBK::Path & d6ProjectFilePath,
+                              double pcmThickness,
+                              double insulationThickness,
+                              const std::string & pcmMaterialFileName,
+                              const std::string & climateDataFileName);
 
 	/*! Starts command in terminal and waits for job to finish. This is meant to be used for fast jobs, i.e. CmdDiscretize.
 	*/
