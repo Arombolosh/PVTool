@@ -75,11 +75,6 @@ public:
 	};
 
 
-	/*! C'tor. */
-	Energy(){
-		m_manuData = ManufactureData();
-	}
-
 	/*! Produces calculation parameters from manufacture dataset for pv-module.
 		In case of errors, throws an IBK::Exception.
 	*/

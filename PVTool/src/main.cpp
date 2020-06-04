@@ -22,7 +22,7 @@ void qDebugMsgHandler(QtMsgType type, const QMessageLogContext &context, const Q
 }
 
 int main(int argc, char *argv[]) {
-	const char * const FUNC_ID = "[main]";
+//	const char * const FUNC_ID = "[main]";
 
 	PVTDebugApplication a(argc, argv);
 	a.setApplicationName(PROGRAM_NAME);

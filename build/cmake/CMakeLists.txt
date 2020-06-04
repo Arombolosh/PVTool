@@ -66,7 +66,7 @@ endif (MSVC)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # Test for Qt5
-find_package(Qt5Widgets required)
+find_package(Qt5Widgets REQUIRED)
 
 # when building with gcc/icc add compile flag 
 if (NOT MSVC)

@@ -8,6 +8,7 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/../../../externals/IBK/src
 	${PROJECT_SOURCE_DIR}/../../../externals/DataIO/src
 	${PROJECT_SOURCE_DIR}/../../../externals/SAM/src
+	${PROJECT_SOURCE_DIR}/../../../PVEnergy/src
 	${Qt5Widgets_INCLUDE_DIRS}
 )
 

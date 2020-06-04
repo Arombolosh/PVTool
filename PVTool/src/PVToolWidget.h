@@ -43,7 +43,6 @@ private slots:
 	void on_pushButton_Directory_clicked();
 
 	void onSimulationJobFinished(int status, QProcess::ExitStatus);
-	void onSimulationJobAborted();
 
 private:
 

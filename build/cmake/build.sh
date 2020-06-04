@@ -65,8 +65,7 @@ do
     if [[ $var = "verbose"  ]];
   	then
 		CMAKE_OPTIONS="$CMAKE_OPTIONS -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
-	  fi
-
+	fi
 
 done
 
@@ -102,6 +101,6 @@ fi &&
 if [ -e $BUILDDIR/PVTool/PVTool.app ]; then
   if [ -e ../../bin/release/PVTool.app ]; then
     rm -rf ../../bin/release/PVTool.app
-  fi &&
+  fi
 fi 
 

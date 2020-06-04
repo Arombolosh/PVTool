@@ -445,7 +445,7 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 
 
 void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus status) {
-	if (status == QProcess::Crashed || exitCode != 0) {
+	if (status == QProcess::CrashExit || exitCode != 0) {
 		IBK::Path logFile(IBK::Path(m_completedProjects.back().toStdString()).withoutExtension() / "log/screenlog.txt");
 		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation, siehe Logdatei '%1'")
 							  .arg(QString::fromStdString(logFile.str())));
@@ -455,13 +455,6 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 	m_progressDlg->setValue(m_completedProjects.size());
 	startNextDELPHINSim();
 }
-
-
-
-void PVToolWidget::onSimulationJobAborted() {
-	startNextDELPHINSim();
-}
-
 
 
 // *** private functions
