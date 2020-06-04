@@ -45,7 +45,7 @@ public:
 
 		/*! Calculates the coeff. alphaIsc and betaVoc */
 		void calcCoefficients(){
-			m_alphaIsc = m_alpha * m_isc*0.01;
+			m_alphaIsc = m_alpha * m_isc*0.01;	//0.01 = change percent to unitless
 			m_betaVoc = m_beta * m_voc*0.01;
 		}
 
