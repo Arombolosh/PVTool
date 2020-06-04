@@ -14,7 +14,6 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
 
 # Fortran module files
 *.mod
@@ -33,7 +32,6 @@
 # IBK Git-ignore
 debug/
 debug_x64/
-release/
 release_x64/
 lib_x64/
 lib/
