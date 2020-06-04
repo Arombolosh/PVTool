@@ -308,7 +308,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
 			return;
 		}
-		m_waitingProjects.append(QString::fromStdString(d6ProjectPath.filename().str()));
+		m_waitingProjects.append(QString::fromStdString(d6ProjectPath.str()));
 	}
 
 	if (m_progressDlg == nullptr) {
