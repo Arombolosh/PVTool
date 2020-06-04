@@ -8,7 +8,7 @@
 #include <PVTool_Energy.h>
 
 namespace Ui {
-class PVToolWidget;
+	class PVToolWidget;
 }
 
 /*! Main widget. */
@@ -19,11 +19,7 @@ public:
 	explicit PVToolWidget(QWidget *parent = nullptr);
 	~PVToolWidget();
 
-
-
-	std::vector<std::string>						m_weatherNames;
 	std::vector<PVTOOL::Energy::ManufactureData>	m_pvModule;
-	std::vector<std::string>						m_pcmNames;
 
 private slots:
 	void on_radioButton_WeatherComboBox_toggled(bool checked);
@@ -41,8 +37,6 @@ private slots:
 private:
 	Ui::PVToolWidget *m_ui;
 
-
-	std::vector<std::pair<std::string,IBK::Path>>	m_weather;
 };
 
 #endif // PVTOOLWIDGET_H

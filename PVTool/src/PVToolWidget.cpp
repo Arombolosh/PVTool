@@ -10,6 +10,8 @@
 #include <IBK_assert.h>
 #include <MM_Material.h>
 
+#include "PVTConstants.h"
+
 PVToolWidget::PVToolWidget(QWidget *parent) :
 	QWidget(parent),
 	m_ui(new Ui::PVToolWidget)

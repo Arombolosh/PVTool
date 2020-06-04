@@ -33,14 +33,18 @@ RESOURCES += \
 SOURCES += \
 	../../../PVEnergy/src/PVTool_Energy.cpp \
 	../../src/PVTButtonBar.cpp \
+	../../src/PVTConstants.cpp \
 	../../src/PVTDebugApplication.cpp \
+	../../src/PVTDirectories.cpp \
 	../../src/PVToolWidget.cpp \
 	../../src/main.cpp
 
 HEADERS += \
 	../../../PVEnergy/src/PVTool_Energy.h \
 	../../src/PVTButtonBar.h \
+	../../src/PVTConstants.h \
 	../../src/PVTDebugApplication.h \
+	../../src/PVTDirectories.h \
 	../../src/PVToolWidget.h
 
 FORMS += \
