@@ -277,6 +277,9 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
     createDelphinProject(d6Template, d6ProjectPath, pcmThick, insuThick, m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName);
 
 
+	// now run CmdDiscretize to generate discretized project file
+	QStringList discCmdLine;
+	discCmdLine << QString::fromStdString(d6ProjectPath.str()) <<
 
 #if 0
 	IBK::Path filenameD6p(""), filenameM6("");
