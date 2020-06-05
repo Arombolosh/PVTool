@@ -18,8 +18,13 @@ public:
 
 	void setResultText(const std::vector<std::string> & resultLines);
 
+private slots:
+	void on_pushButtonClose_clicked();
+
+	void on_pushButtonSaveToFile_clicked();
+
 private:
-	Ui::PVTResultWidget *ui;
+	Ui::PVTResultWidget *m_ui;
 };
 
 #endif // PVTRESULTWIDGET_H
