@@ -12,7 +12,7 @@ QT += xml core gui network printsupport widgets
 LIBS += -L../../../lib$${DIR_PREFIX} \
 	-lIBK \
 	-lDataIO \
-        -lSAM
+		-lSAM
 
 
 INCLUDEPATH = \
@@ -32,7 +32,6 @@ RESOURCES += \
 
 SOURCES += \
 	../../../PVEnergy/src/PVTool_Energy.cpp \
-	../../src/PVTButtonBar.cpp \
 	../../src/PVTConstants.cpp \
 	../../src/PVTDebugApplication.cpp \
 	../../src/PVTDirectories.cpp \
@@ -42,7 +41,6 @@ SOURCES += \
 
 HEADERS += \
 	../../../PVEnergy/src/PVTool_Energy.h \
-	../../src/PVTButtonBar.h \
 	../../src/PVTConstants.h \
 	../../src/PVTDebugApplication.h \
 	../../src/PVTDirectories.h \

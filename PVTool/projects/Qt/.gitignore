@@ -1,3 +1,4 @@
 /Makefile.PVTool
 /Makefile.PVTool.Debug
 /Makefile.PVTool.Release
+/qrc_PVTool.cpp

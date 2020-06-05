@@ -177,13 +177,6 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	//einschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(false);
 
-
-	// connect button-bar actions
-	// Note: the variant with function pointers allows signal/slot availability checking at compile-time and
-	//       is therefore preferable
-
-	//connect(m_ui->buttonBar->toolButtonQuit, SIGNAL(clicked()), this, SLOT(onButtonBarQuitClicked()));
-	connect(m_ui->buttonBar->toolButtonQuit, &QToolButton::clicked, this, &PVToolWidget::onButtonBarQuitClicked);
 }
 
 
@@ -651,7 +644,7 @@ void PVToolWidget::runPVEnergy()
 
 
 	PVTResultWidget res(this);
-	res.setResultText();
+//	res.setResultText();
 }
 
 
