@@ -638,13 +638,10 @@ void PVToolWidget::runPVEnergy()
 			summedValues[i] += energyRes[i][j];
 	}
 
-
-	std::vector<std::string> results;
-	results.push_back("Input");
-
-
-	PVTResultWidget res(this);
-//	res.setResultText();
+	std::vector<std::string>	results(summedValues.size());
+	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
+	for(size_t i=0; i<summedValues.size(); ++i)
+		results[i+1]=IBK::FormatString("%1 %2").arg((i+1),5).arg(summedValues[i]/1000,8).str();
 }
 
 
