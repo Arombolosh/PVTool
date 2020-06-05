@@ -46,8 +46,12 @@ Source: ..\..\PVTool\resources\translations\*.qm; DestDir: {app}\resources\trans
 
 ; Documentation
 
-; Examples
-;Source: ..\..\data\examples\win64\*; DestDir: {app}\resources\examples; Flags: recursesubdirs
+; Database files
+Source: ..\..\data\binaries\win64\*; DestDir: {app}\resources\binaries\win64; Flags: recursesubdirs
+Source: ..\..\data\DB_Climate\*; DestDir: {app}\resources\DB_Climate; Flags: recursesubdirs
+Source: ..\..\data\DB_PCMMaterials\*; DestDir: {app}\resources\DB_PCMMaterials; Flags: recursesubdirs
+Source: ..\..\data\file_templates\*; DestDir: {app}\resources\file_templates; Flags: recursesubdirs
+Source: ..\..\data\project_template\*; DestDir: {app}\resources\project_template; Flags: recursesubdirs
 
 ; Auxiliary files
 Source: ..\..\LICENSE ; DestDir: {app}\resources;
