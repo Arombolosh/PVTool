@@ -21,7 +21,7 @@
 
 #include "PVTConstants.h"
 #include "PVTDirectories.h"
-#include "PVTResultWidget.h"
+#include "PVTResultDialog.h"
 
 bool convertDoubleFromText(const QString & text, double & value) {
 	// try converting using the current locale
@@ -656,9 +656,10 @@ void PVToolWidget::runPVEnergy()
 		results.push_back( IBK::FormatString("%1 %2").arg((i+1),5)
 						   .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
 
-	PVTResultWidget * PVResults = new PVTResultWidget();
+	PVTResultDialog * PVResults = new PVTResultDialog();
 	PVResults->setResultText(results);
-	PVResults->show();
+	PVResults->setModal(true);
+	PVResults->exec();
 
 //	// This loop will wait for the window is destroyed
 //	QEventLoop loop;

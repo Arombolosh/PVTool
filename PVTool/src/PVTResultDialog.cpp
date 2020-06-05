@@ -1,14 +1,14 @@
-#include "PVTResultWidget.h"
-#include "ui_PVTResultWidget.h"
+#include "PVTResultDialog.h"
+#include "ui_PVTResultDialog.h"
 
 #include <QFileDialog>
 #include <QFont>
 
 #include "PVTConstants.h"
 
-PVTResultWidget::PVTResultWidget(QWidget *parent) :
-	QWidget(parent),
-	m_ui(new Ui::PVTResultWidget)
+PVTResultDialog::PVTResultDialog(QWidget *parent) :
+	QDialog(parent),
+	m_ui(new Ui::PVTResultDialog)
 {
 	m_ui->setupUi(this);
 
@@ -18,24 +18,24 @@ PVTResultWidget::PVTResultWidget(QWidget *parent) :
 	m_ui->plainTextEditResults->setFont(f);
 }
 
-PVTResultWidget::~PVTResultWidget()
+PVTResultDialog::~PVTResultDialog()
 {
 	delete m_ui;
 }
 
-void PVTResultWidget::setResultText(const std::vector<std::string> & resultLines) {
+void PVTResultDialog::setResultText(const std::vector<std::string> & resultLines) {
 
 	//	ui->plainTextEditResults->appendPlainText(line);
 	for (size_t i=0;i<resultLines.size();++i)
 		m_ui->plainTextEditResults->appendPlainText(QString::fromStdString(resultLines[i]));
 
 }
-void PVTResultWidget::on_pushButtonClose_clicked()
+void PVTResultDialog::on_pushButtonClose_clicked()
 {
 	this->close();
 }
 
-void PVTResultWidget::on_pushButtonSaveToFile_clicked()
+void PVTResultDialog::on_pushButtonSaveToFile_clicked()
 {
 	QString filename = QFileDialog::getSaveFileName(this,tr("Speichere Ergebnisdatei"), QString(),tr("Text File (*.txt)"));
 	QFile f( filename );

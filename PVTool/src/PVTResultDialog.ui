@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PVTResultWidget</class>
- <widget class="QWidget" name="PVTResultWidget">
+ <class>PVTResultDialog</class>
+ <widget class="QDialog" name="PVTResultDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>525</width>
-    <height>300</height>
+    <width>746</width>
+    <height>474</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Ergebnisse</string>
+   <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QPlainTextEdit" name="plainTextEditResults"/>
    </item>
-   <item>
+   <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
