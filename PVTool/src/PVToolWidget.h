@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QProcess>
+#include <QTimer>
 
 #include <IBK_Path.h>
 
@@ -21,7 +22,7 @@ class PVToolWidget : public QWidget {
 
 public:
 	explicit PVToolWidget(QWidget *parent = nullptr);
-	~PVToolWidget();
+	~PVToolWidget() override;
 
 	std::vector<PVTOOL::Energy::ManufactureData>	m_pvModule;
 
@@ -43,6 +44,9 @@ private slots:
 	void on_pushButton_Directory_clicked();
 
 	void onSimulationJobFinished(int status, QProcess::ExitStatus);
+
+	/*! Triggered in repeated intervals during the simulation to update the progress bar. */
+	void onSimProgressTimerTimeout();
 
 	void onButtonBarQuitClicked();
 
@@ -76,6 +80,8 @@ private:
 
 	QProgressDialog		*m_progressDlg;
 	QProcess			*m_cmdLineProcess;
+
+	QTimer				m_simProgressTimer;
 
 	/*! Contains list of all ready and discretized DELPHIN Projects to run (full file paths). */
 	QStringList			m_waitingProjects;

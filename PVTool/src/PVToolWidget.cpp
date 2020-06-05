@@ -432,13 +432,14 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	if (m_progressDlg == nullptr) {
 		m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
+		connect(&m_simProgressTimer, &QTimer::timeout, this, &PVToolWidget::onSimProgressTimerTimeout);
 	}
-	else {
-		m_progressDlg->setMaximum(m_waitingProjects.count());
-	}
+	m_progressDlg->setMaximum(m_waitingProjects.count()*100);
 	m_progressDlg->setValue(0);
 	m_progressDlg->setWindowModality(Qt::WindowModal);
 	m_progressDlg->show();
+	m_simProgressTimer.setInterval(1000);
+	m_simProgressTimer.start();
 	startNextDELPHINSim();
 }
 
@@ -454,14 +455,56 @@ void PVToolWidget::on_pushButton_Directory_clicked() {
 
 void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus status) {
 	if (status == QProcess::CrashExit || exitCode != 0) {
-		IBK::Path logFile(IBK::Path(m_completedProjects.back().toStdString()).withoutExtension() / "log/screenlog.txt");
-		QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation, siehe Logdatei '%1'")
-							  .arg(QString::fromStdString(logFile.str())));
+		// unless dlg was cancelled
+		if (!m_progressDlg->wasCanceled()) {
+			IBK::Path logFile(IBK::Path(m_completedProjects.back().toStdString()).withoutExtension() / "log/screenlog.txt");
+			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation, siehe Logdatei '%1'")
+								  .arg(QString::fromStdString(logFile.str())));
+		}
+		m_simProgressTimer.stop();
 		m_progressDlg->hide();
 		return;
 	}
-	m_progressDlg->setValue(m_completedProjects.size());
+	m_progressDlg->setValue(m_completedProjects.size()*100);
 	startNextDELPHINSim();
+}
+
+
+void PVToolWidget::onSimProgressTimerTimeout() {
+	// was the simulation aborted?
+	if (m_progressDlg->wasCanceled()) {
+		// kill solver process, if still running
+		m_cmdLineProcess->kill();
+		return;
+	}
+	// read currently processed simulation job's progress.tsv file, extract last line's percentage and update progress bar
+	IBK::Path currentSimJob(m_completedProjects.back().toStdString());
+	IBK::Path path2Progress = currentSimJob.withoutExtension() / "/log/progress.tsv";
+	std::ifstream in(path2Progress.str());
+	std::string lastLine, line;
+	while (std::getline(in, line)) {
+		if (line.find_first_not_of(" \t\r") == std::string::npos)
+			continue; // skip empty lines
+		lastLine = line;
+	}
+	// if all went well, lastLine is not empty and contains the corrent percentage
+	if (lastLine.empty())
+		return; // nope, some error
+	// extract columns
+	std::vector<double>  vals;
+	try {
+		IBK::string2valueVector(lastLine, vals);
+		// we need the third number
+		if (vals.size() > 2) {
+			double percentage = vals[2];
+			// compute progress bar value
+			int progressBarValue = percentage + (m_completedProjects.size()-1)*100;
+			m_progressDlg->setValue(progressBarValue);
+		}
+	}
+	catch (...) {
+		// don't mind the error, just do nothing here
+	}
 }
 
 
