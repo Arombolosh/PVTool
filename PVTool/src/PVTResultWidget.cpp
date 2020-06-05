@@ -2,12 +2,20 @@
 #include "ui_PVTResultWidget.h"
 
 #include <QFileDialog>
+#include <QFont>
+
+#include "PVTConstants.h"
 
 PVTResultWidget::PVTResultWidget(QWidget *parent) :
 	QWidget(parent),
 	m_ui(new Ui::PVTResultWidget)
 {
 	m_ui->setupUi(this);
+
+	QFont f;
+	f.setFamily(FIXED_FONT_FAMILY);
+	f.setPointSize(TABLE_FONT_SIZE);
+	m_ui->plainTextEditResults->setFont(f);
 }
 
 PVTResultWidget::~PVTResultWidget()

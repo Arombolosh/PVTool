@@ -165,7 +165,9 @@ FormatString & FormatString::arg(size_t i, int fieldWidth) {
 }
 #endif
 
-FormatString & FormatString::arg(double d, int fieldWidth, char format, int precision, const char & fillChar) {
+FormatString & FormatString::arg(double d, int fieldWidth, char format, int precision, const char & fillChar,
+								 const std::ios_base::fmtflags align)
+{
 	if (format == 'g')
 		m_arguments.push_back(val2string(d));
 	else {
@@ -174,6 +176,11 @@ FormatString & FormatString::arg(double d, int fieldWidth, char format, int prec
 			strm << std::fixed;
 		else if (format=='e' || format=='E') {
 			strm << std::scientific;
+		}
+		switch (align) {
+			case std::ios_base::left : strm << std::left; break;
+			case std::ios_base::right : strm << std::right; break;
+			case std::ios_base::internal : strm << std::internal; break;
 		}
 		strm << std::setw(fieldWidth) << std::setprecision(precision) << std::setfill(fillChar);
 		strm << d;

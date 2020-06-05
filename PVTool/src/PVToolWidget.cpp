@@ -638,19 +638,20 @@ void PVToolWidget::runPVEnergy()
 			summedValues[i] += energyRes[i][j];
 	}
 
-	std::vector<std::string>	results(summedValues.size());
+	std::vector<std::string>	results;
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
 	for(size_t i=0; i<summedValues.size(); ++i)
-		results[i+1]=IBK::FormatString("%1 %2").arg((i+1),5).arg(summedValues[i]/1000,8).str();
+		results.push_back( IBK::FormatString("%1 %2").arg((i+1),5)
+						   .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
 
-	PVTResultWidget PVResults;
-	PVResults.setResultText(results);
-	PVResults.show();
+	PVTResultWidget * PVResults = new PVTResultWidget();
+	PVResults->setResultText(results);
+	PVResults->show();
 
-	// This loop will wait for the window is destroyed
-	QEventLoop loop;
-	connect(this, SIGNAL(PVResults.destroyed()), & loop, SLOT(quit()));
-	loop.exec();
+//	// This loop will wait for the window is destroyed
+//	QEventLoop loop;
+//	connect(this, SIGNAL(PVResults.destroyed()), & loop, SLOT(quit()));
+//	loop.exec();
 
 	//m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
 	//connect(&m_simProgressTimer, &QTimer::timeout, this, &PVToolWidget::onSimProgressTimerTimeout);

@@ -142,7 +142,9 @@ public:
 		\return		FormatString including the substitution argument.
 		\sa QString::arg(double, ...) for description of arguments
 	*/
-	FormatString & arg(double d, int fieldWidth = 0, char format = 'g', int precision = -1, const char & fillChar = ' ' );
+	FormatString & arg(double d, int fieldWidth = 0, char format = 'g', int precision = -1,
+					   const char & fillChar = ' ',
+					   const std::ios_base::fmtflags align = std::ios_base::left );
 
 	/*! Inserts another FomatString at the next location of '%'.
 		\return		FormatString including the substitution argument.

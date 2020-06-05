@@ -17,5 +17,10 @@ extern const char * const ORG_NAME;
 /*! File extension including the dot (".pv"). */
 extern const char * const DOT_FILE_EXTENSION;
 
+/*! Font size to be used in tables. */
+extern const int TABLE_FONT_SIZE;
+/*! Fixed-size font family to be used in tables. */
+extern const char * const FIXED_FONT_FAMILY;
+
 
 #endif // PVTCONSTANTS_H

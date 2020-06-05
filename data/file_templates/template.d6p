@@ -10,7 +10,7 @@
 		<SimulationParameter>
 			<BalanceEquationModule>BEHeat</BalanceEquationModule>
 			<Interval>
-				<IBK:Parameter name="Duration" unit="a">1</IBK:Parameter>
+				<IBK:Parameter name="Duration" unit="d">1</IBK:Parameter>
 			</Interval>
 			<ClimateDataFilePath>${Project Directory}/climate/${CLIMATE}</ClimateDataFilePath>			
 			<LambdaSelection>LambdaDry</LambdaSelection>
