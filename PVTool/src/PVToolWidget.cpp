@@ -56,38 +56,47 @@ bool convertIntFromText(const QString & text, int & value) {
 	return true;
 }
 
-bool convertLineEditinDouble(QWidget * const widget, QLabel * const label, QLineEdit * const lineEdit, double &value) {
+
+/*! takes Qwidget, Qlabel and QlineEdit object and tries to convert the read value from lineEdit into Double
+	throws QMessageBox with caption from label and lineEdit value if conversion fails and
+	sets color of text in lineEdit Object to red and the focus to it.
+*/
+bool convertLineEditintoDouble(QWidget * const widget, QLabel * const label, QLineEdit * const lineEdit, double &value) {
 	QPalette palette;
 	if (!convertDoubleFromText(lineEdit->text(),value)){
-		lineEdit->setFocus();
+		lineEdit->setFocus(); // set focus to lineEdit Object
 		palette.setColor(QPalette::Text,Qt::red);
-		lineEdit->setPalette(palette);
+		lineEdit->setPalette(palette); // set text color to red in lineEdit field
 		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGleitkommazahl wird benötigt.")
 							  .arg(lineEdit->text())
-							  .arg(label->text()));
+							  .arg(label->text())); // throws QMessageBox with Name of LineEdit Obj and Value
 		return false;
 	}
 	else {
 		palette.setColor(QPalette::Text,Qt::black);
-		lineEdit->setPalette(palette);
+		lineEdit->setPalette(palette); // set text color to black if value is valid
 		return true;
 	}
 }
 
-bool convertLineEditinInt(QWidget * const widget, QLabel * const label, QLineEdit * const lineEdit, int &value) {
+/*! takes Qwidget, Qlabel and QlineEdit object and tries to convert the read value from lineEdit into Integer
+	throws QMessageBox with caption from label and lineEdit value if conversion fails and
+	sets color of text in lineEdit Object to red and the focus to it.
+*/
+bool convertLineEditintoInt(QWidget * const widget, QLabel * const label, QLineEdit * const lineEdit, int &value) {
 	QPalette palette;
 	if (!convertIntFromText(lineEdit->text(),value)){
-		lineEdit->setFocus();
+		lineEdit->setFocus(); // set focus to lineEdit Object
 		palette.setColor(QPalette::Text,Qt::red);
-		lineEdit->setPalette(palette);
-		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGanzzahliger Wert wird benötigt.")
+		lineEdit->setPalette(palette); // set text color to red in lineEdit field
+		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGleitkommazahl wird benötigt.")
 							  .arg(lineEdit->text())
-							  .arg(label->text()));
+							  .arg(label->text())); // throws QMessageBox with Name of LineEdit Obj and Value
 		return false;
 	}
 	else {
 		palette.setColor(QPalette::Text,Qt::black);
-		lineEdit->setPalette(palette);
+		lineEdit->setPalette(palette); // set text color to black if value is valid
 		return true;
 	}
 }
@@ -303,13 +312,16 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
 	}
 	else {
-		if (!convertLineEditinDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, pvtool.m_manuData.m_imp)) return;
-		if (!convertLineEditinDouble(this, m_ui->label_iMPP_2, m_ui->lineEdit_iMPP, pvtool.m_manuData.m_imp)) return;
-		if (!convertLineEditinDouble(this, m_ui->label_uOC, m_ui->lineEdit_uOC, pvtool.m_manuData.m_voc)) return;
-		if (!convertLineEditinDouble(this, m_ui->label_iSC, m_ui->lineEdit_iSC, pvtool.m_manuData.m_isc)) return;
-		if (!convertLineEditinDouble(this, m_ui->label_tempCoeffI, m_ui->lineEdit_alpha, pvtool.m_manuData.m_alpha)) return;
-		if (!convertLineEditinDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_beta, pvtool.m_manuData.m_beta)) return;
-		if (!convertLineEditinInt(this, m_ui->label_nSer, m_ui->lineEdit_nSer, pvtool.m_manuData.m_nSer)) return;
+
+		// set PV module data and throw Message Box if input is wrong
+		if (!convertLineEditintoDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, pvtool.m_manuData.m_imp)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_iMPP_2, m_ui->lineEdit_iMPP, pvtool.m_manuData.m_imp)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_uOC, m_ui->lineEdit_uOC, pvtool.m_manuData.m_voc)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_iSC, m_ui->lineEdit_iSC, pvtool.m_manuData.m_isc)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffI, m_ui->lineEdit_alpha, pvtool.m_manuData.m_alpha)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_beta, pvtool.m_manuData.m_beta)) return;
+		if (!convertLineEditintoInt(this, m_ui->label_nSer, m_ui->lineEdit_nSer, pvtool.m_manuData.m_nSer)) return;
+
 		pvtool.m_manuData.m_name = "UserGeneratedPVModule";
 	}
 
