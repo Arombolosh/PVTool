@@ -20,9 +20,9 @@ AppPublisher=MasterSim Developers
 AppPublisherURL=https://github.com/Arombolosh/PVTool
 AppSupportURL=https://github.com/Arombolosh/PVTool
 AppUpdatesURL=https://github.com/Arombolosh/PVTool
-VersionInfoCompany=Bauklimatik Dresden
-VersionInfoCopyright=${CurrentYear} Andreas Nicolai
-AppCopyright=${CurrentYear} Andreas Nicolai
+VersionInfoCompany=IBK/TU Dresden
+VersionInfoCopyright=${CurrentYear} IBK/TU Dresden
+AppCopyright=${CurrentYear} IBK/TU Dresden
 LicenseFile=..\..\LICENSE
 ArchitecturesInstallIn64BitMode=x64
 
@@ -47,10 +47,10 @@ Source: ..\..\PVTool\resources\translations\*.qm; DestDir: {app}\resources\trans
 ; Documentation
 
 ; Examples
-Source: ..\..\data\examples\win64\*; DestDir: {app}\resources\examples; Flags: recursesubdirs
+;Source: ..\..\data\examples\win64\*; DestDir: {app}\resources\examples; Flags: recursesubdirs
 
 ; Auxiliary files
-Source: ..\..\doc\LICENSE ; DestDir: {app}\resources;
+Source: ..\..\LICENSE ; DestDir: {app}\resources;
 
 
 [InstallDelete]

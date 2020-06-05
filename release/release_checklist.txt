@@ -1,0 +1,10 @@
+Release-Checklist
+-----------------
+
+Follow the usual procedure:
+- make sure all tickets for Milestone-to-be-released are closed
+- update translation
+- update documentation
+- update release_notes.md file
+- increase version number and commit and push everything
+

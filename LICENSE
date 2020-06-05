@@ -1,6 +1,10 @@
-BSD 3-Clause License
+PVTool - A tool for optimizing PCM layer width below PV panels
 
-Copyright (c) 2020, Arombolosh
+This software is free and open-source software, licensed under the 
+
+BSD 3-Clause License.
+
+Copyright (c) 2020, IBK/TU Dresden
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
