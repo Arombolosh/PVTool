@@ -36,6 +36,7 @@ SOURCES += \
 	../../src/PVTConstants.cpp \
 	../../src/PVTDebugApplication.cpp \
 	../../src/PVTDirectories.cpp \
+	../../src/PVTResultWidget.cpp \
 	../../src/PVToolWidget.cpp \
 	../../src/main.cpp
 
@@ -45,8 +46,10 @@ HEADERS += \
 	../../src/PVTConstants.h \
 	../../src/PVTDebugApplication.h \
 	../../src/PVTDirectories.h \
+	../../src/PVTResultWidget.h \
 	../../src/PVToolWidget.h
 
 FORMS += \
+	../../src/PVTResultWidget.ui \
 	../../src/PVToolWidget.ui
 

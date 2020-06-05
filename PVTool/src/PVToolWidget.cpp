@@ -21,6 +21,7 @@
 
 #include "PVTConstants.h"
 #include "PVTDirectories.h"
+#include "PVTResultWidget.h"
 
 bool convertDoubleFromText(const QString & text, double & value) {
 	// try converting using the current locale
@@ -645,6 +646,12 @@ void PVToolWidget::runPVEnergy()
 	}
 
 
+	std::vector<std::string> results;
+	results.push_back("Input");
+
+
+	PVTResultWidget res(this);
+	res.setResultText();
 }
 
 
