@@ -309,8 +309,6 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
 	}
 	else {
-		// TODO : instead of toDouble() use locale-aware
-
 		if (!convertLineEditinDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, pvtool.m_manuData.m_imp)) return;
 		if (!convertLineEditinDouble(this, m_ui->label_iMPP_2, m_ui->lineEdit_iMPP, pvtool.m_manuData.m_imp)) return;
 		if (!convertLineEditinDouble(this, m_ui->label_uOC, m_ui->lineEdit_uOC, pvtool.m_manuData.m_voc)) return;
@@ -318,7 +316,6 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		if (!convertLineEditinDouble(this, m_ui->label_tempCoeffI, m_ui->lineEdit_alpha, pvtool.m_manuData.m_alpha)) return;
 		if (!convertLineEditinDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_beta, pvtool.m_manuData.m_beta)) return;
 		if (!convertLineEditinInt(this, m_ui->label_nSer, m_ui->lineEdit_nSer, pvtool.m_manuData.m_nSer)) return;
-
 		pvtool.m_manuData.m_name = "UserGeneratedPVModule";
 	}
 
@@ -443,8 +440,6 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	m_progressDlg->setWindowModality(Qt::WindowModal);
 	m_progressDlg->show();
 	startNextDELPHINSim();
-	runPVEnergy();
-
 }
 
 
@@ -558,23 +553,32 @@ void PVToolWidget::evaluateResults() {
 		IBK::Path tmp2(tmp.parentPath() / tmp.filename().withoutExtension() / "results/");
 		//read temperature and radiation data
 
-		DATAIO::DataIO temp, rad;
-		temp.read(tmp2 / "TMean.d6o");
-		IBK::UnitVector unitVec;
-		unitVec.m_data = temp.columnValues(0);
-		unitVec.m_unit = IBK::Unit(temp.m_valueUnit);
-		unitVec.convert(IBK::Unit("K"));
-		m_temperature.push_back(unitVec);
-
-
-		rad.read(tmp2 / "GlobalRadition.d6o");
-		unitVec = IBK::UnitVector ();
-		unitVec.m_data = rad.columnValues(0);
-		unitVec.m_unit = IBK::Unit(rad.m_valueUnit);
-		unitVec.convert(IBK::Unit("W/m2"));
-		m_radiation.push_back(unitVec);
+		try {
+			DATAIO::DataIO temp;
+			temp.read(tmp2 / "TMean.d6o");
+			IBK::UnitVector unitVec;
+			unitVec.m_data = temp.columnValues(0);
+			unitVec.m_unit = IBK::Unit(temp.m_valueUnit);
+			unitVec.convert(IBK::Unit("K"));
+			m_temperature.push_back(unitVec);
+		} catch (IBK::Exception &ex ) {
+			QMessageBox::critical(this, QString(), tr("Error during reading the temperature results of DELPHIN. \n %1").arg(ex.what()));
+			return;
+		}
+		try {
+			DATAIO::DataIO rad;
+			rad.read(tmp2 / "GlobalRadition.d6o");
+			IBK::UnitVector unitVec;
+			unitVec.m_data = rad.columnValues(0);
+			unitVec.m_unit = IBK::Unit(rad.m_valueUnit);
+			unitVec.convert(IBK::Unit("W/m2"));
+			m_radiation.push_back(unitVec);
+		} catch (IBK::Exception &ex) {
+			QMessageBox::critical(this, QString(), tr("Error during reading the radiation results of DELPHIN. \n %1").arg(ex.what()));
+			return;
+		}
 	}
-
+	runPVEnergy();
 }
 
 void PVToolWidget::runPVEnergy()
@@ -587,7 +591,6 @@ void PVToolWidget::runPVEnergy()
 		QMessageBox::critical(this, QString(), tr("%1").arg(ex.what()));
 		return;
 	}
-
 
 	//sum up all value of one vector
 	std::vector<double> summedValues(m_temperature.size(),0);
