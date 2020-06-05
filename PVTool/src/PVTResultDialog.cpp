@@ -3,6 +3,7 @@
 
 #include <QFileDialog>
 #include <QFont>
+#include <QMessageBox>
 
 #include "PVTConstants.h"
 
@@ -32,7 +33,7 @@ void PVTResultDialog::setResultText(const std::vector<std::string> & resultLines
 }
 void PVTResultDialog::on_pushButtonClose_clicked()
 {
-	this->close();
+	close();
 }
 
 void PVTResultDialog::on_pushButtonSaveToFile_clicked()
@@ -42,7 +43,10 @@ void PVTResultDialog::on_pushButtonSaveToFile_clicked()
 	f.open( QIODevice::WriteOnly ); // only saving possible
 	// store data in f
 
-	f.write(m_ui->plainTextEditResults->toPlainText().toStdString().c_str());
-
+	if (f.write(m_ui->plainTextEditResults->toPlainText().toStdString().c_str())==-1)
+		QMessageBox::critical(this,"Error",QString("Ergebnisdatei konnte nicht geschrieben werden in:\n%1").arg(filename));
+	else
+		QMessageBox::information(this,QString(),"Ergebnisdatei wurde geschrieben.");
 	f.close();
+	close();
 }
