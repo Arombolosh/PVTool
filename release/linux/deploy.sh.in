@@ -11,6 +11,11 @@ OUTPUT_FILE_BASENAME=${OutputFileBasename}
 mkdir -p $OUTPUT_DIRECTORY_NAME &&
 mkdir -p $OUTPUT_DIRECTORY_NAME/bin &&
 mkdir -p $OUTPUT_DIRECTORY_NAME/resources &&
+mkdir -p $OUTPUT_DIRECTORY_NAME/resources/binaries/linux64 &&
+mkdir -p $OUTPUT_DIRECTORY_NAME/resources/DB_Climate &&
+mkdir -p $OUTPUT_DIRECTORY_NAME/resources/DB_PCMMaterials &&
+mkdir -p $OUTPUT_DIRECTORY_NAME/resources/file_templates &&
+mkdir -p $OUTPUT_DIRECTORY_NAME/resources/project_template &&
 mkdir -p $OUTPUT_DIRECTORY_NAME/resources/translations &&
 mkdir -p $OUTPUT_DIRECTORY_NAME/doc &&
 
@@ -23,9 +28,14 @@ cp ../../bin/release/PVTool $OUTPUT_DIRECTORY_NAME/bin &&
 cp ../../PVTool/resources/translations/PVTool_de.qm $OUTPUT_DIRECTORY_NAME/resources/translations/ &&
 cp ../../PVTool/resources/translations/qt_de.qm $OUTPUT_DIRECTORY_NAME/resources/translations/ &&
 
-# Copy icons
+# Copy Resources
 
-# cp ../../PVTool/resources/logo_64x64.jpg $OUTPUT_DIRECTORY_NAME/resources/ &&
+cp -r ../../data/binaries/linux64/* $OUTPUT_DIRECTORY_NAME/resources/binaries/linux64/ &&
+cp -r ../../data/DB_Climate/* $OUTPUT_DIRECTORY_NAME/resources/DB_Climate/ &&
+cp -r ../../data/DB_PCMMaterials/* $OUTPUT_DIRECTORY_NAME/resources/DB_PCMMaterials/ &&
+cp -r ../../data/file_templates/* $OUTPUT_DIRECTORY_NAME/resources/file_templates/ &&
+cp -r ../../data/project_template/* $OUTPUT_DIRECTORY_NAME/resources/project_template/ &&
+
 
 # Copy desktop icon and auxilliary files
 
