@@ -21,8 +21,6 @@ echo '*** Creating Application bundle and resources to '$OUTPUT_DIRECTORY_NAME &
 # Copy application bundle into folder
 
 cp -R ../../bin/release/PVTool.app  $OUTPUT_DIRECTORY_NAME/PVTool.app &&
-cp ../../bin/release/MasterSimulator $OUTPUT_DIRECTORY_NAME/ &&
-cp ../../bin/release/MasterSimulator $OUTPUT_DIRECTORY_NAME/PVTool.app/Contents/MacOS &&
 
 # Create missing Release-Path and subdirs
 

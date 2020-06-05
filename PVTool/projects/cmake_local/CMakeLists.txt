@@ -56,7 +56,7 @@ if( UNIX )
 	else( APPLE )
 		add_executable( ${PROJECT_NAME} 
 						${APP_SRCS} ${APP_MOC_SRCS} ${APP_RC_SRCS} ${APP_UI_SRCS} 
-						${PROJECT_SOURCE_DIR}/../../resources/PVTool.icns
+						${PROJECT_SOURCE_DIR}/../../resources/gfx/icon/PVTool.icns
 		)
 	endif( APPLE ) 
 

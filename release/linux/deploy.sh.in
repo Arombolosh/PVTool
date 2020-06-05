@@ -25,13 +25,13 @@ cp ../../PVTool/resources/translations/qt_de.qm $OUTPUT_DIRECTORY_NAME/resources
 
 # Copy icons
 
-#cp ../../PVTool/resources/gfx/logo/* $OUTPUT_DIRECTORY_NAME/resources/ &&
+# cp ../../PVTool/resources/logo_64x64.jpg $OUTPUT_DIRECTORY_NAME/resources/ &&
 
 # Copy desktop icon and auxilliary files
 
-#cp ../../PVTool/resources/gfx/logo/icon_64.png $OUTPUT_DIRECTORY_NAME/resources/PVTool-64.png &&
-#cp ../../release/linux/PVTool.desktop $OUTPUT_DIRECTORY_NAME/bin/PVTool.desktop &&
-#cp ../../doc/LICENSE $OUTPUT_DIRECTORY_NAME/resources/LICENSE &&
+cp ../../PVTool/resources/icon/icon_64.jpg $OUTPUT_DIRECTORY_NAME/resources/PVTool-64.jpg &&
+cp ../../release/linux/PVTool.desktop $OUTPUT_DIRECTORY_NAME/bin/PVTool.desktop &&
+cp ../../doc/LICENSE $OUTPUT_DIRECTORY_NAME/resources/LICENSE &&
 
 ${CreateArchive}
 

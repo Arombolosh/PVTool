@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 
 	PVTDebugApplication a(argc, argv);
 	a.setApplicationName(PROGRAM_NAME);
-	a.setWindowIcon(QIcon(":/logo_64x64.jpg"));
+	a.setWindowIcon(QIcon(":/gfx/icon/icon_64.jpg"));
 
 	qInstallMessageHandler(qDebugMsgHandler);
 
