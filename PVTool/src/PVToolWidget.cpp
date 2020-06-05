@@ -562,7 +562,7 @@ void PVToolWidget::evaluateResults() {
 			unitVec.convert(IBK::Unit("K"));
 			m_temperature.push_back(unitVec);
 		} catch (IBK::Exception &ex ) {
-			QMessageBox::critical(this, QString(), tr("Error during reading the temperature results of DELPHIN. \n %1").arg(ex.what()));
+			QMessageBox::critical(this, QString(), tr("Fehler während des Lesens der Ergebnisse Temperatur von DELPHIN. \n %1").arg(ex.what()));
 			return;
 		}
 		try {
@@ -574,7 +574,7 @@ void PVToolWidget::evaluateResults() {
 			unitVec.convert(IBK::Unit("W/m2"));
 			m_radiation.push_back(unitVec);
 		} catch (IBK::Exception &ex) {
-			QMessageBox::critical(this, QString(), tr("Error during reading the radiation results of DELPHIN. \n %1").arg(ex.what()));
+			QMessageBox::critical(this, QString(), tr("Fehler während des Lesens der Ergebnisse Strahlung von DELPHIN. \n %1").arg(ex.what()));
 			return;
 		}
 	}
