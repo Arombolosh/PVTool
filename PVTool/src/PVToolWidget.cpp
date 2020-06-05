@@ -419,8 +419,10 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
 		//	discCmdLine << projectFile << "-o="+projectDiscFile;
 		std::string discFilename = "project" + IBK::val2string(i) + "-disc.d6p";
-		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p") <<
-					   QString::fromStdString("-o=" + discFilename) << "-q";
+		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p")
+					<< QString::fromStdString("-o=" + discFilename)
+					<< "-q"
+					<< "-l=2";
 		QProcess p;
 		int res = p.execute(CMDDISCPATH, discCmdLine);
 		if (res != 0) {
