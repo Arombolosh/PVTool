@@ -5,15 +5,6 @@
 
 	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-	<!--DirectoryPlaceholders section defines strings to be substituted with directories-->
-	<DirectoryPlaceholders>
-		<Placeholder name="Climate Database">${Project Directory}/climate</Placeholder>											
-		<Placeholder name="Material Database">${Project Directory}/materials</Placeholder>										
-		<Placeholder name="Database Root">${Project Directory}</Placeholder>
-	</DirectoryPlaceholders>
-
-	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
 	<!--Model data, solver settings, general parameters-->
 	<Init>
 		<SimulationParameter>
@@ -21,22 +12,25 @@
 			<Interval>
 				<IBK:Parameter name="Duration" unit="a">1</IBK:Parameter>
 			</Interval>
-			<ClimateDataFilePath>${Climate Database}/${CLIMATE}</ClimateDataFilePath>			
+			<ClimateDataFilePath>${Project Directory}/climate/${CLIMATE}</ClimateDataFilePath>			
 			<LambdaSelection>LambdaDry</LambdaSelection>
 		</SimulationParameter>
+		<SolverParameter>
+			<LESSolver>KLU</LESSolver>
+		</SolverParameter>
 	</Init>
 
 	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 	<!--List of all materials used in this construction-->
 	<Materials>
-		<MaterialReference name="Alu" color="#ffff0000" hatchCode="13">${Material Database}/AluminiumFoil_19.m6</MaterialReference>
-		<MaterialReference name="Polytetrafluorethylenkunststoffe (PTFE) [785]" color="#ffaaaa00" hatchCode="13">${Material Database}/PolytetrafluoroethylenePTFE_785.m6</MaterialReference>
-		<MaterialReference name="Glas" color="#ff404060" hatchCode="13">${Material Database}/Glass_72.m6</MaterialReference>
-		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Material Database}/InsulationMat.m6</MaterialReference>											
+		<MaterialReference name="Alu" color="#ffff0000" hatchCode="13">${Project Directory}/materials/AluminiumFoil_19.m6</MaterialReference>
+		<MaterialReference name="Polytetrafluorethylenkunststoffe (PTFE) [785]" color="#ffaaaa00" hatchCode="13">${Project Directory}/materials/PolytetrafluoroethylenePTFE_785.m6</MaterialReference>
+		<MaterialReference name="Glas" color="#ff404060" hatchCode="13">${Project Directory}/materials/Glass_72.m6</MaterialReference>
+		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Project Directory}/materials/InsulationMat.m6</MaterialReference>											
 		<MaterialReference name="PCM" color="#ff00ff7f" hatchCode="13">${Project Directory}/materials/${PCM}.m6</MaterialReference>														
-		<MaterialReference name="Luftschicht 50 mm (vertikal) [18]" color="#ff5020a0" hatchCode="13">${Material Database}/AirGapVertical50mm_18.m6</MaterialReference>
-		<MaterialReference name="Polyvinylchlorid (PVC) [786]" color="#ffaaff00" hatchCode="13">${Material Database}/PolyvinylChloridePVC_786.m6</MaterialReference>
+		<MaterialReference name="Luftschicht 50 mm (vertikal) [18]" color="#ff5020a0" hatchCode="13">${Project Directory}/materials/AirGapVertical50mm_18.m6</MaterialReference>
+		<MaterialReference name="Polyvinylchlorid (PVC) [786]" color="#ffaaff00" hatchCode="13">${Project Directory}/materials/PolyvinylChloridePVC_786.m6</MaterialReference>
 	</Materials>
 
 	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
