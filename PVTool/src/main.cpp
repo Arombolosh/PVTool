@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QFont>
 #include <QStandardPaths>
+#include <QIcon>
 
 #include <IBK_Exception.h>
 #include <IBK_messages.h>
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
 
 	PVTDebugApplication a(argc, argv);
 	a.setApplicationName(PROGRAM_NAME);
+	a.setWindowIcon(QIcon(":/logo_64x64.jpg"));
 
 	qInstallMessageHandler(qDebugMsgHandler);
 

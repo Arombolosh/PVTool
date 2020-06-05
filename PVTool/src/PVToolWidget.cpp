@@ -11,6 +11,7 @@
 #include <QProcess>
 #include <QProgressDialog>
 #include <QLocale>
+#include <QToolButton>
 
 #include <IBK_assert.h>
 
@@ -98,6 +99,7 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_cmdLineProcess(nullptr)
 {
 	m_ui->setupUi(this);
+	setWindowTitle(PROGRAM_NAME);
 
 	// read last used working directory from user-settings
 	QSettings settings(ORG_NAME, PROGRAM_NAME);
@@ -173,6 +175,14 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP30"));
 	//einschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(false);
+
+
+	// connect button-bar actions
+	// Note: the variant with function pointers allows signal/slot availability checking at compile-time and
+	//       is therefore preferable
+
+	//connect(m_ui->buttonBar->toolButtonQuit, SIGNAL(clicked()), this, SLOT(onButtonBarQuitClicked()));
+	connect(m_ui->buttonBar->toolButtonQuit, &QToolButton::clicked, this, &PVToolWidget::onButtonBarQuitClicked);
 }
 
 
@@ -184,6 +194,9 @@ PVToolWidget::~PVToolWidget() {
 // *** protected
 
 void PVToolWidget::closeEvent(QCloseEvent * event) {
+
+	// TODO : ask user to save his/her input data to project file?
+
 	QWidget::closeEvent(event);
 
 	// store currently used working directory in settings
@@ -454,6 +467,11 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 	}
 	m_progressDlg->setValue(m_completedProjects.size());
 	startNextDELPHINSim();
+}
+
+
+void PVToolWidget::onButtonBarQuitClicked() {
+	close();
 }
 
 

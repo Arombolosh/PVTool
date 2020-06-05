@@ -44,6 +44,8 @@ private slots:
 
 	void onSimulationJobFinished(int status, QProcess::ExitStatus);
 
+	void onButtonBarQuitClicked();
+
 private:
 
 	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given

@@ -5,5 +5,6 @@
         <file>gfx/fileopen_32x32.png</file>
         <file>gfx/filesave_32x32.png</file>
         <file>gfx/info_32x32.png</file>
+        <file>logo_64x64.jpg</file>
     </qresource>
 </RCC>
