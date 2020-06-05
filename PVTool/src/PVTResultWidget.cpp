@@ -24,15 +24,17 @@ void PVTResultWidget::setResultText(const std::vector<std::string> & resultLines
 }
 void PVTResultWidget::on_pushButtonClose_clicked()
 {
-	delete m_ui;
+	this->close();
 }
 
 void PVTResultWidget::on_pushButtonSaveToFile_clicked()
 {
 	QString filename = QFileDialog::getSaveFileName(this,tr("Speichere Ergebnisdatei"), QString(),tr("Text File (*.txt)"));
-//	QString fpath = QFileDialog::getOpenFileName(this,tr("Öffne Wetterdatei"),QString(),tr("EnergyPlus Weather Files (*.epw)"));
 	QFile f( filename );
-	f.open( QIODevice::WriteOnly );
+	f.open( QIODevice::WriteOnly ); // only saving possible
 	// store data in f
+
+	f.write(m_ui->plainTextEditResults->toPlainText().toStdString().c_str());
+
 	f.close();
 }
