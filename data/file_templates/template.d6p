@@ -10,7 +10,7 @@
 		<SimulationParameter>
 			<BalanceEquationModule>BEHeat</BalanceEquationModule>
 			<Interval>
-				<IBK:Parameter name="Duration" unit="d">1</IBK:Parameter>
+				<IBK:Parameter name="Duration" unit="d">365</IBK:Parameter>
 			</Interval>
 			<ClimateDataFilePath>${Project Directory}/climate/${CLIMATE}</ClimateDataFilePath>			
 			<LambdaSelection>LambdaDry</LambdaSelection>
@@ -27,18 +27,19 @@
 		<MaterialReference name="Alu" color="#ffff0000" hatchCode="13">${Project Directory}/materials/AluminiumFoil_19.m6</MaterialReference>
 		<MaterialReference name="Polytetrafluorethylenkunststoffe (PTFE) [785]" color="#ffaaaa00" hatchCode="13">${Project Directory}/materials/PolytetrafluoroethylenePTFE_785.m6</MaterialReference>
 		<MaterialReference name="Glas" color="#ff404060" hatchCode="13">${Project Directory}/materials/Glass_72.m6</MaterialReference>
-		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Project Directory}/materials/InsulationMat.m6</MaterialReference>											
-		<MaterialReference name="PCM" color="#ff00ff7f" hatchCode="13">${Project Directory}/materials/${PCM}.m6</MaterialReference>														
+		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Project Directory}/materials/InsulationMat.m6</MaterialReference>
+		<MaterialReference name="PCM" color="#ff00ff7f" hatchCode="13">${Project Directory}/materials/${PCM}.m6</MaterialReference>
 		<MaterialReference name="Luftschicht 50 mm (vertikal) [18]" color="#ff5020a0" hatchCode="13">${Project Directory}/materials/AirGapVertical50mm_18.m6</MaterialReference>
 		<MaterialReference name="Polyvinylchlorid (PVC) [786]" color="#ffaaff00" hatchCode="13">${Project Directory}/materials/PolyvinylChloridePVC_786.m6</MaterialReference>
+		<MaterialReference name="Edelstahl DIN 1.4301 AISI 304 [728]" color="#ffffaa00" hatchCode="13">${Project Directory}/materials/StainlessSteelDIN14301AISI304_728.m6</MaterialReference>
 	</Materials>
 
 	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 	<!--Discretization data (grid and sketches)-->
 	<Discretization>
-		<XSteps unit="m">0.004 0.001 0.00601 0.00399 0.001 0.004 0.001 0.019 ${PCMThick} 0.004 0.001 ${INSULATIONThick} 0.001 0.004 </XSteps>		
-		<YSteps unit="m">0.0010435 0.781374 0.001 0.0165828 0.03 0.005 0.03 0.005 0.03 0.005 0.03 0.8 </YSteps>					
+		<XSteps unit="m">0.004 0.001 0.00601 0.00399 0.001 0.004 0.001 0.019 0.001 ${PCMThick} 0.004 0.001 ${INSULATIONThick} 0.001 0.004 </XSteps>
+		<YSteps unit="m">0.0025 0.03 0.005 0.03 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.001 0.01 0.0005 </YSteps>
 	</Discretization>
 
 	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
@@ -100,30 +101,6 @@
 		</OutputGrids>
 		<!--List of all Output files-->
 		<OutputFiles>
-			<OutputFile name="Temperaturprofil">
-				<Quantity unit="C">Temperature</Quantity>
-				<TimeType>None</TimeType>
-				<SpaceType>Single</SpaceType>
-				<OutputGrid>Felder und Profile</OutputGrid>
-			</OutputFile>
-			<OutputFile name="TMitte">
-				<Quantity unit="C">Temperature</Quantity>
-				<TimeType>None</TimeType>
-				<SpaceType>Single</SpaceType>
-				<OutputGrid>Skalare</OutputGrid>
-			</OutputFile>
-			<OutputFile name="TRand">
-				<Quantity unit="C">Temperature</Quantity>
-				<TimeType>None</TimeType>
-				<SpaceType>Single</SpaceType>
-				<OutputGrid>Skalare</OutputGrid>
-			</OutputFile>
-			<OutputFile name="TPVout">
-				<Quantity unit="C">Temperature</Quantity>
-				<TimeType>None</TimeType>
-				<SpaceType>Single</SpaceType>
-				<OutputGrid>Skalare</OutputGrid>
-			</OutputFile>
 			<OutputFile name="TMean">
 				<Quantity unit="C">Temperature</Quantity>
 				<TimeType>None</TimeType>
@@ -150,284 +127,554 @@
 	<!--List of all assignments of materials and conditions-->
 	<Assignments>
 
-		<Assignment type="Output" location="Element">
-			<Reference>Temperaturprofil</Reference>
-			<Range>0 0 13 11</Range>
-		</Assignment>
-
 		<Assignment type="Material" location="Element">
 			<Reference>Glas</Reference>
-			<Range>0 0 13 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>PCM</Reference>
-			<Range>8 0 13 3</Range>
+			<Range>0 0 14 144</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>InsulationMaterial</Reference>
-			<Range>11 0 13 3</Range>
+			<Range>12 0 14 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>8 0 14 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>8 0 14 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>8 2 14 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>13 0 14 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
+			<Range>0 0 7 0</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>0 0 5 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>2 0 3 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>0 3 5 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Glas</Reference>
+			<Range>8 3 11 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>13 3 14 144</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>InsulationMaterial</Reference>
-			<Range>11 4 13 11</Range>
+			<Range>12 3 12 144</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Alu</Reference>
-			<Range>8 5 13 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>8 6 13 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Alu</Reference>
-			<Range>8 9 13 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Alu</Reference>
-			<Range>12 6 13 8</Range>
+			<Range>10 0 11 1</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
-			<Range>0 7 7 7</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>0 0 5 3</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>0 4 5 4</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Alu</Reference>
-			<Range>0 5 5 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>2 6 3 8</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>0 10 5 11</Range>
+			<Range>8 0 9 0</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Glas</Reference>
-			<Range>8 10 10 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>12 4 13 4</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>12 10 13 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>InsulationMaterial</Reference>
-			<Range>11 10 11 11</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>VOID</Reference>
-			<Range>12 0 13 3</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Alu</Reference>
-			<Range>9 6 10 8</Range>
+			<Range>8 2 9 2</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Glas</Reference>
-			<Range>8 5 8 5</Range>
+			<Range>8 0 9 1</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
-			<Range>8 7 8 7</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Glas</Reference>
-			<Range>8 9 8 9</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Glas</Reference>
-			<Range>8 6 8 8</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
-			<Range>8 7 8 7</Range>
+			<Range>8 0 9 0</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>PCM</Reference>
-			<Range>8 11 8 11</Range>
+			<Range>8 5 9 144</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>PCM</Reference>
-			<Range>9 11 10 11</Range>
+			<Range>10 5 11 144</Range>
 		</Assignment>
 
 		<Assignment type="Interface" location="Right">
 			<Reference>Innenklima20Grad</Reference>
-			<Range>11 0 11 4</Range>
-		</Assignment>
-
-		<Assignment type="Interface" location="Right">
-			<Reference>Innenklima20Grad</Reference>
-			<Range>13 5 13 9</Range>
+			<Range>14 0 14 2</Range>
 		</Assignment>
 
 		<Assignment type="Interface" location="Top">
 			<Reference>Innenklima20Grad</Reference>
-			<Range>12 9 13 9</Range>
-		</Assignment>
-
-		<Assignment type="Interface" location="Bottom">
-			<Reference>Innenklima20Grad</Reference>
-			<Range>12 5 13 5</Range>
+			<Range>13 2 14 2</Range>
 		</Assignment>
 
 		<Assignment type="Interface" location="Right">
 			<Reference>Innenklima20Grad</Reference>
-			<Range>11 10 11 11</Range>
+			<Range>12 3 12 144</Range>
 		</Assignment>
 
 		<Assignment type="Interface" location="Left">
 			<Reference>Climate</Reference>
-			<Range>0 5 0 9</Range>
+			<Range>0 0 0 2</Range>
 		</Assignment>
 
 		<Assignment type="Interface" location="Top">
 			<Reference>Climate</Reference>
-			<Range>0 9 5 9</Range>
+			<Range>0 2 5 2</Range>
 		</Assignment>
 
 		<Assignment type="Interface" location="Left">
 			<Reference>Climate</Reference>
-			<Range>6 10 6 11</Range>
-		</Assignment>
-
-		<Assignment type="Interface" location="Bottom">
-			<Reference>Climate</Reference>
-			<Range>0 5 5 5</Range>
-		</Assignment>
-
-		<Assignment type="Interface" location="Left">
-			<Reference>Climate</Reference>
-			<Range>6 0 6 4</Range>
+			<Range>6 3 6 144</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Luftschicht 50 mm (vertikal) [18]</Reference>
-			<Range>11 6 11 8</Range>
+			<Range>12 0 12 1</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Luftschicht 50 mm (vertikal) [18]</Reference>
-			<Range>2 6 3 8</Range>
+			<Range>2 0 3 1</Range>
 		</Assignment>
 
 		<Assignment type="FieldCondition" location="Element">
 			<Reference>StrAustausch</Reference>
-			<Range>10 6 12 8</Range>
+			<Range>11 0 13 1</Range>
 		</Assignment>
 
 		<Assignment type="FieldCondition" location="Element">
 			<Reference>StrAustausch</Reference>
-			<Range>1 6 4 8</Range>
-		</Assignment>
-
-		<Assignment type="Output" location="Element">
-			<Reference>TMitte</Reference>
-			<Range>3 0 13 0</Range>
-		</Assignment>
-
-		<Assignment type="Output" location="Element">
-			<Reference>TRand</Reference>
-			<Range>4 2 13 2</Range>
+			<Range>1 0 4 1</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Polyvinylchlorid (PVC) [786]</Reference>
-			<Range>8 10 10 10</Range>
+			<Range>8 3 11 4</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>Polyvinylchlorid (PVC) [786]</Reference>
-			<Range>8 8 8 9</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Polyvinylchlorid (PVC) [786]</Reference>
-			<Range>8 5 8 6</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>Polyvinylchlorid (PVC) [786]</Reference>
-			<Range>8 4 10 4</Range>
+			<Range>8 1 9 2</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>InsulationMaterial</Reference>
-			<Range>8 0 10 3</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>InsulationMaterial</Reference>
-			<Range>8 11 10 11</Range>
-		</Assignment>
-
-		<Assignment type="Output" location="Coordinate">
-			<Reference>TPVout</Reference>
-			<IBK:Point3D>0.0205 0.784831 0.5</IBK:Point3D>
+			<Range>8 5 11 144</Range>
 		</Assignment>
 
 		<Assignment type="Material" location="Element">
 			<Reference>PCM</Reference>
-			<Range>8 0 10 3</Range>
-		</Assignment>
-
-		<Assignment type="Material" location="Element">
-			<Reference>PCM</Reference>
-			<Range>8 11 10 11</Range>
+			<Range>8 5 11 144</Range>
 		</Assignment>
 
 		<Assignment type="Output" location="Element">
 			<Reference>TMean</Reference>
-			<Range>6 10 6 11</Range>
+			<Range>6 3 6 144</Range>
 		</Assignment>
 
 		<Assignment type="Output" location="Left">
 			<Reference>GlobalRadition</Reference>
-			<Range>6 10 6 11</Range>
+			<Range>6 3 6 144</Range>
 		</Assignment>
 
 		<Assignment type="Output" location="Left">
 			<Reference>Transmission</Reference>
-			<Range>6 0 6 11</Range>
+			<Range>6 0 6 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>8 4 11 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>11 5 11 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>8 5 8 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 6 10 6</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 8 10 8</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 10 10 10</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 12 10 12</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 14 10 14</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 16 10 16</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 18 11 18</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 20 10 20</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 22 10 22</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 24 10 24</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 26 10 26</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 28 10 28</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 30 10 30</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 32 10 32</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 34 10 34</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 36 10 36</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 38 10 38</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 40 10 40</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 42 10 42</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 44 10 44</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 46 10 46</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 48 10 48</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 50 10 50</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 52 10 52</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 54 10 54</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 56 10 56</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 58 10 58</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 60 10 60</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 62 10 62</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 64 10 64</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 66 10 66</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 68 10 68</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 70 10 70</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 72 10 72</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 74 10 74</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 76 10 76</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 78 10 78</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 80 10 80</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 82 10 82</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 84 10 84</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 86 10 86</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 88 10 88</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 90 10 90</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 92 10 92</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 94 10 94</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 96 10 96</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 98 10 98</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 100 10 100</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 144 10 144</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 140 10 140</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 142 10 142</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 138 10 138</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 136 10 136</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 134 10 134</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 132 10 132</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 130 10 130</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 128 10 128</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 126 10 126</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 124 10 124</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 122 10 122</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 120 10 120</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 118 10 118</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 116 10 116</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 114 10 114</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 112 10 112</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 110 10 110</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 108 10 108</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 106 10 106</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 104 10 104</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Edelstahl DIN 1.4301 AISI 304 [728]</Reference>
+			<Range>9 102 10 102</Range>
 		</Assignment>
 	</Assignments>
 

@@ -76,6 +76,9 @@ private:
 	/*! Run PV energy calculation*/
 	void runPVEnergy();
 
+	/*! */
+	void startDiscProcess(const QString &cmdDiscPath,const QStringList &discCmdLine, QWidget *parent);
+
 	Ui::PVToolWidget	*m_ui;
 
 	QProgressDialog		*m_progressDlg;

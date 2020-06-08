@@ -1,0 +1,29 @@
+D6MARLZ! 006.001
+
+[IDENTIFICATION]
+  NAME                     = DE: Edelstahl DIN 1.4301 AISI 304 |EN: Stainless Steel DIN 1.4301 AISI 304 |IT: Acciaio inossidabile DIN 1.4301 AISI 304 |RU: Сталь DIN 1.4301 AISI 304
+  AQUISITION_ID            = 726
+  LABORATORY               = DE: Literatur |EN: Literature |IT: Letteratura
+  DATE                     = 15.05.2017
+  COLOUR                   = #ff404060
+  FLAGS                    = AIR_TIGHT VAPOR_TIGHT WATER_TIGHT 
+  CATEGORY                 = MISC
+  DBTYPE                   = 1,2,4,5,7,21
+  DATA_SHEET_SOURCE        = http://www.stahl-markt.de/download/datenblatt%204301.pdf
+  HATCHING                 = 13
+
+
+[STORAGE_BASE_PARAMETERS]
+  RHO                      = 7900 kg/m3
+  CE                       = 500 J/kgK
+  THETA_POR                = 1.5e-06 m3/m3
+  THETA_EFF                = 1.5e-06 m3/m3
+  THETA_80                 = 1.5e-08 m3/m3
+
+
+[TRANSPORT_BASE_PARAMETERS]
+  LAMBDA                   = 15 W/mK
+  AW                       = 1e-06 kg/m2s05
+  MEW                      = 200000 -
+  KLEFF                    = 0 s
+

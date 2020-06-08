@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<DelphinProject xmlns="http://www.bauklimatik-dresden.de" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:IBK="http://www.bauklimatik-dresden.de/IBK" xsi:schemaLocation="http://www.bauklimatik-dresden.de DelphinProject.xsd" fileVersion="6.1">
+	<ProjectInfo created="Di Jun 4 08:38:45 2019" lastEdited="Mo Jun 8 13:28:02 2020">
+		<Comment />
+	</ProjectInfo>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--Model data, solver settings, general parameters-->
+	<Init>
+		<SimulationParameter>
+			<BalanceEquationModule>BEHeat</BalanceEquationModule>
+			<Interval>
+				<IBK:Parameter name="Duration" unit="d">365</IBK:Parameter>
+			</Interval>
+			<ClimateDataFilePath>${Project Directory}/climate/${CLIMATE}</ClimateDataFilePath>			
+			<LambdaSelection>LambdaDry</LambdaSelection>
+		</SimulationParameter>
+		<SolverParameter>
+			<LESSolver>KLU</LESSolver>
+		</SolverParameter>
+	</Init>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--List of all materials used in this construction-->
+	<Materials>
+		<MaterialReference name="Alu" color="#ffff0000" hatchCode="13">${Project Directory}/materials/AluminiumFoil_19.m6</MaterialReference>
+		<MaterialReference name="Polytetrafluorethylenkunststoffe (PTFE) [785]" color="#ffaaaa00" hatchCode="13">${Project Directory}/materials/PolytetrafluoroethylenePTFE_785.m6</MaterialReference>
+		<MaterialReference name="Glas" color="#ff404060" hatchCode="13">${Project Directory}/materials/Glass_72.m6</MaterialReference>
+		<MaterialReference name="InsulationMaterial" color="#fff7fe2e" hatchCode="13">${Project Directory}/materials/InsulationMat.m6</MaterialReference>
+		
+		<MaterialReference name="Luftschicht 50 mm (vertikal) [18]" color="#ff5020a0" hatchCode="13">${Project Directory}/materials/AirGapVertical50mm_18.m6</MaterialReference>
+		<MaterialReference name="Polyvinylchlorid (PVC) [786]" color="#ffaaff00" hatchCode="13">${Project Directory}/materials/PolyvinylChloridePVC_786.m6</MaterialReference>
+		<MaterialReference name="Edelstahl DIN 1.4301 AISI 304 [728]" color="#ffffaa00" hatchCode="13">${Project Directory}/materials/StainlessSteelDIN14301AISI304_728.m6</MaterialReference>
+	</Materials>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--Discretization data (grid and sketches)-->
+	<Discretization>
+		<XSteps unit="m">0.004 0.001 0.00601 0.00399 0.001 0.004 0.001 0.019 0.001 0.006 0.004 0.001 ${INSULATIONThick} 0.001 0.004 </XSteps>
+		<YSteps unit="m">0.0025 0.03 0.005 0.03 0.771 </YSteps>
+	</Discretization>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--Conditions data, specifies how construction interacts with environment-->
+	<Conditions>
+
+		<Interfaces>
+			<Interface name="Climate" type="EngineeringOutdoor">
+				<IBK:Parameter name="Orientation" unit="Deg">180</IBK:Parameter>
+				<IBK:Parameter name="Inclination" unit="Deg">0</IBK:Parameter>
+				<IBK:Parameter name="OutdoorHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
+				<IBK:Parameter name="OutdoorConvectiveHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
+				<IBK:Parameter name="OutdoorRadiantHeatTransferCoefficient" unit="W/m2K">5</IBK:Parameter>
+				<IBK:Parameter name="OutdoorAdsorptionCoefficient" unit="-">0.7</IBK:Parameter>
+				<IBK:Parameter name="OutdoorEmissionCoefficient" unit="-">0.9</IBK:Parameter>
+				<IBK:Flag name="UseHeatCond">true</IBK:Flag>
+				<IBK:Flag name="UseShortWaveRadiation">true</IBK:Flag>
+				<IBK:Flag name="UseLongWaveRadiation">true</IBK:Flag>
+				<ClimateTypeOutdoor>OutdoorUserData</ClimateTypeOutdoor>
+			</Interface>
+			<Interface name="Innenklima20Grad" type="EngineeringIndoor">
+				<ClimateTypeIndoor>IndoorDIN4108_2001Horizontal</ClimateTypeIndoor>
+			</Interface>
+		</Interfaces>
+
+		<FieldConditions>
+
+			<FieldCondition name="StrAustausch" type="LongWaveRadiation">
+				<IBK:Parameter name="LeftEmissionCoefficient" unit="-">0.9</IBK:Parameter>
+				<IBK:Parameter name="RightEmissionCoefficient" unit="-">0.9</IBK:Parameter>
+				<IBK:Flag name="LongWaveRadiationX">true</IBK:Flag>
+				<IBK:Flag name="LongWaveRadiationY">false</IBK:Flag>
+				<IBK:Flag name="LongWaveRadiationZ">false</IBK:Flag>
+			</FieldCondition>
+		</FieldConditions>
+	</Conditions>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--Contains definitions of output files and schedules for outputs.-->
+	<Outputs>
+		<!--General parameters-->
+		<IBK:Unit name="TimeUnit">h</IBK:Unit>
+		<!--List of all Output schedules-->
+		<OutputGrids>
+			<OutputGrid name="Felder und Profile">
+				<Interval>
+					<IBK:Parameter name="Duration" unit="a">0</IBK:Parameter>
+					<IBK:Parameter name="StepSize" unit="d">1.5</IBK:Parameter>
+				</Interval>
+			</OutputGrid>
+			<OutputGrid name="Skalare">
+				<Interval>
+					<IBK:Parameter name="Duration" unit="a">0</IBK:Parameter>
+					<IBK:Parameter name="StepSize" unit="h">1</IBK:Parameter>
+				</Interval>
+			</OutputGrid>
+		</OutputGrids>
+		<!--List of all Output files-->
+		<OutputFiles>
+			<OutputFile name="TMean">
+				<Quantity unit="C">Temperature</Quantity>
+				<TimeType>None</TimeType>
+				<SpaceType>Mean</SpaceType>
+				<OutputGrid>Skalare</OutputGrid>
+			</OutputFile>
+			<OutputFile name="GlobalRadition">
+				<Quantity unit="J/m2s">FluxShortWaveRadiationGlobal</Quantity>
+				<TimeType>None</TimeType>
+				<SpaceType>Mean</SpaceType>
+				<OutputGrid>Skalare</OutputGrid>
+			</OutputFile>
+			<OutputFile name="Transmission">
+				<Quantity unit="J/m2s">FluxHeatConduction</Quantity>
+				<TimeType>None</TimeType>
+				<SpaceType>Mean</SpaceType>
+				<OutputGrid>Skalare</OutputGrid>
+			</OutputFile>
+		</OutputFiles>
+	</Outputs>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--List of all assignments of materials and conditions-->
+	<Assignments>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Glas</Reference>
+			<Range>0 0 14 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>InsulationMaterial</Reference>
+			<Range>12 0 14 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>8 0 14 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>8 0 14 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>8 2 14 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>13 0 14 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
+			<Range>0 0 7 0</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>0 0 5 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>2 0 3 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>0 3 5 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Glas</Reference>
+			<Range>8 3 11 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>VOID</Reference>
+			<Range>13 3 14 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>InsulationMaterial</Reference>
+			<Range>12 3 12 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Alu</Reference>
+			<Range>10 0 11 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
+			<Range>8 0 9 0</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Glas</Reference>
+			<Range>8 2 9 2</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Glas</Reference>
+			<Range>8 0 9 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Polytetrafluorethylenkunststoffe (PTFE) [785]</Reference>
+			<Range>8 0 9 0</Range>
+		</Assignment>
+
+		<Assignment type="Interface" location="Right">
+			<Reference>Innenklima20Grad</Reference>
+			<Range>14 0 14 2</Range>
+		</Assignment>
+
+		<Assignment type="Interface" location="Top">
+			<Reference>Innenklima20Grad</Reference>
+			<Range>13 2 14 2</Range>
+		</Assignment>
+
+		<Assignment type="Interface" location="Right">
+			<Reference>Innenklima20Grad</Reference>
+			<Range>12 3 12 4</Range>
+		</Assignment>
+
+		<Assignment type="Interface" location="Left">
+			<Reference>Climate</Reference>
+			<Range>0 0 0 2</Range>
+		</Assignment>
+
+		<Assignment type="Interface" location="Top">
+			<Reference>Climate</Reference>
+			<Range>0 2 5 2</Range>
+		</Assignment>
+
+		<Assignment type="Interface" location="Left">
+			<Reference>Climate</Reference>
+			<Range>6 3 6 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Luftschicht 50 mm (vertikal) [18]</Reference>
+			<Range>12 0 12 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Luftschicht 50 mm (vertikal) [18]</Reference>
+			<Range>2 0 3 1</Range>
+		</Assignment>
+
+		<Assignment type="FieldCondition" location="Element">
+			<Reference>StrAustausch</Reference>
+			<Range>11 0 13 1</Range>
+		</Assignment>
+
+		<Assignment type="FieldCondition" location="Element">
+			<Reference>StrAustausch</Reference>
+			<Range>1 0 4 1</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Polyvinylchlorid (PVC) [786]</Reference>
+			<Range>8 3 11 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>Polyvinylchlorid (PVC) [786]</Reference>
+			<Range>8 1 9 2</Range>
+		</Assignment>
+
+		<Assignment type="Output" location="Element">
+			<Reference>TMean</Reference>
+			<Range>6 3 6 4</Range>
+		</Assignment>
+
+		<Assignment type="Output" location="Left">
+			<Reference>GlobalRadition</Reference>
+			<Range>6 3 6 4</Range>
+		</Assignment>
+
+		<Assignment type="Output" location="Left">
+			<Reference>Transmission</Reference>
+			<Range>6 0 6 4</Range>
+		</Assignment>
+
+		<Assignment type="Material" location="Element">
+			<Reference>InsulationMaterial</Reference>
+			<Range>8 4 11 4</Range>
+		</Assignment>
+	</Assignments>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+</DelphinProject>

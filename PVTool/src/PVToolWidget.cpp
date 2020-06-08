@@ -267,8 +267,17 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 	m_ui->lineEdit_uMPP->setText(QString("%L1").arg(m_pvModule[index].m_vmp));
 	m_ui->lineEdit_alpha->setText(QString("%L1").arg(m_pvModule[index].m_alpha));
 	m_ui->lineEdit_gamma->setText(QString("%L1").arg(m_pvModule[index].m_gamma));
+
 }
 
+void PVToolWidget::startDiscProcess(const QString &cmdDiscPath,const QStringList &discCmdLine, QWidget *parent){
+	QProcess p;
+	int res = p.execute(cmdDiscPath, discCmdLine);
+	if (res != 0) {
+		QMessageBox::critical(parent, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
+		return;
+	}
+}
 
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// Climate data file
@@ -376,14 +385,21 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// - insulation template
 
 	IBK::Path d6pTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/template.d6p").toStdString());
+	IBK::Path d6pTemplateWithoutPCMPath( (PVTDirectories::resourcesRootDir() + "/file_templates/templateWithoutPCM.d6p").toStdString());
 	IBK::Path m6TemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/InsulationMatTemplate.m6").toStdString());
 
-	std::string d6Template, m6Template;
+	std::string d6Template, d6TemplateWithoutPCM, m6Template;
 	{
 		std::ifstream in(d6pTemplatePath.str());
 		std::stringstream strm;
 		strm << in.rdbuf();
 		d6Template = strm.str();
+	}
+	{
+		std::ifstream in(d6pTemplateWithoutPCMPath.str());
+		std::stringstream strm;
+		strm << in.rdbuf();
+		d6TemplateWithoutPCM = strm.str();
 	}
 	{
 		std::ifstream in(m6TemplatePath.str());
@@ -410,31 +426,47 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 				 m_ui->doubleSpinBox_Conductivity->value());
 
 	// *** start variation loop
+
+	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
+	IBK::Path d6pWithoutPCM(IBK::FormatString( "%1/projectWithoutPCM.d6p").arg(workingDirectory).str());
+	createDelphinProject(d6TemplateWithoutPCM, d6pWithoutPCM,0, insuThick,
+						 "", weatherName.str());
+	QStringList discCmdLine0;
+	QDir::setCurrent(workingDir);
+	std::string discFilename = d6pWithoutPCM.filename().withoutExtension().str() + "-disc.d6p";
+	discCmdLine0 << QString::fromStdString(d6pWithoutPCM.filename().str())
+				<< QString::fromStdString("-o=" + discFilename)
+				<< "-q"
+				<< "-l=2";
+	startDiscProcess(CMDDISCPATH,discCmdLine0,this);
+	m_waitingProjects.append(QString::fromStdString((d6pWithoutPCM.parentPath() / discFilename).str()));
+
+
 	std::vector<double> pcmThick{0.01, 0.02, 0.03};	//thickness of pcm
 	for (size_t i=0; i<pcmThick.size(); ++i) {
 		IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2.d6p").arg(workingDirectory).arg(i).str());
-		pcmThick[i] -= 0.005; // pcm has 3 cells, two non adjustable cells are set to 5 mm
+		pcmThick[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
 		// - adjust PCM material layer thickness and write project template
-		double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
 		createDelphinProject(d6Template, d6ProjectPath, pcmThick[i], insuThick,
 							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str());
 		// now run CmdDiscretize to generate discretized project file
 		QStringList discCmdLine;
-		QDir::setCurrent(workingDir);
 		//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
 		//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
 		//	discCmdLine << projectFile << "-o="+projectDiscFile;
-		std::string discFilename = "project" + IBK::val2string(i) + "-disc.d6p";
+		discFilename = "project" + IBK::val2string(i) + "-disc.d6p";
 		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p")
 					<< QString::fromStdString("-o=" + discFilename)
 					<< "-q"
 					<< "-l=2";
-		QProcess p;
-		int res = p.execute(CMDDISCPATH, discCmdLine);
-		if (res != 0) {
-			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
-			return;
-		}
+
+		startDiscProcess(CMDDISCPATH,discCmdLine,this);
+//		QProcess p;
+//		int res = p.execute(CMDDISCPATH, discCmdLine);
+//		if (res != 0) {
+//			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
+//			return;
+//		}
 		m_waitingProjects.append(QString::fromStdString((d6ProjectPath.parentPath() / discFilename).str()));
 	}
 
@@ -449,6 +481,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	m_simProgressTimer.setInterval(1000);
 	m_simProgressTimer.start();
 	startNextDELPHINSim();
+
 }
 
 
@@ -487,7 +520,7 @@ void PVToolWidget::onSimProgressTimerTimeout() {
 	}
 	// read currently processed simulation job's progress.tsv file, extract last line's percentage and update progress bar
 	IBK::Path currentSimJob(m_completedProjects.back().toStdString());
-	IBK::Path path2Progress = currentSimJob.withoutExtension() / "/log/progress.tsv";
+	IBK::Path path2Progress = currentSimJob.withoutExtension() / "/log/progress.txt"; //changed from tsv to txt (OS: win64)
 	std::ifstream in(path2Progress.str());
 	std::string lastLine, line;
 	while (std::getline(in, line)) {
@@ -560,6 +593,7 @@ void PVToolWidget::startNextDELPHINSim() {
 	if (m_waitingProjects.isEmpty() || m_progressDlg->wasCanceled()) {
 		m_progressDlg->hide();
 		evaluateResults();
+		m_completedProjects.clear();
 		return;
 	}
 
