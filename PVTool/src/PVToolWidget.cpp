@@ -507,7 +507,7 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 		m_progressDlg->hide();
 		return;
 	}
-	m_progressDlg->setValue(m_completedProjects.size()*100);
+	//m_progressDlg->setValue((m_completedProjects.size())*100);
 	startNextDELPHINSim();
 }
 
@@ -540,7 +540,7 @@ void PVToolWidget::onSimProgressTimerTimeout() {
 		if (vals.size() > 2) {
 			double percentage = vals[2];
 			// compute progress bar value
-			int progressBarValue = percentage + (m_completedProjects.size()-1)*100;
+			int progressBarValue = percentage + (m_completedProjects.empty() ? 0 : m_completedProjects.size()-1)*100;
 			m_progressDlg->setValue(progressBarValue);
 		}
 	}
@@ -592,6 +592,7 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 
 void PVToolWidget::startNextDELPHINSim() {
 	if (m_waitingProjects.isEmpty() || m_progressDlg->wasCanceled()) {
+		m_simProgressTimer.stop();
 		evaluateResults();
 		m_progressDlg->hide();
 		m_completedProjects.clear();
@@ -671,9 +672,12 @@ void PVToolWidget::runPVEnergy()
 {
 	std::vector<std::vector<double>> energyRes(m_temperature.size());
 	try {
+		int incrementValue = m_progressDlg->maximum()/m_temperature.size()/2;
 		for (size_t i=0; i<m_temperature.size(); ++i){
 			m_pvtool.calcPVEnergy(m_temperature[i].m_data,m_radiation[i].m_data, energyRes[i]);
-			m_progressDlg->setValue(m_progressDlg->value()+100);
+			int progressValue = m_progressDlg->value();
+			progressValue += incrementValue;
+			m_progressDlg->setValue(progressValue);
 		}
 	} catch (IBK::Exception &ex) {
 		QMessageBox::critical(this, QString(), tr("%1").arg(ex.what()));
