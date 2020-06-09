@@ -315,28 +315,28 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	}
 	// TODO : check all the other input for meaningful values
 
+
 	// populate manufacturing data with input values
-	PVTOOL::Energy pvtool;
 	if (m_ui->radioButton_PVDatabase->isChecked()){
-		pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
+		m_pvtool.m_manuData = m_pvModule[m_ui->comboBox_PVModule->currentIndex()];
 	}
 	else {
 
 		// set PV module data and throw Message Box if input is wrong
-		if (!convertLineEditintoDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, pvtool.m_manuData.m_imp)) return;
-		if (!convertLineEditintoDouble(this, m_ui->label_iMPP_2, m_ui->lineEdit_iMPP, pvtool.m_manuData.m_imp)) return;
-		if (!convertLineEditintoDouble(this, m_ui->label_uOC, m_ui->lineEdit_uOC, pvtool.m_manuData.m_voc)) return;
-		if (!convertLineEditintoDouble(this, m_ui->label_iSC, m_ui->lineEdit_iSC, pvtool.m_manuData.m_isc)) return;
-		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffI, m_ui->lineEdit_alpha, pvtool.m_manuData.m_alpha)) return;
-		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_beta, pvtool.m_manuData.m_beta)) return;
-		if (!convertLineEditintoInt(this, m_ui->label_nSer, m_ui->lineEdit_nSer, pvtool.m_manuData.m_nSer)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, m_pvtool.m_manuData.m_imp)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_iMPP_2, m_ui->lineEdit_iMPP, m_pvtool.m_manuData.m_imp)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_uOC, m_ui->lineEdit_uOC, m_pvtool.m_manuData.m_voc)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_iSC, m_ui->lineEdit_iSC, m_pvtool.m_manuData.m_isc)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffI, m_ui->lineEdit_alpha, m_pvtool.m_manuData.m_alpha)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_beta, m_pvtool.m_manuData.m_beta)) return;
+		if (!convertLineEditintoInt(this, m_ui->label_nSer, m_ui->lineEdit_nSer, m_pvtool.m_manuData.m_nSer)) return;
 
-		pvtool.m_manuData.m_name = "UserGeneratedPVModule";
+		m_pvtool.m_manuData.m_name = "UserGeneratedPVModule";
 	}
 
 	// now pre-calculate manufacturing parameter set
 	try {
-		pvtool.calcPhysicalParameterFromManufactureData();
+		m_pvtool.calcPhysicalParameterFromManufactureData();
 	}
 	catch (IBK::Exception & ex) {
 		QMessageBox::critical(this, QString(), tr("Bei der Berechnung der PV-Panel-Kenngrößen aus den Eingabedaten ist ein Fehler aufgetreten."));
@@ -442,12 +442,13 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	m_waitingProjects.append(QString::fromStdString((d6pWithoutPCM.parentPath() / discFilename).str()));
 
 
-	std::vector<double> pcmThick{0.01, 0.02, 0.03};	//thickness of pcm
-	for (size_t i=0; i<pcmThick.size(); ++i) {
+	m_thicknessPCM = {0, 0.01, 0.02, 0.03};	//thickness of pcm
+
+	for (size_t i=1; i<m_thicknessPCM.size(); ++i) {
 		IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2.d6p").arg(workingDirectory).arg(i).str());
-		pcmThick[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
+		m_thicknessPCM[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
 		// - adjust PCM material layer thickness and write project template
-		createDelphinProject(d6Template, d6ProjectPath, pcmThick[i], insuThick,
+		createDelphinProject(d6Template, d6ProjectPath, m_thicknessPCM[i], insuThick,
 							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str());
 		// now run CmdDiscretize to generate discretized project file
 		QStringList discCmdLine;
@@ -474,7 +475,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
 		connect(&m_simProgressTimer, &QTimer::timeout, this, &PVToolWidget::onSimProgressTimerTimeout);
 	}
-	m_progressDlg->setMaximum(m_waitingProjects.count()*100);
+	m_progressDlg->setMaximum(2*m_waitingProjects.count()*100);
 	m_progressDlg->setValue(0);
 	m_progressDlg->setWindowModality(Qt::WindowModal);
 	m_progressDlg->show();
@@ -591,8 +592,8 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 
 void PVToolWidget::startNextDELPHINSim() {
 	if (m_waitingProjects.isEmpty() || m_progressDlg->wasCanceled()) {
-		m_progressDlg->hide();
 		evaluateResults();
+		m_progressDlg->hide();
 		m_completedProjects.clear();
 		return;
 	}
@@ -670,8 +671,10 @@ void PVToolWidget::runPVEnergy()
 {
 	std::vector<std::vector<double>> energyRes(m_temperature.size());
 	try {
-		for (size_t i=0; i<m_temperature.size(); ++i)
+		for (size_t i=0; i<m_temperature.size(); ++i){
 			m_pvtool.calcPVEnergy(m_temperature[i].m_data,m_radiation[i].m_data, energyRes[i]);
+			m_progressDlg->setValue(m_progressDlg->value()+100);
+		}
 	} catch (IBK::Exception &ex) {
 		QMessageBox::critical(this, QString(), tr("%1").arg(ex.what()));
 		return;
@@ -687,7 +690,7 @@ void PVToolWidget::runPVEnergy()
 	std::vector<std::string>	results;
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
 	for(size_t i=0; i<summedValues.size(); ++i)
-		results.push_back( IBK::FormatString("%1 %2").arg((i+1),5)
+		results.push_back( IBK::FormatString("%1 %2").arg(m_thicknessPCM[i]*100,5)
 						   .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
 
 	PVTResultDialog * PVResults = new PVTResultDialog();

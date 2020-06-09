@@ -87,6 +87,7 @@ private:
 	QTimer				m_simProgressTimer;
 
 	/*! Contains list of all ready and discretized DELPHIN Projects to run (full file paths). */
+	std::vector<double>	m_thicknessPCM;			///< thickness of PCM [m]
 	QStringList			m_waitingProjects;
 	QStringList			m_completedProjects;
 

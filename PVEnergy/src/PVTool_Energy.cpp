@@ -126,6 +126,9 @@ void Energy::calcPVEnergy(const std::vector<double> &absTemp, const std::vector<
 	for (size_t k=0;k<rad.size(); ++k) {
 		const double &radiation = rad[k];
 		const double &cellTemperature = absTemp[k];
+		if(k>8750){
+			double x=0;
+		}
 
 		double energy = calcPVEnergy(cellTemperature, radiation); // in W
 		energyPV.push_back(energy);
