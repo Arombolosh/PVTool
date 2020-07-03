@@ -74,6 +74,7 @@ void writeResultData(const IBK::Path &path, const IBK::UnitVector &result){
 		resDataIO[i].push_back(result[i]);
 	}
 	data.setData(data.m_timepoints, resDataIO);
+	data.m_type = DATAIO::DataIO::T_FLUX;
 	data.m_filename = path / ("pvEnergy.d6o");
 	data.m_quantity = result.m_unit.name();
 	data.m_timeType = DATAIO::DataIO::TT_MEAN;

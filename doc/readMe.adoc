@@ -1,0 +1,121 @@
+# PVTool Auslegungsprogramm
+:toc:
+:toclevels: 3
+:toc-title: Inhaltsverzeichnis
+:imagesdir: pictures
+
+
+## Einleitung
+
+Das Programm PVTool wurde für die Auslegung von PCMs in Baukonstruktionen mit integrierten PV-Paneelen entwickelt. Berechnet werden können damit Fassadenkonstruktionen (Neigung derzeit nur 90° - senkrechte Wand) mit integrierten PV-Modul und einer PCM-Schicht. Als Ergebnis wird der zu erwartende Stromertrag über ein Jahr geliefert und in Varianten gegenübergestellt.
+
+## GUI
+
+.Die Programmoberfläche vom _PVTool_
+image::GUIAndNumbers.png[width=1095,pdfwidth=17.65cm]
+
+Das Programm gliedert sich in folgende Bereiche Bereiche:
+
+* Ausführungspfad [A]
+* Bestimmung Klimadatensatz [B]
+* PV-Moduleigenschaften [C]
+* PCM-Eigenschaften [D]
+* Material-Eigenschaften der Dämmebene [E]
+* Run-Simulation-Button für die 
+
+### Ausführungspfad
+
+Hier wird der Pfad festgelegt wo die temporären Daten abgelegt werden. Dies kann direkt im Eingabefeld oder per Auswahlbutton erfolgen.
+
+### Klimadatensatz
+
+Es gibt zwei Möglichkeiten den Klimadatensatz auswählen:
+
+Möglichkeit 1:
+
+Es wird in den vorgegeben Klimadatensatz ein bestimmter ausgewählt. Wichtig für die Berechnung ist, dass Weather File aktiviert ist.
+
+Möglichkeit 2:
+
+Per Nutzereingabe wird ein Klimadatensatz ausgewählt. Hierbei werden derzeit nur EPW-Formate unterstützt. "EPW-File" muss aktiviert sein, um die Berechnung mit dem selbstgewählten Klimadatensatz zu starten.
+
+### PCM
+
+Hier kann ein PCM ausgwählt werden welches bei der Berechnung verwendet wird.
+
+[NOTE] 
+Derzeit wird nur das PCM SP26 von Rubitherm unterstützt.
+
+Für die Dämmschicht welche sich hinter dem PCM anschließt werden hier die Materialeigenschaften (Dichte, Speicherkapazität und Wärmeleitfähigkeit) sowie die Schichtdicke definiert.
+
+### Run Simulation
+
+Nachdem alle Eingaben vorgenommen wurden kann hier die Simulationsstudie gestartet werden. 
+
+## Berechnungsablauf
+
+Nach Start der Simulation werden 4 Varianten automatisiert aufgesetzt. Dazu wird eine Referenzkonstruktion ohne PCM aufgesetzt sowie 3 Konstruktionen mit PCM, wobei die PCM-Schichtdicke zwischen 1 cm, 2 cm und 3 cm variiert wird. Die thermische Berechnung wird mit dem Solverkern Delphin durchgeführt. Die Projektdateien von DELPHIN werden automatisiert im temporäre Verzeichnis erzeugt, diskretisiert und berechnet. Die Berechnungsergebnisse aus der DELPHIN-Simulation sind die mittlere Modultemperatur sowie die Strahlung, die senkrecht auf das Modul auftrifft. Diese Ergebnisse werden für alle Stunden (8760 h) im Jahr berechnet. 
+
+Anschließend übernimmt eine weitere Routine das Berechnen des Strom-Ertrags. Eingangsparameter sind die mittlere Modultemperatur sowie die auftreffende Strahlung. Die Berechnung wird von der SAM-Bibliothek übernommen. Dadurch ist die Berechnung von Stromerträgen mit Temperaturabhängigkeit möglich. Grundlage für die Berechnung des Stromertrags bildet das Ein-Dioden-Modell.
+
+## Auswertung
+
+Der Stromertrag wird für die oben erwähnten Varianten tabellarisch dargestellt.
+
+## Zusatzprogramm PVEnergy
+
+Falls berechnete Daten für die mittlere Modultemperatur und die Strahlung vorliegen kann direkt der Stromertrag berechnet werden. Dazu muss das Kommandozeilenprogramm PVEnergy ausgeführt werden. Folgende Ausführungsvariante sind möglich:
+
+### Ausführung für genau einen Zeitpunkt
+
+Für die Berechnung des Stromertrags für ein PV-Modul und einem Wertepaar für Temperatur und Strahlung ist folgender Kommandozeilen-Aufruf nötigt:
+
+Der pvenergy.exe müssen folgende Parameter übergeben werden:
+
+* Spannung im Maximum Power Point (MPP) [V]
+* Strom im MPP [A]
+* Leerlaufspannung [V]
+* Kurzschlussstrom [A]
+* Temperaturkoeffizient Strom in [%/K]
+* Temperaturkoeffizient Spannung in [%/K]
+* Temperaturkoeffizient Leistung in [%/K]
+* Zellenanzahl pro Modul [-]
+* Referenztemperatur [K]; Annahme meist 298.15
+* Zelltyp
+** Derzeit nur das monokristalline Zelltypen möglich. Keyword: monoSi
+* Mittlere Modultemperatur [K]
+* Strahlung senkrecht aufs Modul [W/m2]
+
+
+.Kommandozeilenaufruf:
+====
+pvenergy.exe 31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi 298.15 200
+====
+
+### Ausführung für Zeitreihenwerte
+
+Für die Berechnung des Stromertrags für ein PV-Modul und Zeitreihen für Temperatur und Strahlung müssen die Ergebnisse der Temperatur und Strahlung in einer d6o-Datei (DELPHIN-Ausgabeformat) mit folgenden Namen in einem Unterordner (mit dem Namen "results") vorliegen:
+
+* TMean.d6o
+* GlobalRadiation.d6o
+
+Beider Zeitreihen müssen exakt die gleichen Zeitpunkte enthalten. Für den Kommandozeilenaufruf müssen der pvenergy.exe folgende Parameter übergeben werden:
+
+* Spannung im Maximum Power Point (MPP) [V]
+* Strom im MPP [A]
+* Leerlaufspannung [V]
+* Kurzschlussstrom [A]
+* Temperaturkoeffizient Strom in [%/K]
+* Temperaturkoeffizient Spannung in [%/K]
+* Temperaturkoeffizient Leistung in [%/K]
+* Zellenanzahl pro Modul [-]
+* Referenztemperatur [K]; Annahme meist 298.15
+* Zelltyp
+** Derzeit nur das monokristalline Zelltypen möglich. Keyword: monoSi
+* Pfad des results-Ordners. In aller Regel ist das der Ordner in dem die DELPHIN-Projektdatei abgelegt ist.
+
+.Kommandozeilenaufruf:
+====
+pvenergy.exe 31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="C:/temp/pvtool/project1-disc"
+====
+

@@ -673,7 +673,7 @@ void PVToolWidget::runPVEnergy()
 	std::vector<std::vector<double>> energyRes(m_temperature.size());
 	try {
 		int incrementValue = m_progressDlg->maximum()/m_temperature.size()/2;
-		for (size_t i=0; i<m_temperature.size(); ++i){
+		for (	size_t i=0; i<m_temperature.size(); ++i){
 			m_pvtool.calcPVEnergy(m_temperature[i].m_data,m_radiation[i].m_data, energyRes[i]);
 			int progressValue = m_progressDlg->value();
 			progressValue += incrementValue;

@@ -11,7 +11,7 @@
 		<SimulationParameter>
 			<BalanceEquationModule>BEHeat</BalanceEquationModule>
 			<Interval>
-				<IBK:Parameter name="Duration" unit="d">1</IBK:Parameter>
+				<IBK:Parameter name="Duration" unit="d">365</IBK:Parameter>
 			</Interval>
 			<ClimateDataFilePath>${Project Directory}/climate/${CLIMATE}</ClimateDataFilePath>			
 			<LambdaSelection>LambdaDry</LambdaSelection>
@@ -51,7 +51,7 @@
 		<Interfaces>
 			<Interface name="Climate" type="EngineeringOutdoor">
 				<IBK:Parameter name="Orientation" unit="Deg">180</IBK:Parameter>
-				<IBK:Parameter name="Inclination" unit="Deg">0</IBK:Parameter>
+				<IBK:Parameter name="Inclination" unit="Deg">90</IBK:Parameter>
 				<IBK:Parameter name="OutdoorHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
 				<IBK:Parameter name="OutdoorConvectiveHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
 				<IBK:Parameter name="OutdoorRadiantHeatTransferCoefficient" unit="W/m2K">5</IBK:Parameter>
