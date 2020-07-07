@@ -195,7 +195,16 @@ int main(int argc, char* argv[]) {
 			pvEnergyVec.m_unit = IBK::Unit("W");
 			pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, pvEnergyVec.m_data);
 			// calculation of physical PV data
-			writeResultData(IBK::Path("c:/temp/"), pvEnergyVec);
+
+			IBK::Path cTemp("c:/temp/");
+
+			if(!cTemp.exists())
+			{
+				throw IBK::Exception(IBK::FormatString("Directory: '%1' is missing. Please create directory.").arg(cTemp.str()), FUNC_ID);
+				return EXIT_FAILURE;
+			}
+
+			writeResultData(cTemp, pvEnergyVec);
 		}
 		catch (IBK::Exception &ex) {
 			ex.writeMsgStackToError();
