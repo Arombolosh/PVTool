@@ -70,6 +70,9 @@ private:
 	*/
 	void startNextDELPHINSim();
 
+	/*! Clear all result vectors. */
+	void clearResultVecs();
+
 	/*! Evaluate simulation results. */
 	void evaluateResults();
 

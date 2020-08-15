@@ -390,13 +390,13 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// read the template files into memory
 	// - project template
 	// - insulation template
-    IBK::Path d6pTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple.d6p").toStdString());
-    IBK::Path d6pTemplateWithoutPCMPath( (PVTDirectories::resourcesRootDir() + "/file_templates/templateWithoutPCM_simple.d6p").toStdString());
+	IBK::Path d6pTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple.d6p").toStdString());
+	IBK::Path d6pTemplateWithoutPCMPath( (PVTDirectories::resourcesRootDir() + "/file_templates/templateWithoutPCM_simple.d6p").toStdString());
 	IBK::Path m6TemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/InsulationMatTemplate.m6").toStdString());
 // Wenn Radiobutton für Kamm eingebaut, dann hier Variable setzen ToDo Dirk
-    bool withComb=false;
-    if(withComb)
-         d6pTemplatePath= IBK::Path( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple_comb.d6p").toStdString());
+	bool withComb=false;
+	if(withComb)
+		 d6pTemplatePath= IBK::Path( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple_comb.d6p").toStdString());
 	std::string d6Template, d6TemplateWithoutPCM, m6Template;
 	{
 		std::ifstream in(d6pTemplatePath.str());
@@ -455,8 +455,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	for (size_t i=1; i<m_thicknessPCM.size(); ++i) {
 		IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2.d6p").arg(workingDirectory).arg(i).str());
-        //for detailed model see description below...not required in the simple model
-        //m_thicknessPCM[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
+		//for detailed model see description below...not required in the simple model
+		//m_thicknessPCM[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
 		// - adjust PCM material layer thickness and write project template
 		createDelphinProject(d6Template, d6ProjectPath, m_thicknessPCM[i], insuThick,
 							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str());
@@ -638,10 +638,16 @@ void PVToolWidget::startNextDELPHINSim() {
 	m_cmdLineProcess->start(DELPHINPATH, cmdLine);
 }
 
+void PVToolWidget::clearResultVecs(){
+	m_temperature.clear();
+	m_radiation.clear();
+}
 
 void PVToolWidget::evaluateResults() {
 	// process ready results
 	//m_completedProjects.
+
+	clearResultVecs();
 
 	std::vector<IBK::Path> projectPaths;
 	projectPaths.reserve(m_completedProjects.size());
@@ -667,8 +673,8 @@ void PVToolWidget::evaluateResults() {
 			rad.read(tmp2 / "GlobalRadition.d6o");
 			IBK::UnitVector unitVec;
 			unitVec.m_data = rad.columnValues(0);
-            for (double &v : unitVec.m_data)
-                v/=0.7; //absorption coeficient from Delphin
+			for (double &v : unitVec.m_data)
+				v/=0.7; //absorption coeficient from Delphin
 			unitVec.m_unit = IBK::Unit(rad.m_valueUnit);
 			unitVec.convert(IBK::Unit("W/m2"));
 			m_radiation.push_back(unitVec);

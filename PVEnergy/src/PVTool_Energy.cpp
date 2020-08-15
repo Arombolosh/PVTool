@@ -78,11 +78,41 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	double volt = -0.01;
 	double eps =1E-10;
 
-
-
 	double uMpp=volt;				//Save Voltage at Maximum Power
 	double iMpp=current;			//Save Current at Maximum Power
 	double stepInc = 0.1;
+
+	//Vorberechnung
+
+
+	volt = m_manuData.m_vmp;
+	for(size_t i= 0; i<1000; ++i)
+	{
+		double i0 = current;
+		current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
+		if(std::fabs(i0-current)<eps)
+			break;
+		if (current < 0 )
+			break;
+	}
+	double powerA = volt * current;
+	volt = m_manuData.m_vmp + stepInc;
+	for(size_t i= 0; i<1000; ++i)
+	{
+		double i0 = current;
+		current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
+		if(std::fabs(i0-current)<eps)
+			break;
+		if (current < 0 )
+			break;
+	}
+	double powerB = volt * current;
+
+	//maximum is left of the position von m_manuData.m_voc
+	if(powerA > powerB)
+		stepInc *= -1;
+	volt = m_manuData.m_vmp;
+
 	for (size_t j=0; j<int(2*m_manuData.m_voc / stepInc); ++j) {
 		volt += stepInc;
 		for(size_t i= 0; i<1000; ++i)
@@ -100,11 +130,11 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 
 		if (pMax>P) {//std::abs(Pold - Pmax) < 0.0001  ) { //Wenn neues Maximum gefunden wurde
 
-			IBK::IBK_Message(IBK::FormatString("pMax = %1 \tuMpp = %2 \tiMpp = %3\n").arg(pMax).arg(uMpp).arg(iMpp),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DETAILED);
+			//IBK::IBK_Message(IBK::FormatString("pMax = %1 \tuMpp = %2 \tiMpp = %3\n").arg(pMax).arg(uMpp).arg(iMpp),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DETAILED);
 
 			break;
 		}
-		IBK::IBK_Message(IBK::FormatString("P = %1 \tvolt = %2 \tcurrent = %3\n").arg(P).arg(volt).arg(current),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
+		//IBK::IBK_Message(IBK::FormatString("P = %1 \tvolt = %2 \tcurrent = %3\n").arg(P).arg(volt).arg(current),IBK::MSG_PROGRESS,FUNC_ID,IBK::VL_DEVELOPER);
 
 		uMpp=volt;  //Save Voltage at Maximum Power
 		iMpp=current;  //Save Current at Maximum Power
