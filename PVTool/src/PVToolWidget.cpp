@@ -386,6 +386,13 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 			return;
 		}
 	}
+	// create "power" subdirectory if it doesn't exist yet
+	if (!QFileInfo(workingDir + "/power").exists()) {
+		if (!QDir().mkpath(workingDir + "/power")) {
+			QMessageBox::critical(this, QString(), tr("Konnte das Arbeitsverzeichnis nicht erstellen. Möglicherweise fehlen die Zugriffsrechte?"));
+			return;
+		}
+	}
 
 	// read the template files into memory
 	// - project template
@@ -426,6 +433,12 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		QMessageBox::critical(this, QString(), tr("Konnte Projektverzeichnis nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
 		return;
 	}
+	// copy power drain template
+	success = IBK::Path::copy( IBK::Path((PVTDirectories::resourcesRootDir() + "/file_templates/no_drain.tsv").toStdString()), workingDirectory / "power");
+	if (!success) {
+		QMessageBox::critical(this, QString(), tr("Konnte 'no_drain.tsv' nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
+		return;
+	}
 
 	// adjust template insulation material and write to target directory
 	IBK::Path insulationM6Path( workingDirectory / "materials/InsulationMat.m6");
@@ -437,48 +450,63 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	// *** start variation loop
 
 	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
-	IBK::Path d6pWithoutPCM(IBK::FormatString( "%1/projectWithoutPCM.d6p").arg(workingDirectory).str());
-	createDelphinProject(d6TemplateWithoutPCM, d6pWithoutPCM,0, insuThick,
-						 "", weatherName.str());
-	QStringList discCmdLine0;
-	QDir::setCurrent(workingDir);
-	std::string discFilename = d6pWithoutPCM.filename().withoutExtension().str() + "-disc.d6p";
-	discCmdLine0 << QString::fromStdString(d6pWithoutPCM.filename().str())
-				<< QString::fromStdString("-o=" + discFilename)
-				<< "-q"
-				<< "-l=2";
-	startDiscProcess(CMDDISCPATH,discCmdLine0,this);
-	m_waitingProjects.append(QString::fromStdString((d6pWithoutPCM.parentPath() / discFilename).str()));
-
+	const unsigned int MAX_WRM_ITERS = 3;
+	for (unsigned int WRMCount=0; WRMCount<MAX_WRM_ITERS; ++WRMCount) {
+		IBK::Path d6pWithoutPCM(IBK::FormatString( "%1/projectWithoutPCM-%2.d6p").arg(workingDirectory).arg(WRMCount).str());
+		std::string powerDrainFilePath = "no_drain.tsv";
+		// for all but first use counter
+		if (WRMCount > 0) {
+			powerDrainFilePath = IBK::FormatString("pv_power_drain_withoutPCM-%1.tsv").arg(WRMCount).str();
+		}
+		createDelphinProject(d6TemplateWithoutPCM, d6pWithoutPCM,0, insuThick,
+							 "", weatherName.str(), powerDrainFilePath);
+		QStringList discCmdLine0;
+		QDir::setCurrent(workingDir);
+		std::string discFilename = d6pWithoutPCM.filename().withoutExtension().str() + "-disc.d6p";
+		discCmdLine0 << QString::fromStdString(d6pWithoutPCM.filename().str())
+					<< QString::fromStdString("-o=" + discFilename)
+					<< "-q"
+					<< "-l=2";
+		startDiscProcess(CMDDISCPATH,discCmdLine0,this);
+		m_waitingProjects.append(QString::fromStdString((d6pWithoutPCM.parentPath() / discFilename).str()));
+	}
 
 	m_thicknessPCM = {0, 0.01, 0.02, 0.03};	//thickness of pcm
 
 	for (size_t i=1; i<m_thicknessPCM.size(); ++i) {
-		IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2.d6p").arg(workingDirectory).arg(i).str());
-		//for detailed model see description below...not required in the simple model
-		//m_thicknessPCM[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
-		// - adjust PCM material layer thickness and write project template
-		createDelphinProject(d6Template, d6ProjectPath, m_thicknessPCM[i], insuThick,
-							 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str());
-		// now run CmdDiscretize to generate discretized project file
-		QStringList discCmdLine;
-		//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
-		//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
-		//	discCmdLine << projectFile << "-o="+projectDiscFile;
-		discFilename = "project" + IBK::val2string(i) + "-disc.d6p";
-		discCmdLine << QString::fromStdString("project" + IBK::val2string(i) + ".d6p")
-					<< QString::fromStdString("-o=" + discFilename)
-					<< "-q"
-					<< "-l=2";
+		for (unsigned int WRMCount=0; WRMCount<MAX_WRM_ITERS; ++WRMCount) {
 
-		startDiscProcess(CMDDISCPATH,discCmdLine,this);
-//		QProcess p;
-//		int res = p.execute(CMDDISCPATH, discCmdLine);
-//		if (res != 0) {
-//			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
-//			return;
-//		}
-		m_waitingProjects.append(QString::fromStdString((d6ProjectPath.parentPath() / discFilename).str()));
+			IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2-%3.d6p").arg(workingDirectory).arg(i).arg(WRMCount).str());
+			std::string powerDrainFilePath = "no_drain.tsv";
+			// for all but first use counter
+			if (WRMCount > 0) {
+				powerDrainFilePath = IBK::FormatString("pv_power_drain_PCM%1-%2.tsv").arg(i).arg(WRMCount).str();
+			}
+			//for detailed model see description below...not required in the simple model
+			//m_thicknessPCM[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
+			// - adjust PCM material layer thickness and write project template
+			createDelphinProject(d6Template, d6ProjectPath, m_thicknessPCM[i], insuThick,
+								 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str(), powerDrainFilePath);
+			// now run CmdDiscretize to generate discretized project file
+			QStringList discCmdLine;
+			//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
+			//	QString projectDiscFile = QString::fromStdString(d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p");
+			//	discCmdLine << projectFile << "-o="+projectDiscFile;
+			std::string discFilename = d6ProjectPath.filename().withoutExtension().str() + "-disc.d6p";
+			discCmdLine << QString::fromStdString(d6ProjectPath.filename().str())
+						<< QString::fromStdString("-o=" + discFilename)
+						<< "-q"
+						<< "-l=2";
+
+			startDiscProcess(CMDDISCPATH,discCmdLine,this);
+	//		QProcess p;
+	//		int res = p.execute(CMDDISCPATH, discCmdLine);
+	//		if (res != 0) {
+	//			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
+	//			return;
+	//		}
+			m_waitingProjects.append(QString::fromStdString((d6ProjectPath.parentPath() / discFilename).str()));
+		} // WRM loop
 	}
 
 	if (m_progressDlg == nullptr) {
@@ -517,7 +545,10 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 		m_progressDlg->hide();
 		return;
 	}
-	//m_progressDlg->setValue((m_completedProjects.size())*100);
+
+	// now read temperature from just completed D6 project and generate
+	// power drain tsv file for next project
+
 	startNextDELPHINSim();
 }
 
@@ -586,12 +617,14 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 										double pcmThickness,
 										double insulationThickness,
 										const std::string & pcmMaterialFileName,
-										const std::string & climateDataFileName)
+										const std::string & climateDataFileName,
+										const std::string & powerDrainFilePath)
 {
 	std::string d6str = IBK::replace_string(d6Template, "${PCMThick}", IBK::val2string(pcmThickness));
 	d6str = IBK::replace_string(d6str, "${INSULATIONThick}", IBK::val2string(insulationThickness));
 	d6str = IBK::replace_string(d6str, "${PCM}",pcmMaterialFileName);
 	d6str = IBK::replace_string(d6str, "${CLIMATE}", climateDataFileName);
+	d6str = IBK::replace_string(d6str, "${POWER_DRAIN_FILE_PATH}", powerDrainFilePath);
 
 	// write file
 	std::ofstream out(d6ProjectFilePath.str());

@@ -64,7 +64,8 @@ private:
 							  double pcmThickness,
 							  double insulationThickness,
 							  const std::string & pcmMaterialFileName,
-							  const std::string & climateDataFileName);
+							  const std::string & climateDataFileName,
+							  const std::string & powerDrainFilePath);
 
 	/*! Takes the next waiting job from m_waitingProjects and starts the process in slave mode.
 	*/

@@ -67,14 +67,18 @@
 			</Interface>
 		</Interfaces>
 
+		<ClimateConditions>
+
+			<ClimateCondition name="ElectricalEnergyConsumption" type="EnergySource" kind="TabulatedData">
+				<Filename>${Project Directory}/power/${POWER_DRAIN_FILE_PATH}</Filename>
+				<IBK:Parameter name="ShiftValue" unit="J/m3s">0</IBK:Parameter>
+			</ClimateCondition>
+		</ClimateConditions>
+
 		<FieldConditions>
 
-			<FieldCondition name="StrAustausch" type="LongWaveRadiation">
-				<IBK:Parameter name="LeftEmissionCoefficient" unit="-">0.9</IBK:Parameter>
-				<IBK:Parameter name="RightEmissionCoefficient" unit="-">0.9</IBK:Parameter>
-				<IBK:Flag name="LongWaveRadiationX">true</IBK:Flag>
-				<IBK:Flag name="LongWaveRadiationY">false</IBK:Flag>
-				<IBK:Flag name="LongWaveRadiationZ">false</IBK:Flag>
+			<FieldCondition name="ElektricalPowerConsumption" type="EnergySource">
+				<CCReference type="EnergySource">ElectricalEnergyConsumption</CCReference>
 			</FieldCondition>
 		</FieldConditions>
 	</Conditions>
@@ -158,6 +162,10 @@
 			<Range>0 0 0 0</Range>
 		</Assignment>
 
+		<Assignment type="FieldCondition" location="Element">
+			<Reference>ElektricalPowerConsumption</Reference>
+			<Range>0 0 1 0</Range>
+		</Assignment>
 
 	</Assignments>
 
