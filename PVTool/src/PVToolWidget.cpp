@@ -68,8 +68,8 @@ bool convertLineEditintoDouble(QWidget * const widget, QLabel * const label, QLi
 		palette.setColor(QPalette::Text,Qt::red);
 		lineEdit->setPalette(palette); // set text color to red in lineEdit field
 		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGleitkommazahl wird benötigt.")
-							  .arg(lineEdit->text())
-							  .arg(label->text())); // throws QMessageBox with Name of LineEdit Obj and Value
+								.arg(lineEdit->text())
+								.arg(label->text())); // throws QMessageBox with Name of LineEdit Obj and Value
 		return false;
 	}
 	else {
@@ -90,8 +90,8 @@ bool convertLineEditintoInt(QWidget * const widget, QLabel * const label, QLineE
 		palette.setColor(QPalette::Text,Qt::red);
 		lineEdit->setPalette(palette); // set text color to red in lineEdit field
 		QMessageBox::critical(widget, QString(), QMessageBox::tr("Ungültige Eingabe '%1' im Feld '%2'\nGleitkommazahl wird benötigt.")
-							  .arg(lineEdit->text())
-							  .arg(label->text())); // throws QMessageBox with Name of LineEdit Obj and Value
+								.arg(lineEdit->text())
+								.arg(label->text())); // throws QMessageBox with Name of LineEdit Obj and Value
 		return false;
 	}
 	else {
@@ -317,7 +317,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	bool success = IBK::Path::copy(weatherPath, weatherTargetDir / weatherName);
 	if (!success) {
 		QMessageBox::critical(this, QString(), tr("Konnte Klimadatei '%2' nicht ins Arbeitsverzeichnis '%1' kopieren.")
-							  .arg(QString::fromStdString(weatherTargetDir.str())).arg(QString::fromStdString(weatherPath.str())) );
+								.arg(QString::fromStdString(weatherTargetDir.str())).arg(QString::fromStdString(weatherPath.str())) );
 		return;
 	}
 	// TODO : check all the other input for meaningful values
@@ -511,7 +511,7 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 		if (!m_progressDlg->wasCanceled()) {
 			IBK::Path logFile(IBK::Path(m_completedProjects.back().toStdString()).withoutExtension() / "log/screenlog.txt");
 			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung der DELPHIN-Simulation, siehe Logdatei '%1'")
-								  .arg(QString::fromStdString(logFile.str())));
+									.arg(QString::fromStdString(logFile.str())));
 		}
 		m_simProgressTimer.stop();
 		m_progressDlg->hide();
@@ -531,7 +531,7 @@ void PVToolWidget::onSimProgressTimerTimeout() {
 	}
 	// read currently processed simulation job's progress.tsv file, extract last line's percentage and update progress bar
 	IBK::Path currentSimJob(m_completedProjects.back().toStdString());
-	IBK::Path path2Progress = currentSimJob.withoutExtension() / "/log/progress.txt"; //changed from tsv to txt (OS: win64)
+	IBK::Path path2Progress = currentSimJob.withoutExtension() / "log/progress.tsv"; //changed from tsv to txt (OS: win64)
 	std::ifstream in(path2Progress.str());
 	std::string lastLine, line;
 	while (std::getline(in, line)) {
@@ -713,7 +713,7 @@ void PVToolWidget::runPVEnergy()
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
 	for(size_t i=0; i<summedValues.size(); ++i)
 		results.push_back( IBK::FormatString("%1 %2").arg(m_thicknessPCM[i]*100,5)
-						   .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
+							 .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
 
 	PVTResultDialog * PVResults = new PVTResultDialog();
 	PVResults->setResultText(results);
