@@ -77,8 +77,13 @@ private:
 	/*! Evaluate simulation results. */
 	void evaluateResults();
 
+	/*! Evaluate simulation results. */
+	void evaluateResults(IBK::Path & filename);
+
 	/*! Run PV energy calculation*/
 	void runPVEnergy();
+
+	void showResults();
 
 	/*! */
 	void startDiscProcess(const QString &cmdDiscPath,const QStringList &discCmdLine, QWidget *parent);
@@ -101,6 +106,7 @@ private:
 	/*! Delphin results.*/
 	std::vector<IBK::UnitVector>	m_temperature;
 	std::vector<IBK::UnitVector>	m_radiation;
+	std::vector<IBK::UnitVector>	m_pvEnergy;
 
 };
 

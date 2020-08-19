@@ -14,6 +14,7 @@
 #include <QToolButton>
 
 #include <IBK_assert.h>
+#include <IBK_math.h>
 
 #include <fstream>
 
@@ -513,7 +514,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
 		connect(&m_simProgressTimer, &QTimer::timeout, this, &PVToolWidget::onSimProgressTimerTimeout);
 	}
-	m_progressDlg->setMaximum(2*m_waitingProjects.count()*100);
+	m_progressDlg->setMaximum(m_waitingProjects.count()*100);
 	m_progressDlg->setValue(0);
 	m_progressDlg->setWindowModality(Qt::WindowModal);
 	m_progressDlg->show();
@@ -548,6 +549,9 @@ void PVToolWidget::onSimulationJobFinished(int exitCode, QProcess::ExitStatus st
 
 	// now read temperature from just completed D6 project and generate
 	// power drain tsv file for next project
+	IBK::Path filename("");
+	evaluateResults(filename);
+
 
 	startNextDELPHINSim();
 }
@@ -636,7 +640,8 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 void PVToolWidget::startNextDELPHINSim() {
 	if (m_waitingProjects.isEmpty() || m_progressDlg->wasCanceled()) {
 		m_simProgressTimer.stop();
-		evaluateResults();
+		//evaluateResults();
+		showResults();
 		m_progressDlg->hide();
 		m_completedProjects.clear();
 		return;
@@ -674,6 +679,106 @@ void PVToolWidget::startNextDELPHINSim() {
 void PVToolWidget::clearResultVecs(){
 	m_temperature.clear();
 	m_radiation.clear();
+}
+
+void PVToolWidget::evaluateResults(IBK::Path &filename){
+	m_completedProjects.back();
+
+	IBK::Path tmp(m_completedProjects.back().toStdString());
+	IBK::Path tmp2(tmp.parentPath() / tmp.filename().withoutExtension() / "results/");
+
+	//read temperature and radiation data
+	IBK::UnitVector temperature, radiation;
+	try {
+		DATAIO::DataIO temp;
+		temp.read(tmp2 / "TMean.d6o");
+		temperature.m_data = temp.columnValues(0);
+		temperature.m_unit = IBK::Unit(temp.m_valueUnit);
+		temperature.convert(IBK::Unit("K"));
+	} catch (IBK::Exception &ex ) {
+		QMessageBox::critical(this, QString(), tr("Fehler während des Lesens der Ergebnisse Temperatur von DELPHIN. \n %1").arg(ex.what()));
+		return;
+	}
+	try {
+		DATAIO::DataIO rad;
+		rad.read(tmp2 / "GlobalRadition.d6o");
+		IBK::UnitVector unitVec;
+		radiation.m_data = rad.columnValues(0);
+		for (double &v : radiation.m_data)
+			v/=0.7; //absorption coeficient from Delphin
+		radiation.m_unit = IBK::Unit(rad.m_valueUnit);
+		radiation.convert(IBK::Unit("W/m2"));
+	} catch (IBK::Exception &ex) {
+		QMessageBox::critical(this, QString(), tr("Fehler während des Lesens der Ergebnisse Strahlung von DELPHIN. \n %1").arg(ex.what()));
+		return;
+	}
+
+	//run pvEnergy
+	std::vector<double> energyRes;
+	try {
+//		int incrementValue = m_progressDlg->maximum();
+
+		m_pvtool.calcPVEnergy(temperature.m_data,radiation.m_data, energyRes);
+//		int progressValue = m_progressDlg->value();
+//		progressValue += incrementValue;
+//		m_progressDlg->setValue(progressValue);
+
+	} catch (IBK::Exception &ex) {
+		QMessageBox::critical(this, QString(), tr("%1").arg(ex.what()));
+		return;
+	}
+	//create path variables (reading/writing)
+	IBK::Path outFilename(tmp2.parentPath().parentPath() / "power" );
+	std::string testStr = tmp2.parentPath().filename().str();
+	std::string newFile = "pv_power_drain_";
+	unsigned int fileNr;
+	bool withPCM = false;
+	if(testStr.find("WithoutPCM") != std::string::npos){
+		std::string filenameOld = IBK::Path(m_completedProjects.back().toStdString()).filename().withoutExtension().str();
+		std::string filenameNr = filenameOld.substr(filenameOld.find_last_of("-disc")-1-4,1);
+		fileNr = IBK::string2val<unsigned int>(filenameNr)+1;
+		newFile += "withoutPCM-" + IBK::val2string(fileNr) + ".tsv";
+		outFilename.addPath(IBK::Path(newFile));
+	}
+	else {
+		withPCM = true;
+		std::string filenameOld = IBK::Path(m_completedProjects.back().toStdString()).filename().withoutExtension().str();
+		std::string filenameNr = filenameOld.substr(filenameOld.find_last_of("-disc")-3-4,3);
+		fileNr = IBK::string2val<unsigned int>(filenameNr.substr(2))+1;
+		newFile += "PCM" + filenameNr.substr(0,2) + IBK::val2string(fileNr) + ".tsv";
+		outFilename.addPath(IBK::Path(newFile));
+	}
+	//save last iteration vector for reporting
+	if(fileNr == 3){
+		IBK::UnitVector energy;
+		energy.m_data = energyRes;
+		energy.m_name = "PV Energy";
+		energy.m_unit = IBK::Unit("W");
+		m_pvEnergy.push_back(energy);
+		//write file
+		std::ofstream out2(outFilename.parentPath().str() + "/" + (withPCM ? "PCM" : "withoutPCM") + IBK::val2string(m_pvEnergy.size()-1) + ".tsv");
+		out2 << "Time [h]\tPVEnergy[J/m3s]" << std::endl;
+		//cyclic year: attention no time data value of 0 AND 8760 in one file
+		size_t timeVal = 0;
+
+		for(double &val : m_pvEnergy.back().m_data){
+
+			out2 << timeVal++ << "\t" << IBK::val2string(val) << std::endl;
+		}
+		out2 << std::endl;
+		out2.close();
+	}
+	//write file
+	std::ofstream out(outFilename.str());
+	out << "Time [h]\tPVEnergy[J/m3s]" << std::endl;
+	//cyclic year: attention no time data value of 0 AND 8760 in one file
+	size_t maxI = energyRes.size() <= 8760 ? energyRes.size() : 8760;
+	for(size_t i=0; i<maxI; ++i){
+		double val = energyRes[i]/(0.02*1.6);
+		out << i << "\t" << (IBK::near_zero(val) ? "" : "-") << IBK::val2string(val,10) << std::endl;
+	}
+	out << std::endl;
+	out.close();
 }
 
 void PVToolWidget::evaluateResults() {
@@ -761,6 +866,29 @@ void PVToolWidget::runPVEnergy()
 	//m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
 	//connect(&m_simProgressTimer, &QTimer::timeout, this, &PVToolWidget::onSimProgressTimerTimeout);
 
+}
+
+void PVToolWidget::showResults(){
+	//sum up all value of one vector
+	std::vector<double> summedValues;//(m_pvEnergy.size(),0);
+	for(IBK::UnitVector &pvE : m_pvEnergy){
+
+		double res =0;
+		for(double &val : pvE.m_data)
+			res += val;
+		summedValues.push_back(res);
+	}
+
+	std::vector<std::string>	results;
+	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
+	for(size_t i=0; i<summedValues.size(); ++i)
+		results.push_back( IBK::FormatString("%1 %2").arg(m_thicknessPCM[i]*100,5)
+							 .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
+
+	PVTResultDialog * PVResults = new PVTResultDialog();
+	PVResults->setResultText(results);
+	PVResults->setModal(true);
+	PVResults->exec();
 }
 
 
