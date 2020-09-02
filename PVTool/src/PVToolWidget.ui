@@ -208,103 +208,123 @@
      <property name="title">
       <string>PV-Module</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0,0">
-      <item row="1" column="1">
-       <widget class="QLabel" name="label_uMPP">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_uMPP_2">
         <property name="text">
-         <string>Nennspannung (MPP) in V</string>
+         <string>Neigung ... 0-Dach; 90-Wand [Deg]</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
-       <widget class="QLineEdit" name="lineEdit_alpha"/>
+      <item row="0" column="2">
+       <widget class="QLineEdit" name="lineEdit_Inclination"/>
       </item>
-      <item row="4" column="2">
-       <widget class="QLineEdit" name="lineEdit_iSC"/>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLabel" name="label_iSC">
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_tempCoeffU_2">
         <property name="text">
-         <string>Kurzschlussstrom in A</string>
+         <string>Orientierung 0-Nord; 90-Ost; ... [Deg]</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_iMPP_2">
-        <property name="text">
-         <string>Nennstromstärke (MPP) in A</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
-       <widget class="QLineEdit" name="lineEdit_beta"/>
-      </item>
-      <item row="3" column="4">
-       <widget class="QLineEdit" name="lineEdit_gamma"/>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="label_uOC">
-        <property name="text">
-         <string>Leerlaufspannung in V</string>
-        </property>
-       </widget>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="lineEdit_Orientation"/>
       </item>
       <item row="1" column="0">
-       <widget class="QRadioButton" name="radioButton_PVModuleManufacture">
-        <property name="text">
-         <string>PV Herstellerdaten</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="4">
-       <widget class="QComboBox" name="comboBox_PVModule"/>
-      </item>
-      <item row="0" column="0">
        <widget class="QRadioButton" name="radioButton_PVDatabase">
         <property name="text">
          <string>PV Datenbank</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
-       <widget class="QLabel" name="label_nSer">
+      <item row="1" column="1" colspan="4">
+       <widget class="QComboBox" name="comboBox_PVModule"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="radioButton_PVModuleManufacture">
         <property name="text">
-         <string>Zellanzahl</string>
+         <string>PV Herstellerdaten</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_uMPP">
+        <property name="text">
+         <string>Nennspannung (MPP) in V</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="lineEdit_uMPP"/>
+      </item>
+      <item row="2" column="3">
        <widget class="QLabel" name="label_tempCoeffU">
         <property name="text">
          <string>Temperaturkoeffizient Uoc in %/K</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
+      <item row="2" column="4">
+       <widget class="QLineEdit" name="lineEdit_beta"/>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="label_iMPP_2">
+        <property name="text">
+         <string>Nennstromstärke (MPP) in A</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="lineEdit_iMPP"/>
+      </item>
+      <item row="3" column="3">
        <widget class="QLabel" name="label_tempCoeffI">
         <property name="text">
          <string>Temperaturkoeffizient Isc in %/K</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="3">
+      <item row="3" column="4">
+       <widget class="QLineEdit" name="lineEdit_alpha"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_uOC">
+        <property name="text">
+         <string>Leerlaufspannung in V</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QLineEdit" name="lineEdit_uOC"/>
+      </item>
+      <item row="4" column="3">
        <widget class="QLabel" name="label_tempCoeffP">
         <property name="text">
          <string>Temperaturkoeffizient PMPP in %/K</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="QLineEdit" name="lineEdit_uOC"/>
-      </item>
       <item row="4" column="4">
+       <widget class="QLineEdit" name="lineEdit_gamma"/>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="label_iSC">
+        <property name="text">
+         <string>Kurzschlussstrom in A</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLineEdit" name="lineEdit_iSC"/>
+      </item>
+      <item row="5" column="3">
+       <widget class="QLabel" name="label_nSer">
+        <property name="text">
+         <string>Zellanzahl</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="4">
        <widget class="QLineEdit" name="lineEdit_nSer"/>
-      </item>
-      <item row="2" column="2">
-       <widget class="QLineEdit" name="lineEdit_iMPP"/>
-      </item>
-      <item row="1" column="2">
-       <widget class="QLineEdit" name="lineEdit_uMPP"/>
       </item>
      </layout>
     </widget>

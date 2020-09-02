@@ -7,6 +7,7 @@ PRODUCER                 = DE: Rubitherm
 DATE                     = 17.08.2020
 COLOUR                   = #ff409020
 CATEGORY                 = MISC
+FLAGS					 = AIR_TIGHT
 
 
 [STORAGE_BASE_PARAMETERS]

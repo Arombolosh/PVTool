@@ -117,6 +117,9 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	QString initialWorkingDirectory = settings.value("WorkingDirectory", QDir::homePath()).toString();
 	m_ui->lineEdit_Directory->setText(initialWorkingDirectory);
 
+	m_ui->lineEdit_Inclination->setText(QString("90"));
+	m_ui->lineEdit_Orientation->setText(QString("180"));
+
 	m_ui->radioButton_WeatherComboBox->setChecked(true);
 	on_radioButton_WeatherComboBox_toggled(true);
 
@@ -253,6 +256,9 @@ void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked) {
 		m_ui->lineEdit_alpha->setText(QString("%L1").arg(m_pvModule[index].m_alpha));
 		m_ui->lineEdit_gamma->setText(QString("%L1").arg(m_pvModule[index].m_gamma));
 	}
+
+	m_ui->lineEdit_Inclination->setEnabled(true);
+	m_ui->lineEdit_Orientation->setEnabled(true);
 }
 
 
@@ -401,7 +407,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	IBK::Path d6pTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple.d6p").toStdString());
 	IBK::Path d6pTemplateWithoutPCMPath( (PVTDirectories::resourcesRootDir() + "/file_templates/templateWithoutPCM_simple.d6p").toStdString());
 	IBK::Path m6TemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/InsulationMatTemplate.m6").toStdString());
-// Wenn Radiobutton für Kamm eingebaut, dann hier Variable setzen ToDo Dirk
+
+	// Wenn Radiobutton für Kamm eingebaut, dann hier Variable setzen ToDo Dirk
 	bool withComb=false;
 	if(withComb)
 		 d6pTemplatePath= IBK::Path( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple_comb.d6p").toStdString());
@@ -460,7 +467,9 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 			powerDrainFilePath = IBK::FormatString("pv_power_drain_withoutPCM-%1.tsv").arg(WRMCount).str();
 		}
 		createDelphinProject(d6TemplateWithoutPCM, d6pWithoutPCM,0, insuThick,
-							 "", weatherName.str(), powerDrainFilePath);
+							 "SP26", weatherName.str(), powerDrainFilePath,
+							 m_ui->lineEdit_Inclination->text().toStdString(),
+							 m_ui->lineEdit_Orientation->text().toStdString());
 		QStringList discCmdLine0;
 		QDir::setCurrent(workingDir);
 		std::string discFilename = d6pWithoutPCM.filename().withoutExtension().str() + "-disc.d6p";
@@ -472,7 +481,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		m_waitingProjects.append(QString::fromStdString((d6pWithoutPCM.parentPath() / discFilename).str()));
 	}
 
-	m_thicknessPCM = {0, 0.01, 0.02, 0.03};	//thickness of pcm
+	m_thicknessPCM = {0, 0.01, 0.02/*, 0.03*/};	//thickness of pcm
 
 	for (size_t i=1; i<m_thicknessPCM.size(); ++i) {
 		for (unsigned int WRMCount=0; WRMCount<MAX_WRM_ITERS; ++WRMCount) {
@@ -486,8 +495,11 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 			//for detailed model see description below...not required in the simple model
 			//m_thicknessPCM[i] -= 0.004; // pcm has 3 cells, two non adjustable cells are set to 5 mm
 			// - adjust PCM material layer thickness and write project template
+			auto sss = m_ui->comboBox_PCMMaterials->currentText().toStdString();
 			createDelphinProject(d6Template, d6ProjectPath, m_thicknessPCM[i], insuThick,
-								 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str(), powerDrainFilePath);
+								 m_ui->comboBox_PCMMaterials->currentText().toStdString(), weatherName.str(), powerDrainFilePath,
+								 m_ui->lineEdit_Inclination->text().toStdString(),
+								 m_ui->lineEdit_Orientation->text().toStdString());
 			// now run CmdDiscretize to generate discretized project file
 			QStringList discCmdLine;
 			//	QString projectFile = QString::fromStdString(d6ProjectPath.filename().str());
@@ -622,13 +634,17 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 										double insulationThickness,
 										const std::string & pcmMaterialFileName,
 										const std::string & climateDataFileName,
-										const std::string & powerDrainFilePath)
+										const std::string & powerDrainFilePath,
+										const std::string & inclination,
+										const std::string & orientation)
 {
 	std::string d6str = IBK::replace_string(d6Template, "${PCMThick}", IBK::val2string(pcmThickness));
 	d6str = IBK::replace_string(d6str, "${INSULATIONThick}", IBK::val2string(insulationThickness));
 	d6str = IBK::replace_string(d6str, "${PCM}",pcmMaterialFileName);
 	d6str = IBK::replace_string(d6str, "${CLIMATE}", climateDataFileName);
 	d6str = IBK::replace_string(d6str, "${POWER_DRAIN_FILE_PATH}", powerDrainFilePath);
+	d6str = IBK::replace_string(d6str, "${INCLINATION}", inclination);
+	d6str = IBK::replace_string(d6str, "${ORIENTATION}", orientation);
 
 	// write file
 	std::ofstream out(d6ProjectFilePath.str());
@@ -679,6 +695,7 @@ void PVToolWidget::startNextDELPHINSim() {
 void PVToolWidget::clearResultVecs(){
 	m_temperature.clear();
 	m_radiation.clear();
+	m_pvEnergy.clear();
 }
 
 void PVToolWidget::evaluateResults(IBK::Path &filename){
@@ -889,6 +906,7 @@ void PVToolWidget::showResults(){
 	PVResults->setResultText(results);
 	PVResults->setModal(true);
 	PVResults->exec();
+	clearResultVecs();
 }
 
 

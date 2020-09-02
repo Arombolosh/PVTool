@@ -5,7 +5,7 @@ D6MARLZ! 006.001
   LABORATORY               = EN: Generik
   DATE                     = 04.06.20
   COLOUR                   = #ff409020
-  FLAGS                    = WATER_TIGHT 
+  FLAGS                    = WATER_TIGHT AIR_TIGHT
   CATEGORY                 = INSULATION
   HATCHING                 = 13
 

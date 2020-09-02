@@ -50,8 +50,8 @@
 
 		<Interfaces>
 			<Interface name="Climate" type="EngineeringOutdoor">
-				<IBK:Parameter name="Orientation" unit="Deg">180</IBK:Parameter>
-				<IBK:Parameter name="Inclination" unit="Deg">90</IBK:Parameter>
+				<IBK:Parameter name="Orientation" unit="Deg">${ORIENTATION}</IBK:Parameter>
+				<IBK:Parameter name="Inclination" unit="Deg">${INCLINATION}</IBK:Parameter>
 				<IBK:Parameter name="OutdoorHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
 				<IBK:Parameter name="OutdoorConvectiveHeatTransferCoefficient" unit="W/m2K">12</IBK:Parameter>
 				<IBK:Parameter name="OutdoorRadiantHeatTransferCoefficient" unit="W/m2K">5</IBK:Parameter>
