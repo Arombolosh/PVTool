@@ -150,15 +150,24 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_WeatherFile->blockSignals(false);
 
 	//Data PV modules
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(31.4, 8.44, 38.3, 8.91, 0.05, -0.30, -0.43, 60, "aleo S19L265"));				//Material monoSi
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(31.5, 8.57, 38.3, 9.05, 0.05, -0.30, -0.43, 60, "aleo S19L270"));				//Material monoSi
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(32.24, 9.27, 39.75, 9.76, 0.043, -0.31, -0.41, 60, "NEMO 2.0 M295"));			//Material monoSi
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(44.1, 1.84, 59.8, 2.16, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 80"));			//Material CdTe
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75"));			//Material CdTe
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75"));			//Material CdTe
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(70.2, 1.6, 87.7, 1.75, 0.04, -0.29, -0.34, 213, "Firstsolar Dünnschicht"));	//Material CdTe
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(15.57, 8.25, 18.17, 8.71, 0.06, -0.30, -0.39, 28, "Solarglas Premium"));		//Material monoSi
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(19.4, 9.09, 23.8, 9.32, 0.05, -0.31, -0.39, 36, "Solarwatt"));					//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(31.4, 8.44, 38.3, 8.91, 0.05, -0.30, -0.43, 60, "aleo S19L265", PVTOOL::Energy::ManufactureData::CellType::monoSi));				//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(31.5, 8.57, 38.3, 9.05, 0.05, -0.30, -0.43, 60, "aleo S19L270", PVTOOL::Energy::ManufactureData::CellType::monoSi));				//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(32.24, 9.27, 39.75, 9.76, 0.043, -0.31, -0.41, 60, "NEMO 2.0 M295", PVTOOL::Energy::ManufactureData::CellType::monoSi));			//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(44.1, 1.84, 59.8, 2.16, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 80", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(70.2, 1.6, 87.7, 1.75, 0.04, -0.29, -0.34, 213, "Firstsolar Dünnschicht", PVTOOL::Energy::ManufactureData::CellType::CdTe));	//Material CdTe
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(15.57, 8.25, 18.17, 8.71, 0.06, -0.30, -0.39, 28, "Solarglas Premium", PVTOOL::Energy::ManufactureData::CellType::monoSi));		//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(19.4, 9.09, 23.8, 9.32, 0.05, -0.31, -0.39, 36, "Solarwatt", PVTOOL::Energy::ManufactureData::CellType::monoSi));					//Material monoSi
+
+	//Attention follow sort order in enum CellType { monoSi, multiSi, CdTe, CIS, CIGS, Amorphous };
+	m_ui->comboBoxCellType->addItem("MonoSi", PVTOOL::Energy::ManufactureData::CellType::monoSi);
+	m_ui->comboBoxCellType->addItem("multiSi", PVTOOL::Energy::ManufactureData::CellType::multiSi);
+	m_ui->comboBoxCellType->addItem("CdTe", PVTOOL::Energy::ManufactureData::CellType::CdTe);
+	m_ui->comboBoxCellType->addItem("CIS", PVTOOL::Energy::ManufactureData::CellType::CIS);
+	m_ui->comboBoxCellType->addItem("CIGS", PVTOOL::Energy::ManufactureData::CellType::CIGS);
+	m_ui->comboBoxCellType->addItem("Amorphous", PVTOOL::Energy::ManufactureData::CellType::Amorphous);
+
 
 
 	//todo schleife mit weather
@@ -236,8 +245,11 @@ void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked) {
 	{
 		allLineEdits.at(i)->setEnabled(!checked);
 	}
+	m_ui->comboBoxCellType->setEnabled(!checked);
+
 	m_ui->comboBox_PVModule->setEnabled(checked);
 	if(checked) {
+		m_ui->comboBoxCellType->setCurrentIndex((m_pvModule[m_ui->comboBox_PVModule->currentIndex()].m_material));
 		QPalette palette;
 		palette.setColor(QPalette::Text, Qt::black);
 		for (int i=0; i < allLineEdits.size(); i++)
@@ -282,6 +294,9 @@ void PVToolWidget::on_comboBox_PVModule_currentIndexChanged(int index) {
 	m_ui->lineEdit_alpha->setText(QString("%L1").arg(m_pvModule[index].m_alpha));
 	m_ui->lineEdit_gamma->setText(QString("%L1").arg(m_pvModule[index].m_gamma));
 
+	auto xxx = m_pvModule[index].m_material;
+	auto xxx2 = static_cast<PVTOOL::Energy::ManufactureData::CellType>(xxx);
+	m_ui->comboBoxCellType->setCurrentIndex((m_pvModule[index].m_material));
 }
 
 void PVToolWidget::startDiscProcess(const QString &cmdDiscPath,const QStringList &discCmdLine, QWidget *parent){
@@ -337,13 +352,17 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	else {
 
 		// set PV module data and throw Message Box if input is wrong
-		if (!convertLineEditintoDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, m_pvtool.m_manuData.m_imp)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_uMPP, m_ui->lineEdit_uMPP, m_pvtool.m_manuData.m_vmp)) return;
 		if (!convertLineEditintoDouble(this, m_ui->label_iMPP_2, m_ui->lineEdit_iMPP, m_pvtool.m_manuData.m_imp)) return;
 		if (!convertLineEditintoDouble(this, m_ui->label_uOC, m_ui->lineEdit_uOC, m_pvtool.m_manuData.m_voc)) return;
 		if (!convertLineEditintoDouble(this, m_ui->label_iSC, m_ui->lineEdit_iSC, m_pvtool.m_manuData.m_isc)) return;
 		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffI, m_ui->lineEdit_alpha, m_pvtool.m_manuData.m_alpha)) return;
 		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_beta, m_pvtool.m_manuData.m_beta)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_tempCoeffU, m_ui->lineEdit_gamma, m_pvtool.m_manuData.m_gamma)) return;
 		if (!convertLineEditintoInt(this, m_ui->label_nSer, m_ui->lineEdit_nSer, m_pvtool.m_manuData.m_nSer)) return;
+		m_pvtool.m_manuData.m_refTemp = 298.15;
+		m_pvtool.m_manuData.m_material = static_cast<PVTOOL::Energy::ManufactureData::CellType>(m_ui->comboBoxCellType->currentData().toInt());
+
 
 		m_pvtool.m_manuData.m_name = "UserGeneratedPVModule";
 	}

@@ -13,10 +13,13 @@ public:
 	/*! Manufacture dataset for PV module under STC.*/
 	struct ManufactureData{
 
+		/*! Attention enums not link to SAM-LIB. */
+		enum CellType { monoSi, multiSi, CdTe, CIS, CIGS, Amorphous};
+
 		ManufactureData(){}
 
-		ManufactureData(double vmp, double imp, double voc, double isc, double alpha, double beta, double gamma, int nSer, std::string name):
-			m_material(module6par::monoSi),
+		ManufactureData(double vmp, double imp, double voc, double isc, double alpha, double beta, double gamma, int nSer,const std::string &name, CellType cellType):
+			m_material(cellType),
 			m_vmp(vmp),
 			m_imp(imp),
 			m_voc(voc),
