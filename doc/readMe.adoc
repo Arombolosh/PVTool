@@ -7,7 +7,7 @@
 
 ## Einleitung
 
-Das Programm PVTool wurde für die Auslegung von PCMs in Baukonstruktionen mit integrierten PV-Paneelen entwickelt. Es können damit Fassadenkonstruktionen (Neigung derzeit nur 90° - senkrechte Wand) mit integrierten PV-Modul und einer PCM-Schicht bemessen werden. Als Ergebnis wird der zu erwartende Stromertrag über ein Jahr geliefert und in Varianten gegenübergestellt.
+Das Programm PVTool wurde für die Auslegung von PCMs in Baukonstruktionen mit integrierten PV-Paneelen entwickelt. Es können damit Fassadenkonstruktionen sowie Dachkonstruktionen (Neigung derzeit zwischen 0° Dach und 90° - senkrechte Wand) mit integrierten PV-Modul und einer PCM-Schicht bemessen werden. Als Ergebnis wird der zu erwartende Stromertrag über ein Jahr geliefert und in Varianten gegenübergestellt.
 
 ## GUI
 
@@ -42,9 +42,10 @@ Per Nutzereingabe wird ein Klimadatensatz ausgewählt. Hierbei werden derzeit nu
 ### PCM
 
 Hier kann ein PCM ausgwählt werden, welches bei der Berechnung verwendet wird.
+Es ist eine Datenbank bestehender PCMs hinterlegt, welche durch Nutzervorgaben erweitert werden kann. Hierfür wurde im Rahmen des Projektes ein PCM-Material-Generator programmiert, welcher PCM-Materialdateien erstellt.
 
 [NOTE] 
-Derzeit wird nur das PCM SP26 von https://www.rubitherm.eu/index.php/produktkategorie/anorganische-pcm-sp[Rubitherm] unterstützt.
+In der Entwicklungsphase wurde nur das PCM SP26 von https://www.rubitherm.eu/index.php/produktkategorie/anorganische-pcm-sp[Rubitherm] unterstützt.
 
 ### Insulation
 
@@ -56,9 +57,12 @@ Nachdem alle Eingaben vorgenommen wurden kann hier die Simulationsstudie gestart
 
 ## Berechnungsablauf
 
-Nach dem Start des Programms werden werden automatisiert 4 Simulationsvarianten aufgesetzt. Dazu wird eine Referenzkonstruktion ohne PCM sowie 3 Konstruktionen mit PCM (PCM-Schichtdicke 1 cm, 2 cm und 3 cm) initialisiert. Die thermische Berechnung wird mit dem Solverkern https://www.bauklimatik-dresden.de/[Delphin] durchgeführt. Die Projektdateien von DELPHIN werden automatisiert im temporären Verzeichnis erzeugt, diskretisiert und berechnet. Die Berechnungsergebnisse aus der DELPHIN-Simulation liefern die mittlere Modultemperatur sowie die Strahlung, die senkrecht auf das Modul auftrifft. Diese Ergebnisse werden für alle Stunden (8760 h) im Jahr berechnet. 
+Nach dem Start des Programms werden automatisiert 4 Simulationsvarianten aufgesetzt. Dazu wird eine Referenzkonstruktion ohne PCM sowie 2 Konstruktionen mit PCM (PCM-Schichtdicke 1 cm und 2 cm) initialisiert. Die thermische Berechnung wird mit dem Solverkern https://www.bauklimatik-dresden.de/[Delphin] durchgeführt. Die Projektdateien von DELPHIN werden automatisiert im temporären Verzeichnis erzeugt, diskretisiert und berechnet. Die Berechnungsergebnisse aus der DELPHIN-Simulation liefern die mittlere Modultemperatur sowie die Strahlung, die senkrecht auf das Modul auftrifft. Diese Ergebnisse werden für alle Stunden (8760 h) im Jahr berechnet.
 
-Anschließend übernimmt eine weitere Routine das Berechnen des Stromertrags. Eingangsparameter sind die mittlere Modultemperatur sowie die auftreffende Strahlung. Die Berechnung wird von der https://github.com/NREL/ssc/tree/develop/shared[SAM-Bibliothek] übernommen. Dadurch ist die Berechnung von Stromerträgen unter Berücksichtigung der Temperaturabhängigkeit möglich. Die Grundlage für die Berechnung des Stromertrags bildet das Ein-Dioden-Modell.
+Anschließend übernimmt eine weitere Routine das Berechnen des Stromertrags. Eingangsparameter sind die mittlere Modultemperatur sowie die auftreffende Strahlung. Die Berechnung wird von der https://github.com/NREL/ssc/tree/develop/shared[SAM-Bibliothek] übernommen. Dadurch ist die Berechnung von Stromerträgen unter Berücksichtigung der Temperaturabhängigkeit möglich. 
+Die Simulation wird iterativ dreifach durchgeführt. Dem Modul  wird dabei die erzeugte elektrische Energie der vorrausgegangenen Simulationsrechnung als thermische Energie entzogen und erneut der elektrische Energieertrag ermittelt. Spätestens bei der dritten Simulationsrunde sind die Energiemengen so ausiteriert, dass die physikalischen Prozesse exakt genug abgebildet werden ohne eine reale "Co-Simulation" umsetzen zu müssen.
+
+Die Grundlage für die Berechnung des Stromertrags bildet das Ein-Dioden-Modell.
 Ebenso wurde die IBK-Bibliothek für die Umsetzung der Berechnungsmethodik genutzt.
 
 ## Auswertung
