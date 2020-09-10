@@ -165,13 +165,22 @@ int main(int argc, char* argv[]) {
 		manuData.m_nSer =	IBK::string2val<int>(argv[8]);
 		manuData.m_refTemp =	IBK::string2val<double>(argv[9]);
 
-		// TODO : material is not taken into account yet; Default monoSi
-		if (args.args()[10] == "monoSi") {
-			manuData.m_material = 0;
-		}
-		else {
-			manuData.m_material = 0;
-		}
+		if (args.args()[10] == "monoSi")
+			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::monoSi);
+		else if (args.args()[10] == "CdTe")
+			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CdTe);
+		else if (args.args()[10] == "CIS")
+			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIS);
+		else if (args.args()[10] == "CIGS")
+			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIGS);
+		else if (args.args()[10] == "multiSi")
+			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::multiSi);
+		else if (args.args()[10] == "Amorphous")
+			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::Amorphous);
+		else
+			throw IBK::Exception(IBK::FormatString("PV material is not valid. Please use one of the following materials:\n "
+											 "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
+
 
 		// compute derived parameters, may throw an exception
 		pvtool.calcPhysicalParameterFromManufactureData();
