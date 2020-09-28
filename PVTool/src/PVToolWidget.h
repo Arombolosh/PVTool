@@ -108,6 +108,7 @@ private:
 	std::vector<IBK::UnitVector>	m_temperature;
 	std::vector<IBK::UnitVector>	m_radiation;
 	std::vector<IBK::UnitVector>	m_pvEnergy;
+	double							m_tempProgress;
 
 };
 
