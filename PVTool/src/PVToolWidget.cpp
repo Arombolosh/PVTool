@@ -13,6 +13,7 @@
 #include <QLocale>
 #include <QToolButton>
 
+
 #include <IBK_assert.h>
 #include <IBK_math.h>
 
@@ -616,8 +617,9 @@ void PVToolWidget::onSimProgressTimerTimeout() {
 		if (vals.size() > 2) {
 			double percentage = vals[2];
 			// compute progress bar value
-			int progressBarValue = percentage + (m_completedProjects.empty() ? 0 : m_completedProjects.size()-1)*100;
+			int progressBarValue = percentage + m_finishedProjects*100;
 			m_progressDlg->setValue(progressBarValue);
+			//qDebug() << progressBarValue;
 		}
 	}
 	catch (...) {
@@ -815,6 +817,9 @@ void PVToolWidget::evaluateResults(IBK::Path &filename){
 	}
 	out << std::endl;
 	out.close();
+
+	// set progress bar
+	++m_finishedProjects;
 }
 
 void PVToolWidget::evaluateResults() {

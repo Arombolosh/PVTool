@@ -99,6 +99,7 @@ private:
 	std::vector<double>	m_thicknessPCM;			///< thickness of PCM [m]
 	QStringList			m_waitingProjects;
 	QStringList			m_completedProjects;
+	size_t				m_finishedProjects = 0;		///< finished projects to set progressBar
 
 	/*! PV module data. */
 	PVTOOL::Energy					m_pvtool;
