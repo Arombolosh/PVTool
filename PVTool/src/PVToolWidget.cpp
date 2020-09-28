@@ -156,7 +156,6 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(32.24, 9.27, 39.75, 9.76, 0.043, -0.31, -0.41, 60, "NEMO 2.0 M295", PVTOOL::Energy::ManufactureData::CellType::monoSi));			//Material monoSi
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(44.1, 1.84, 59.8, 2.16, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 80", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(70.2, 1.6, 87.7, 1.75, 0.04, -0.29, -0.34, 213, "Firstsolar Dünnschicht", PVTOOL::Energy::ManufactureData::CellType::CdTe));	//Material CdTe
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(15.57, 8.25, 18.17, 8.71, 0.06, -0.30, -0.39, 28, "Solarglas Premium", PVTOOL::Energy::ManufactureData::CellType::monoSi));		//Material monoSi
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(19.4, 9.09, 23.8, 9.32, 0.05, -0.31, -0.39, 36, "Solarwatt", PVTOOL::Energy::ManufactureData::CellType::monoSi));					//Material monoSi
