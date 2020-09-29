@@ -315,6 +315,22 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	IBK::Path weatherPath;
 	QString workingDir = m_ui->lineEdit_Directory->text();
 	IBK::Path workingDirectory( workingDir.toStdString() );
+
+	std::vector<IBK::Path> deleteDirs;
+
+	deleteDirs.push_back( workingDirectory + "/project1-0-disc" );
+	deleteDirs.push_back( workingDirectory + "/project1-1-disc" );
+	deleteDirs.push_back( workingDirectory + "/project1-2-disc" );
+	deleteDirs.push_back( workingDirectory + "/project2-0-disc" );
+	deleteDirs.push_back( workingDirectory + "/project2-1-disc" );
+	deleteDirs.push_back( workingDirectory + "/project2-2-disc" );
+	deleteDirs.push_back( workingDirectory + "/projectWithoutPCM-0-disc" );
+	deleteDirs.push_back( workingDirectory + "/projectWithoutPCM-1-disc" );
+	deleteDirs.push_back( workingDirectory + "/projectWithoutPCM-2-disc" );
+
+	for (size_t i=0; i<deleteDirs.size(); ++i)
+		workingDirectory.remove(deleteDirs[i]);
+
 	if (m_ui->radioButton_WeatherComboBox->isChecked()){
 		weatherPath = weatherDirectory / m_ui->comboBox_WeatherFile->itemText(m_ui->comboBox_WeatherFile->currentIndex()).toStdString() + ".c6b";
 		// Note: we can rely on the file to exist, since this is built-in stuff
