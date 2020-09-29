@@ -596,7 +596,7 @@ void PVToolWidget::onSimProgressTimerTimeout() {
 		return;
 	}
 	// read currently processed simulation job's progress.tsv file, extract last line's percentage and update progress bar
-	IBK::Path currentSimJob(m_completedProjects.back().toStdString());
+	IBK::Path currentSimJob(m_completedProjects[m_finishedProjects].toStdString());
 	IBK::Path path2Progress = currentSimJob.withoutExtension() / "log/progress.tsv"; //changed from tsv to txt (OS: win64)
 	std::ifstream in(path2Progress.str());
 	std::string lastLine, line;
@@ -618,7 +618,9 @@ void PVToolWidget::onSimProgressTimerTimeout() {
 			// compute progress bar value
 			int progressBarValue = percentage + m_finishedProjects*100;
 			m_progressDlg->setValue(progressBarValue);
-			//qDebug() << progressBarValue;
+			if (progressBarValue > m_tempProgress+20)
+				qDebug() << progressBarValue;
+			m_tempProgress = progressBarValue;
 		}
 	}
 	catch (...) {
