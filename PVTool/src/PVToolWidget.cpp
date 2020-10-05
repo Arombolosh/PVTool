@@ -756,7 +756,7 @@ void PVToolWidget::evaluateResults(IBK::Path &filename){
 	}
 	try {
 		DATAIO::DataIO rad;
-		rad.read(tmp2 / "GlobalRadition.d6o");
+		rad.read(tmp2 / "GlobalRadiation.d6o");
 		IBK::UnitVector unitVec;
 		radiation.m_data = rad.columnValues(0);
 		for (double &v : radiation.m_data)
@@ -866,7 +866,7 @@ void PVToolWidget::evaluateResults() {
 		}
 		try {
 			DATAIO::DataIO rad;
-			rad.read(tmp2 / "GlobalRadition.d6o");
+			rad.read(tmp2 / "GlobalRadiation.d6o");
 			IBK::UnitVector unitVec;
 			unitVec.m_data = rad.columnValues(0);
 			for (double &v : unitVec.m_data)

@@ -34,7 +34,7 @@ void helpDocumentation(){
 void extractDataFromD6Results(const IBK::Path & path, IBK::UnitVector &temp, IBK::UnitVector &rad){
 	//ToDo hier müssen die richtigen Datei geladen werden
 	temp = readDataIO( path /"results/TMean.d6o");
-	rad = readDataIO(path / "results/GlobalRadition.d6o");
+	rad = readDataIO(path / "results/GlobalRadiation.d6o");
 	temp.convert(IBK::Unit("K"));
 	rad.convert(IBK::Unit("W/m2"));
 /*
