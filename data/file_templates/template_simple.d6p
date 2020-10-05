@@ -107,7 +107,7 @@
 				<SpaceType>Mean</SpaceType>
 				<OutputGrid>Skalare</OutputGrid>
 			</OutputFile>
-			<OutputFile name="GlobalRadition">
+			<OutputFile name="GlobalRadiation">
 				<Quantity unit="J/m2s">FluxShortWaveRadiationGlobal</Quantity>
 				<TimeType>Mean</TimeType>
 				<SpaceType>Mean</SpaceType>
@@ -158,7 +158,7 @@
 		</Assignment>
 
 		<Assignment type="Output" location="Left">
-			<Reference>GlobalRadition</Reference>
+			<Reference>GlobalRadiation</Reference>
 			<Range>0 0 0 0</Range>
 		</Assignment>
 

@@ -134,8 +134,8 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_WeatherFile->addItem("02_Rostock_Warnemuende");
 	m_ui->comboBox_WeatherFile->addItem("03_Hamburg-Fuhlsbuettel");
 	m_ui->comboBox_WeatherFile->addItem("04_Potsdam");
-	m_ui->comboBox_WeatherFile->addItem("04_Potsdam_Sommer");
-	m_ui->comboBox_WeatherFile->addItem("04_Potsdam_Winter");
+	//m_ui->comboBox_WeatherFile->addItem("04_Potsdam_Sommer");
+	//m_ui->comboBox_WeatherFile->addItem("04_Potsdam_Winter");
 	m_ui->comboBox_WeatherFile->addItem("05_Essen");
 	m_ui->comboBox_WeatherFile->addItem("06_Bad_Marienberg_withoutRain");
 	m_ui->comboBox_WeatherFile->addItem("07_Kassel");
@@ -333,7 +333,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	if (m_ui->radioButton_WeatherComboBox->isChecked()){
 		weatherPath = weatherDirectory / m_ui->comboBox_WeatherFile->itemText(m_ui->comboBox_WeatherFile->currentIndex()).toStdString() + ".c6b";
-		// Note: we can rely on the file to exist, since this is built-in stuff
+		// Note: we can relay on the file to exist, since this is built-in stuff
 	}
 	else {
 		// get path to user-defined climate data file
