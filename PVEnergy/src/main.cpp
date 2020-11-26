@@ -65,7 +65,8 @@ void extractDataFromD6Results(const IBK::Path & path, IBK::UnitVector &temp, IBK
 
 }
 
-void writeResultData(const IBK::Path &path, const IBK::UnitVector &result){
+
+void writeResultData(const IBK::Path &path, const IBK::UnitVector &result, const std::string &filename){
 	std::cout<< "write d6o files."  <<std::endl;
 	DATAIO::DataIO data;
 	std::vector<std::vector<double>> resDataIO(result.size());
@@ -76,7 +77,7 @@ void writeResultData(const IBK::Path &path, const IBK::UnitVector &result){
 	data.setData(data.m_timepoints, resDataIO);
 	data.m_nums.push_back(1);
 	data.m_type = DATAIO::DataIO::T_FIELD;
-	data.m_filename = path / ("pvEnergy.d6o");
+	data.m_filename = path / filename;
 	data.m_quantity = result.m_unit.name();
 	data.m_timeType = DATAIO::DataIO::TT_MEAN;
 	data.m_timeUnit = "h";
@@ -101,6 +102,7 @@ int main(int argc, char* argv[]) {
 	//option for values double, string, etc.
 	args.addOption('f', "path", "Input path for d6o result folder.", "","");
 	args.addOption(0, "verbosity-level", "Sets verbosity of tool output.", "<0..4>", "1");
+	args.addOption('o',"output","Output path for results.","","");
 
 	//flags for bool
 	args.addFlag('v', "version", "Displays current version");
@@ -132,17 +134,29 @@ int main(int argc, char* argv[]) {
 	// pv_tool.exe vmp imp voc isc alpha beta gamma nSer refTemp Material T Rad
 	// pv_tool.exe vmp imp voc isc alpha beta gamma nSer refTemp Material -f path
 	//
-	// With temperature: 32.24 9.27 39.75 9.76 0.00013 "-0.0031" "-0.41" 60 298.15 monoSi 30 300
-	// With file:
+	// With temperature:	31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi (273.15+30) 300
+	// temperatures are all absolute values [K]
+	// radiation in [W/m2]
+
+	// With file:			31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="c:/temp/test02/"
 
 	// case filepath?
-	if (args.hasOption('f')) {
-		if (args.args().size() != 11 ) {
+	if (args.hasOption('o') && args.hasOption('f')) {
+		 if ( args.args().size() != 11 ) {
+			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -f=<> and -o=<> option . Use --help.", IBK::MSG_ERROR);
+			return EXIT_FAILURE;
+		}
+	} else 	if (args.hasOption('o')) {
+		if ( args.args().size() != 11 ) {
+			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -o=<> option. Use --help.", IBK::MSG_ERROR);
+			return EXIT_FAILURE;
+		}
+	} else if (args.hasOption('f')) {
+		if ( args.args().size() != 11 ) {
 			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -f=<> option. Use --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
 		}
-	}
-	else {
+	} else {
 		if (args.args().size() != 13 ) {
 			IBK::IBK_Message("Invalid command line, 12 positional arguments expected. U --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
@@ -205,6 +219,15 @@ int main(int argc, char* argv[]) {
 			pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, pvEnergyVec.m_data);
 			// calculation of physical PV data
 
+			std::string filename;
+
+			if (args.hasOption('o')) {
+				filename = args.option('o');
+				if(filename.substr(filename.find_last_of(".") + 1) != "d6o")
+					filename += "d6o";
+			} else
+				filename = "pvEnergy.d6o";
+
 			IBK::Path cTemp("c:/temp/");
 
 			if(!cTemp.exists())
@@ -213,7 +236,7 @@ int main(int argc, char* argv[]) {
 				return EXIT_FAILURE;
 			}
 
-			writeResultData(cTemp, pvEnergyVec);
+			writeResultData(cTemp, pvEnergyVec, filename);
 		}
 		catch (IBK::Exception &ex) {
 			ex.writeMsgStackToError();

@@ -85,33 +85,50 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	//Vorberechnung
 
 
-	volt = m_manuData.m_vmp;
-	for(size_t i= 0; i<1000; ++i)
-	{
-		double i0 = current;
-		current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
-		if(std::fabs(i0-current)<eps)
-			break;
-		if (current < 0 )
-			break;
-	}
-	double powerA = volt * current;
-	volt = m_manuData.m_vmp + stepInc;
-	for(size_t i= 0; i<1000; ++i)
-	{
-		double i0 = current;
-		current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
-		if(std::fabs(i0-current)<eps)
-			break;
-		if (current < 0 )
-			break;
-	}
-	double powerB = volt * current;
 
-	//maximum is left of the position von m_manuData.m_voc
-	if(powerA > powerB)
-		stepInc *= -1;
+
+	// calculate current and power at MPP --> powerA
 	volt = m_manuData.m_vmp;
+	bool currentIsNegative = false;
+	for(size_t i= 0; i<1000; ++i)
+	{
+		double i0 = current;
+//		double tempVal1 = volt + current * m_pvData.m_rS;
+//		double tempVal2 = (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1);
+//		double tempVal3 = (volt + current * m_pvData.m_rS) / rSh;
+//		double tempVal4 = iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1);
+		current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
+		if(std::fabs(i0-current)<eps)
+			break;
+		if (current < 0 ){
+			currentIsNegative = true;
+			break;
+		}
+	}
+
+	if(!currentIsNegative){
+		double powerA = volt * current;
+		//calculate current and power right from MPP --> powerB
+		volt = m_manuData.m_vmp + stepInc;
+		current = m_manuData.m_imp;
+		for(size_t i= 0; i<1000; ++i)
+		{
+			double i0 = current;
+			current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
+			if(std::fabs(i0-current)<eps)
+				break;
+			if (current < 0 )
+				break;
+		}
+		double powerB = volt * current;
+
+		//maximum is left of the position von m_manuData.m_voc
+		if(powerA > powerB)
+			stepInc *= -1;
+		volt = m_manuData.m_vmp;
+	}
+	else
+		volt = 0;
 
 	for (size_t j=0; j<int(2*m_manuData.m_voc / stepInc); ++j) {
 		volt += stepInc;
