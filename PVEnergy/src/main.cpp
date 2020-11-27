@@ -137,6 +137,7 @@ int main(int argc, char* argv[]) {
 	// With temperature:	31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi (273.15+30) 300
 	// temperatures are all absolute values [K]
 	// radiation in [W/m2]
+	// temperature depend values in %/K
 
 	// With file:			31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="c:/temp/test02/"
 
