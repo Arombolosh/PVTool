@@ -110,15 +110,21 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 		double powerA = volt * current;
 		//calculate current and power right from MPP --> powerB
 		volt = m_manuData.m_vmp + stepInc;
-		current = m_manuData.m_imp;
+		//current = m_manuData.m_imp;
 		for(size_t i= 0; i<1000; ++i)
 		{
 			double i0 = current;
+			double tempVal1 = volt + current * m_pvData.m_rS;
+			double tempVal2 = (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1);
+			double tempVal3 = (volt + current * m_pvData.m_rS) / rSh;
+			double tempVal4 = iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1);
 			current = iL - iO * (std::exp((volt + current * m_pvData.m_rS)/m_pvData.m_a)-1) - (volt + current * m_pvData.m_rS) / rSh;
 			if(std::fabs(i0-current)<eps)
 				break;
-			if (current < 0 )
+			if (current < 0 ){
 				break;
+			}
+
 		}
 		double powerB = volt * current;
 
