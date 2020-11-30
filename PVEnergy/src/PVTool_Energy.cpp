@@ -155,27 +155,27 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 		std::ofstream out;
 		out.open("c:/temp/pvPostProc.csv");
 
-		out << "Time [min]/tIref [A]/tUref [V]/tPref [W]/tI [A]/tU [V]/tP [W]" << std::endl;
+		out << "Time [min]\tIref [A]\tUref [V]\tPref [W]\tI [A]\tU [V]\tP [W]" << std::endl;
 		unsigned int sizeRef, size2;
 		sizeRef = refValues.size();
 		size2 = tempBasedValues.size();
-		double time =0;
+		unsigned int time =0;
 		for(unsigned int i=0; i<std::max<unsigned int>(sizeRef, size2); ++i){
-			out << time << "/t";
+			out << time++ << "\t";
 			if(i < sizeRef){
-				out << refValues[i].i << "/t";
-				out << refValues[i].u << "/t";
-				out << refValues[i].p << "/t";
+				out << refValues[i].i << "\t";
+				out << refValues[i].u << "\t";
+				out << refValues[i].p << "\t";
 			}
 			else
-				out << "0/t0/t0/t";
+				out << "0\t0\t0\t";
 			if(i<size2){
-				out << tempBasedValues[i].i << "/t";
-				out << tempBasedValues[i].u << "/t";
-				out << tempBasedValues[i].p << "/t";
+				out << tempBasedValues[i].i << "\t";
+				out << tempBasedValues[i].u << "\t";
+				out << tempBasedValues[i].p << "\t";
 			}
 			else
-				out << "0/t0/t0/t";
+				out << "0\t0\t0\t";
 			out << std::endl;
 		}
 	}
