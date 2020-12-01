@@ -88,7 +88,7 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	//Vorberechnung
 
 	//Achtung neue Auswertung
-	if(true){
+	if(false){
 		struct pvVals{
 			pvVals(double i, double u) :
 				i(i),
