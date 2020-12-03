@@ -138,6 +138,11 @@ int main(int argc, char* argv[]) {
 	// temperatures are all absolute values [K]
 	// radiation in [W/m2]
 	// temperature depend values in %/K
+	// alpha=Temp Coeff of Isc (Isc[A]*alpha[%/K] = alpha[A/K])
+	// beta= Temp coeff of Voc (Isc[V]*beta[%/K] = beta[V/K])
+	// gamma=Temp coeff of Mpp
+	// nSer number of cells in series
+	// refTemp in K [STC..25°C...289.15K]
 
 	// With file:			31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="c:/temp/test02/"
 

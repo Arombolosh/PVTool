@@ -201,6 +201,7 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 	}
 
 	if(!currentIsNegative){
+
 		double powerA = volt * current;
 		//calculate current and power right from MPP --> powerB
 		volt = m_manuData.m_vmp + stepInc;
@@ -223,9 +224,14 @@ double Energy::calcPVEnergy(double absTemp, double rad, double airMass) const {
 		double powerB = volt * current;
 
 		//maximum is left of the position von m_manuData.m_voc
-		if(powerA > powerB)
+		if(current<0)
+			volt = 0;
+		else if(powerA > powerB){
 			stepInc *= -1;
-		volt = m_manuData.m_vmp;
+			volt = m_manuData.m_vmp;
+		}
+		else
+			volt = m_manuData.m_vmp;
 	}
 	else
 		volt = 0;
