@@ -158,7 +158,9 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(42.0, 1.81, 59.6, 2.15, 0.02, -0.24, -0.25, 156, "Calyxo CX 3 75", PVTOOL::Energy::ManufactureData::CellType::CdTe));			//Material CdTe
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(70.2, 1.6, 87.7, 1.75, 0.04, -0.29, -0.34, 213, "Firstsolar Dünnschicht", PVTOOL::Energy::ManufactureData::CellType::CdTe));	//Material CdTe
 	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(15.57, 8.25, 18.17, 8.71, 0.06, -0.30, -0.39, 28, "Solarglas Premium", PVTOOL::Energy::ManufactureData::CellType::monoSi));		//Material monoSi
-	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(19.4, 9.09, 23.8, 9.32, 0.05, -0.31, -0.39, 36, "Solarwatt", PVTOOL::Energy::ManufactureData::CellType::monoSi));					//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(19.4, 9.09, 23.8, 9.32, 0.05, -0.31, -0.39, 36, "Solarwatt", PVTOOL::Energy::ManufactureData::CellType::monoSi));	//Material monoSi
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(61.9, 2.34, 80.1, 2.59, 0.0, -0.287, -0.39, 136, "Avancis Powermax 145", PVTOOL::Energy::ManufactureData::CellType::CIS));		//Material CIS
+	m_pvModule.push_back(PVTOOL::Energy::ManufactureData(30.4, 3.29, 40.9, 3.93, 0.08, -0.33, -0.2, 72, "Schott Protect ASI100", PVTOOL::Energy::ManufactureData::CellType::Amorphous));						//Material Amorphous
 
 	//Attention follow sort order in enum CellType { monoSi, multiSi, CdTe, CIS, CIGS, Amorphous };
 	m_ui->comboBoxCellType->addItem("MonoSi", PVTOOL::Energy::ManufactureData::CellType::monoSi);
@@ -870,7 +872,7 @@ void PVToolWidget::evaluateResults() {
 			IBK::UnitVector unitVec;
 			unitVec.m_data = rad.columnValues(0);
 			for (double &v : unitVec.m_data)
-				v/=0.7; //absorption coeficient from Delphin
+				v/=0.7; //absorption coefficient from Delphin
 			unitVec.m_unit = IBK::Unit(rad.m_valueUnit);
 			unitVec.convert(IBK::Unit("W/m2"));
 			m_radiation.push_back(unitVec);
