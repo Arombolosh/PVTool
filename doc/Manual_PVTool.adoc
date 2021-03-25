@@ -57,9 +57,9 @@ Nachdem alle Eingaben vorgenommen wurden kann hier die Simulationsstudie gestart
 
 ## Berechnungsablauf
 
-Nach dem Start des Programms werden automatisiert 4 Simulationsvarianten aufgesetzt. Dazu wird eine Referenzkonstruktion ohne PCM sowie 2 Konstruktionen mit PCM (PCM-Schichtdicke 1 cm und 2 cm) initialisiert. Die thermische Berechnung wird mit dem Solverkern https://www.bauklimatik-dresden.de/[Delphin] durchgeführt. Die Projektdateien von DELPHIN werden automatisiert im temporären Verzeichnis erzeugt, diskretisiert und berechnet. Die Berechnungsergebnisse aus der DELPHIN-Simulation liefern die mittlere Modultemperatur sowie die Strahlung, die senkrecht auf das Modul auftrifft. Diese Ergebnisse werden für alle Stunden (8760 h) im Jahr berechnet.
+Nach dem Start des Programms werden automatisiert 3 Simulationsvarianten aufgesetzt. Dazu wird eine Referenzkonstruktion ohne PCM sowie 2 Konstruktionen mit PCM (PCM-Schichtdicke 1 cm und 2 cm) initialisiert. Die thermische Berechnung wird mit dem Solverkern https://www.bauklimatik-dresden.de/[Delphin] durchgeführt. Die Projektdateien von DELPHIN werden automatisiert im temporären Verzeichnis erzeugt, diskretisiert und berechnet. Die Berechnungsergebnisse aus der DELPHIN-Simulation liefern die mittlere Modultemperatur sowie die Strahlung, die senkrecht auf das Modul auftrifft. Diese Ergebnisse werden für alle Stunden (8760 h) im Jahr berechnet. Im Zielordner befinden sich für jede Konstruktionsvariante Ordner der jeweiligen Iterationsschritte. Die Werte für Strahlung und Temperatur befinden sich im jeweiligen Ordner unter `results`, die Modultemperaturen in der `TMean.d6o`-Datei und die Strahlungswerte in der `GlobalRadiation.d6o`-Datei.
 
-Anschließend übernimmt eine weitere Routine das Berechnen des Stromertrags. Eingangsparameter sind die mittlere Modultemperatur sowie die auftreffende Strahlung. Die Berechnung wird von der https://github.com/NREL/ssc/tree/develop/shared[SAM-Bibliothek] übernommen. Dadurch ist die Berechnung von Stromerträgen unter Berücksichtigung der Temperaturabhängigkeit möglich. 
+Anschließend übernimmt eine weitere Routine das Berechnen des Stromertrags. Die Ertragswerte werden im angegebenen Zielordner unter `power` abgelegt, wobei die `pv_power_drain`-Dateien nur für die weiteren Schritte der Delphin-Berechnung notwendig sind und keine Endergebnisse darstellen. Eingangsparameter für die Rechenroutine sind die mittlere Modultemperatur sowie die auftreffende Strahlung. Die Berechnung wird von der https://github.com/NREL/ssc/tree/develop/shared[SAM-Bibliothek] übernommen. Dadurch ist die Berechnung von Stromerträgen unter Berücksichtigung der Temperaturabhängigkeit möglich. 
 Die Simulation wird iterativ dreifach durchgeführt. Dem Modul  wird dabei die erzeugte elektrische Energie der vorrausgegangenen Simulationsrechnung als thermische Energie entzogen und erneut der elektrische Energieertrag ermittelt. Spätestens bei der dritten Simulationsrunde sind die Energiemengen so ausiteriert, dass die physikalischen Prozesse exakt genug abgebildet werden ohne eine reale "Co-Simulation" umsetzen zu müssen.
 
 Die Grundlage für die Berechnung des Stromertrags bildet das Ein-Dioden-Modell.
@@ -71,7 +71,46 @@ Der Stromertrag wird für die oben erwähnten Varianten tabellarisch dargestellt
 
 ## Zusatzprogramm PVEnergy
 
-Falls berechnete Daten für die mittlere Modultemperatur und die Strahlung vorliegen kann direkt der Stromertrag berechnet werden. Dazu muss das Kommandozeilenprogramm PVEnergy ausgeführt werden. Folgende Ausführungsvariante sind möglich:
+Falls berechnete Daten für die mittlere Modultemperatur und die Strahlung vorliegen kann direkt der Stromertrag berechnet werden. Dazu muss das Kommandozeilenprogramm PVEnergy ausgeführt werden. 
+Eine mögliche Batch-Datei könnte wie folgt aussehen:
+
+.Aufbau Batch-Datei
+====
+::hier muss der Pfad zu den notwendigen d6o-Dateien angegeben werden
+
+set "filePath=...."
+
+::Namen der zu berechnenden Eingangsdaten können hier angepasst werden
+
+set "rad=GlobalRadiationSued1"
+set "temp=TMean1withPCM"
+set "result=PVEnergy1WithPCM"
+
+copy "d6oDateien\%rad%.d6o" "results\" /y 
+copy "d6oDateien\%temp%.d6o" "results\" /y
+
+cd results
+
+del "GlobalRadiation.d6o"
+del "TMean.d6o"
+pause
+
+ren "%rad%.d6o" "GlobalRadiation.d6o"
+ren "%temp%.d6o" "TMean.d6o"
+pause
+
+cd "%filePath%"
+
+::Eingabezeile Parameter für die Berechnung mit PVEnergy
+PVEnergy.exe 15.57 8.25 18.17 8.71 0.06 -0.3 -0.39 28 298.15 "monoSi" -f="%filePath%"
+
+ren "c:\temp\pvEnergy.d6o" "%result%.d6o"
+pause
+====
+
+Damit werden im `Temp`-Ordner die Ergebnisse der Berechnung mit PVEnergy gespeichert.
+
+Die Parameter für die Berchnung werden anschließend erläutert. Folgende Ausführungsvariante sind möglich:
 
 ### Ausführung für genau einen Zeitpunkt
 
@@ -125,4 +164,5 @@ Beide Zeitreihen müssen exakt die gleichen Zeitpunkte enthalten. Für den Komma
 ====
 pvenergy.exe 31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="C:/temp/pvtool/project1-disc"
 ====
+
 
