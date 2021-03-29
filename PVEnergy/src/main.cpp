@@ -1,10 +1,12 @@
 #include <iostream>
 #include <limits>
+#include <iostream>
+#include <fstream>
 
 #include <IBK_assert.h>
 #include <IBK_messages.h>
 #include <IBK_MessageHandlerRegistry.h>
-
+#include <IBK_FileReader.h>
 #include <IBK_ArgParser.h>
 #include <DATAIO_DataIO.h>
 
@@ -106,6 +108,7 @@ int main(int argc, char* argv[]) {
 
 	//flags for bool
 	args.addFlag('v', "version", "Displays current version");
+	args.addFlag('s', "filename", "First input: file name for data with name.tsv and second input: file name for modul data with name2.txt.");
 	//args.addFlag('f', "path", "Displays current version");
 
 	args.parse(argc, argv);
@@ -147,7 +150,16 @@ int main(int argc, char* argv[]) {
 	// With file:			31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="c:/temp/test02/"
 
 	// case filepath?
-	if (args.hasOption('o') && args.hasOption('f')) {
+	bool withTSV = false;
+
+	if(args.flagEnabled('s')){
+		withTSV  = true;
+		if(args.args().size() != 3){
+			IBK::IBK_Message("Need two filenames. First filename -> data.tsv Second filename -> modulData.txt", IBK::MSG_ERROR);
+			return EXIT_FAILURE;
+		}
+	}
+	else if (args.hasOption('o') && args.hasOption('f')) {
 		 if ( args.args().size() != 11 ) {
 			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -f=<> and -o=<> option . Use --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
@@ -173,106 +185,234 @@ int main(int argc, char* argv[]) {
 	PVTOOL::Energy pvtool;
 	PVTOOL::Energy::ManufactureData &manuData = pvtool.m_manuData;
 
-	//read PV module data
-	try {
-		manuData.m_vmp =	IBK::string2val<double>(argv[1]);
-		manuData.m_imp =	IBK::string2val<double>(argv[2]);
-		manuData.m_voc =	IBK::string2val<double>(argv[3]);
-		manuData.m_isc =	IBK::string2val<double>(argv[4]);
-		manuData.m_alpha =	IBK::string2val<double>(argv[5]);
-		manuData.m_beta =	IBK::string2val<double>(argv[6]);
-		manuData.m_gamma =	IBK::string2val<double>(argv[7]);
-		manuData.m_nSer =	IBK::string2val<int>(argv[8]);
-		manuData.m_refTemp =	IBK::string2val<double>(argv[9]);
+	if(withTSV){
+		//set filenames
+		IBK::Path dataFilename(args.args()[1]);
+		IBK::Path pvFilename(args.args()[2]);
+		std::string test = dataFilename.absolutePath().c_str();
 
-		if (args.args()[10] == "monoSi")
-			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::monoSi);
-		else if (args.args()[10] == "CdTe")
-			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CdTe);
-		else if (args.args()[10] == "CIS")
-			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIS);
-		else if (args.args()[10] == "CIGS")
-			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIGS);
-		else if (args.args()[10] == "multiSi")
-			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::multiSi);
-		else if (args.args()[10] == "Amorphous")
-			manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::Amorphous);
-		else
-			throw IBK::Exception(IBK::FormatString("PV material is not valid. Please use one of the following materials:\n "
+		//check filenames
+		if(!dataFilename.exists()){
+			IBK::IBK_Message(IBK::FormatString("Data file name: '%1'.").arg(dataFilename), IBK::MSG_ERROR);
+			return EXIT_FAILURE;
+		}
+		if(!pvFilename.exists()){
+			IBK::IBK_Message(IBK::FormatString("PV file name: '%1'.").arg(pvFilename), IBK::MSG_ERROR);
+			return EXIT_FAILURE;
+		}
+
+		//read files
+		IBK::FileReader dataFile(dataFilename);
+		IBK::FileReader pvFile(pvFilename);
+
+		std::vector<std::string> dataLines, pvLines;
+		dataFile.readAll(dataFilename, dataLines, std::vector<std::string>{"\n"});
+
+		if(dataLines.empty()){
+			//TODO Mira fehler
+		}
+		std::vector<std::string> allData(1, dataLines.front());
+		std::vector<double> tempDblVec(dataLines.size()-1), radDblVec(dataLines.size()-1);
+		for (unsigned int i=0; i < dataLines.size(); ++i){
+			const std::string &line = dataLines[i];
+			//skip empty lines and first line (header)
+			if (line.empty() || i==0)
+				continue;
+			std::vector<std::string> tempData;
+			tempData = IBK::explode(line, '\t');
+			if( tempData.size()<3){
+				//TODO Mira Fehler abbruch
+			}
+
+			try {
+				tempDblVec[i-1] = IBK::string2val<double>(tempData[2]);
+				radDblVec[i-1] = IBK::string2val<double>(tempData[1]);
+			}  catch (IBK::Exception &ex) {
+				//TODO Mira
+			}
+
+
+
+			//allData.push_back(line.front() + "\t");
+
+		}
+		IBK::UnitVector tempVec(tempDblVec.size(),IBK::Unit("C")), radVec(radDblVec.size(),IBK::Unit("W/m2")), energyVec;
+		tempVec.m_data.swap(tempDblVec);
+		radVec.m_data.swap(radDblVec);
+
+		energyVec.m_unit = IBK::Unit("W");
+
+		pvFile.readAll(pvFilename, pvLines, std::vector<std::string>{"\n"});
+
+		//we must have 2 lines
+		//second line contains values
+		if(pvLines.size()<2){
+			IBK::IBK_Message(IBK::FormatString("PV file data is invalid: '%1'.").arg(pvFilename), IBK::MSG_ERROR);
+			return EXIT_FAILURE;
+		}
+
+		//eplode 2nd line in pv data
+		std::vector<std::string> pv = IBK::explode(pvLines[1], '\t');
+		if(pv.size() != 10 ){
+			//Todo mira
+		}
+
+		try {
+			manuData.m_vmp =	IBK::string2val<double>(pv[0]);
+			manuData.m_imp =	IBK::string2val<double>(pv[1]);
+			manuData.m_voc =	IBK::string2val<double>(pv[2]);
+			manuData.m_isc =	IBK::string2val<double>(pv[3]);
+			manuData.m_alpha =	IBK::string2val<double>(pv[4]);
+			manuData.m_beta =	IBK::string2val<double>(pv[5]);
+			manuData.m_gamma =	IBK::string2val<double>(pv[6]);
+			manuData.m_nSer =	IBK::string2val<int>(pv[7]);
+			manuData.m_refTemp =	IBK::string2val<double>(pv[8]);
+
+			if (pv[9] == "monoSi")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::monoSi);
+			else if (pv[9] == "CdTe")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CdTe);
+			else if (pv[9] == "CIS")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIS);
+			else if (pv[9] == "CIGS")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIGS);
+			else if (pv[9] == "multiSi")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::multiSi);
+			else if (pv[9] == "Amorphous")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::Amorphous);
+			else
+				throw IBK::Exception(IBK::FormatString("PV material is not valid. Please use one of the following materials:\n "
 											 "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
 
 
-		// compute derived parameters, may throw an exception
-		pvtool.calcPhysicalParameterFromManufactureData();
-	}
-	catch (IBK::Exception  &ex) {
-		ex.writeMsgStackToError();
-		IBK::IBK_Message("Invalid PV-data provided as command line arguments.", IBK::MSG_ERROR, FUNC_ID);
-		return EXIT_FAILURE;
-	}
+			// compute derived parameters, may throw an exception
+			pvtool.calcPhysicalParameterFromManufactureData();
+		}  catch (IBK::Exception  &ex) {
+			ex.writeMsgStackToError();
+			//TODO Mira text anpassen
+			IBK::IBK_Message("....", IBK::MSG_ERROR, FUNC_ID);
+			return EXIT_FAILURE;
+		}
 
 
-	// read temperature and radiation data from d6o files
-	IBK::UnitVector tempVec, radVec, pvEnergyVec;
-	if (args.hasOption('f')) {
+		//calculate
+		pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, energyVec.m_data);
+
+		//write output
+		dataLines.front() += "\tPower PV [W]";
+		for(unsigned int i=0; i<energyVec.size(); ++i){
+			dataLines[i+1] += "\t" + IBK::val2string(energyVec[i]);
+		}
+		std::ofstream myfile;
+		myfile.open (dataFilename.absolutePath().c_str());
+		for(auto &d : dataLines)
+			myfile << d + "\n";
+		myfile.close();
+
+
+	}
+	else{
+
+		//read PV module data
 		try {
-			// attempt to read input data from d6o files in given directory
-			extractDataFromD6Results(IBK::Path(args.option('f')), tempVec, radVec);
-			// convert to required unit (may throw if source unit mismatches)
-			tempVec.convert(IBK::Unit("K"));
-			radVec.convert(IBK::Unit("W/m2"));
-			pvEnergyVec.m_unit = IBK::Unit("W");
-			pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, pvEnergyVec.m_data);
-			// calculation of physical PV data
+			manuData.m_vmp =	IBK::string2val<double>(argv[1]);
+			manuData.m_imp =	IBK::string2val<double>(argv[2]);
+			manuData.m_voc =	IBK::string2val<double>(argv[3]);
+			manuData.m_isc =	IBK::string2val<double>(argv[4]);
+			manuData.m_alpha =	IBK::string2val<double>(argv[5]);
+			manuData.m_beta =	IBK::string2val<double>(argv[6]);
+			manuData.m_gamma =	IBK::string2val<double>(argv[7]);
+			manuData.m_nSer =	IBK::string2val<int>(argv[8]);
+			manuData.m_refTemp =	IBK::string2val<double>(argv[9]);
 
-			std::string filename;
+			if (args.args()[10] == "monoSi")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::monoSi);
+			else if (args.args()[10] == "CdTe")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CdTe);
+			else if (args.args()[10] == "CIS")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIS);
+			else if (args.args()[10] == "CIGS")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::CIGS);
+			else if (args.args()[10] == "multiSi")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::multiSi);
+			else if (args.args()[10] == "Amorphous")
+				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::Amorphous);
+			else
+				throw IBK::Exception(IBK::FormatString("PV material is not valid. Please use one of the following materials:\n "
+											 "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
 
-			if (args.hasOption('o')) {
-				filename = args.option('o');
-				if(filename.substr(filename.find_last_of(".") + 1) != "d6o")
-					filename += "d6o";
-			} else
-				filename = "pvEnergy.d6o";
 
-			IBK::Path cTemp("c:/temp/");
+			// compute derived parameters, may throw an exception
+			pvtool.calcPhysicalParameterFromManufactureData();
+		}
+		catch (IBK::Exception  &ex) {
+			ex.writeMsgStackToError();
+			IBK::IBK_Message("Invalid PV-data provided as command line arguments.", IBK::MSG_ERROR, FUNC_ID);
+			return EXIT_FAILURE;
+		}
 
-			if(!cTemp.exists())
-			{
-				throw IBK::Exception(IBK::FormatString("Directory: '%1' is missing. Please create directory.").arg(cTemp.str()), FUNC_ID);
+
+		// read temperature and radiation data from d6o files
+		IBK::UnitVector tempVec, radVec, pvEnergyVec;
+		if (args.hasOption('f')) {
+			try {
+				// attempt to read input data from d6o files in given directory
+				extractDataFromD6Results(IBK::Path(args.option('f')), tempVec, radVec);
+				// convert to required unit (may throw if source unit mismatches)
+				tempVec.convert(IBK::Unit("K"));
+				radVec.convert(IBK::Unit("W/m2"));
+				pvEnergyVec.m_unit = IBK::Unit("W");
+				pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, pvEnergyVec.m_data);
+				// calculation of physical PV data
+
+				std::string filename;
+
+				if (args.hasOption('o')) {
+					filename = args.option('o');
+					if(filename.substr(filename.find_last_of(".") + 1) != "d6o")
+						filename += "d6o";
+				} else
+					filename = "pvEnergy.d6o";
+
+				IBK::Path cTemp("c:/temp/");
+
+				if(!cTemp.exists())
+				{
+					throw IBK::Exception(IBK::FormatString("Directory: '%1' is missing. Please create directory.").arg(cTemp.str()), FUNC_ID);
+					return EXIT_FAILURE;
+				}
+
+				writeResultData(cTemp, pvEnergyVec, filename);
+			}
+			catch (IBK::Exception &ex) {
+				ex.writeMsgStackToError();
+				IBK::IBK_Message("Error during energy calculation!", IBK::MSG_ERROR, FUNC_ID);
 				return EXIT_FAILURE;
 			}
-
-			writeResultData(cTemp, pvEnergyVec, filename);
 		}
-		catch (IBK::Exception &ex) {
-			ex.writeMsgStackToError();
-			IBK::IBK_Message("Error during energy calculation!", IBK::MSG_ERROR, FUNC_ID);
-			return EXIT_FAILURE;
-		}
-	}
-	else {
-		double temp, rad;
-		try {
-			temp = IBK::string2val<double>(args.args()[11]); // K
-			rad = IBK::string2val<double>(args.args()[12]); // W/m2
-		}
-		catch (IBK::Exception  &ex) {
-			ex.writeMsgStackToError();
-			IBK::IBK_Message("Temperature or radiation invalid on command line!", IBK::MSG_ERROR, FUNC_ID);
-			return EXIT_FAILURE;
-		}
-		// calculation for a single value
-		try {
-			double pvEnergy = pvtool.calcPVEnergy(temp, rad);
-			// for scalar value variant, dump out result in english number format onto the console
-			std::cout << pvEnergy << std::endl;
-		}
-		catch (IBK::Exception  &ex) {
-			ex.writeMsgStackToError();
-			IBK::IBK_Message("Error during energy calculation!", IBK::MSG_ERROR, FUNC_ID);
-			return EXIT_FAILURE;
+		else {
+			double temp, rad;
+			try {
+				temp = IBK::string2val<double>(args.args()[11]); // K
+				rad = IBK::string2val<double>(args.args()[12]); // W/m2
+			}
+			catch (IBK::Exception  &ex) {
+				ex.writeMsgStackToError();
+				IBK::IBK_Message("Temperature or radiation invalid on command line!", IBK::MSG_ERROR, FUNC_ID);
+				return EXIT_FAILURE;
+			}
+			// calculation for a single value
+			try {
+				double pvEnergy = pvtool.calcPVEnergy(temp, rad);
+				// for scalar value variant, dump out result in english number format onto the console
+				std::cout << pvEnergy << std::endl;
+			}
+			catch (IBK::Exception  &ex) {
+				ex.writeMsgStackToError();
+				IBK::IBK_Message("Error during energy calculation!", IBK::MSG_ERROR, FUNC_ID);
+				return EXIT_FAILURE;
+			}
 		}
 	}
-
 	return EXIT_SUCCESS;
 }
