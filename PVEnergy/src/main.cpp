@@ -39,7 +39,7 @@ void extractDataFromD6Results(const IBK::Path & path, IBK::UnitVector &temp, IBK
 	rad = readDataIO(path / "results/GlobalRadiation.d6o");
 	temp.convert(IBK::Unit("K"));
 	rad.convert(IBK::Unit("W/m2"));
-/*
+	/*
 	IBK::UnitVector results;
 	results.m_unit = IBK::Unit("W");
 	results.m_name = "PV-Energy";
@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 	else if (args.hasOption('o') && args.hasOption('f')) {
-		 if ( args.args().size() != 11 ) {
+		if ( args.args().size() != 11 ) {
 			IBK::IBK_Message("Invalid command line, 11 positional arguments expected in addition to -f=<> and -o=<> option . Use --help.", IBK::MSG_ERROR);
 			return EXIT_FAILURE;
 		}
@@ -209,7 +209,8 @@ int main(int argc, char* argv[]) {
 		dataFile.readAll(dataFilename, dataLines, std::vector<std::string>{"\n"});
 
 		if(dataLines.empty()){
-			//TODO Mira fehler
+			IBK::IBK_Message("Datasheet is empty. Can't find values.`", IBK::MSG_ERROR);
+			return EXIT_FAILURE;
 		}
 		std::vector<std::string> allData(1, dataLines.front());
 		std::vector<double> tempDblVec(dataLines.size()-1), radDblVec(dataLines.size()-1);
@@ -221,14 +222,18 @@ int main(int argc, char* argv[]) {
 			std::vector<std::string> tempData;
 			tempData = IBK::explode(line, '\t');
 			if( tempData.size()<3){
+				//continue;//das muss dann wieder weg
 				//TODO Mira Fehler abbruch
+				IBK::IBK_Message("Missing values. If no values available, please assume zero.", IBK::MSG_ERROR);
+				return EXIT_FAILURE;
 			}
-
 			try {
 				tempDblVec[i-1] = IBK::string2val<double>(tempData[2]);
 				radDblVec[i-1] = IBK::string2val<double>(tempData[1]);
 			}  catch (IBK::Exception &ex) {
-				//TODO Mira
+				ex.writeMsgStackToError();
+				IBK::IBK_Message("Invalid Datatype.", IBK::MSG_ERROR, FUNC_ID);
+				return EXIT_FAILURE;
 			}
 
 
@@ -282,20 +287,21 @@ int main(int argc, char* argv[]) {
 				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::Amorphous);
 			else
 				throw IBK::Exception(IBK::FormatString("PV material is not valid. Please use one of the following materials:\n "
-											 "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
+													   "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
 
 
 			// compute derived parameters, may throw an exception
 			pvtool.calcPhysicalParameterFromManufactureData();
 		}  catch (IBK::Exception  &ex) {
 			ex.writeMsgStackToError();
-			//TODO Mira text anpassen
-			IBK::IBK_Message("....", IBK::MSG_ERROR, FUNC_ID);
+			IBK::IBK_Message("PV data is missing or not valid. Please check with datasheet.", IBK::MSG_ERROR, FUNC_ID);
 			return EXIT_FAILURE;
 		}
 
 
 		//calculate
+		tempVec.convert(IBK::Unit("K"));
+
 		pvtool.calcPVEnergy(tempVec.m_data, radVec.m_data, energyVec.m_data);
 
 		//write output
@@ -308,7 +314,7 @@ int main(int argc, char* argv[]) {
 		for(auto &d : dataLines)
 			myfile << d + "\n";
 		myfile.close();
-
+		IBK::IBK_Message("All done.\n", IBK::MSG_PROGRESS, FUNC_ID);
 
 	}
 	else{
@@ -339,7 +345,7 @@ int main(int argc, char* argv[]) {
 				manuData.m_material = static_cast<int>(PVTOOL::Energy::ManufactureData::CellType::Amorphous);
 			else
 				throw IBK::Exception(IBK::FormatString("PV material is not valid. Please use one of the following materials:\n "
-											 "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
+													   "monoSi, CdTe, CIS, CIGS, multiSi, Amorphous"), FUNC_ID);
 
 
 			// compute derived parameters, may throw an exception
