@@ -222,9 +222,7 @@ int main(int argc, char* argv[]) {
 			std::vector<std::string> tempData;
 			tempData = IBK::explode(line, '\t');
 			if( tempData.size()<3){
-				//continue;//das muss dann wieder weg
-				//TODO Mira Fehler abbruch
-				IBK::IBK_Message("Missing values. If no values available, please assume zero.", IBK::MSG_ERROR);
+				IBK::IBK_Message(IBK::FormatString("Missing values at line %1. If no values available, please assume zero.").arg(i+1), IBK::MSG_ERROR);
 				return EXIT_FAILURE;
 			}
 			try {
@@ -232,7 +230,7 @@ int main(int argc, char* argv[]) {
 				radDblVec[i-1] = IBK::string2val<double>(tempData[1]);
 			}  catch (IBK::Exception &ex) {
 				ex.writeMsgStackToError();
-				IBK::IBK_Message("Invalid Datatype.", IBK::MSG_ERROR, FUNC_ID);
+				IBK::IBK_Message(IBK::FormatString("Invalid Datatype in line %1.").arg(i+1), IBK::MSG_ERROR, FUNC_ID);
 				return EXIT_FAILURE;
 			}
 
@@ -259,7 +257,8 @@ int main(int argc, char* argv[]) {
 		//eplode 2nd line in pv data
 		std::vector<std::string> pv = IBK::explode(pvLines[1], '\t');
 		if(pv.size() != 10 ){
-			//Todo mira
+			IBK::IBK_Message("Wrong amount of values in pv data file. Please check: Vmp Imp Voc Isc alpha beta gamma nSer refTemp celltype", IBK::MSG_ERROR);
+			return EXIT_FAILURE;
 		}
 
 		try {
