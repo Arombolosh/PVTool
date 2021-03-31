@@ -72,6 +72,9 @@ Der Stromertrag wird für die oben erwähnten Varianten tabellarisch dargestellt
 ## Zusatzprogramm PVEnergy
 
 Falls berechnete Daten für die mittlere Modultemperatur und die Strahlung vorliegen kann direkt der Stromertrag berechnet werden. Dazu muss das Kommandozeilenprogramm PVEnergy ausgeführt werden. 
+
+### Ausführung mit Batch-Datei
+
 Eine mögliche Batch-Datei könnte wie folgt aussehen:
 
 .Aufbau Batch-Datei
@@ -112,33 +115,45 @@ Damit werden im `Temp`-Ordner die Ergebnisse der Berechnung mit PVEnergy gespeic
 
 Die Parameter für die Berchnung werden anschließend erläutert. Folgende Ausführungsvariante sind möglich:
 
-### Ausführung für genau einen Zeitpunkt
+#### Ausführung für genau einen Zeitpunkt
 
 Für die Berechnung des Stromertrags für ein PV-Modul und einem Wertepaar für Temperatur und Strahlung ist folgender Kommandozeilen-Aufruf notwendig:
 
-Der pvenergy.exe müssen dazu folgende Parameter übergeben werden:
+Der pvenergy.exe müssen dazu folgende Parameter in dieser Reihenfolge in die Kommandozeile übergeben werden:
 
-* Spannung im Maximum Power Point (MPP) [V]
-* Strom im MPP [A]
-* Leerlaufspannung [V]
-* Kurzschlussstrom [A]
-* Temperaturkoeffizient Strom in [%/K]
-* Temperaturkoeffizient Spannung in [%/K]
-* Temperaturkoeffizient Leistung in [%/K]
+* Spannung im Maximum Power Point (MPP) _V~mp~_ [V]
+* Strom im MPP _I~mp~_ [A]
+* Leerlaufspannung _V~oc~_ [V]
+* Kurzschlussstrom _I~sc~_ [A]
+* Temperaturkoeffizient Strom _I~sc~_ in [%/K]
+* Temperaturkoeffizient Spannung _V~oc~_ in [%/K]
+* Temperaturkoeffizient Leistung _P~max~_ in [%/K]
 * Zellenanzahl pro Modul [-]
 * Referenztemperatur [K]; Annahme meist 298.15
 * Zelltyp
-** Derzeit nur das monokristalline Zelltypen möglich. Keyword: monoSi
+** Derzeit die in <<tab_PVTool_celltypes>> gelisteten Zelltypen möglich. Keyword: monoSi
 * Mittlere Modultemperatur [K]
 * Strahlung senkrecht aufs Modul [W/m2]
 
-
+[[tab_PVTool_celltypes]]
+.Zelltypen
+[options="header",cols="60%,40%",width="100%"]
+|====================
+| Zelltyp  | Keyword
+| monokristallin | `monoSi`
+| Cadmiumtellurid Dünnschicht | `CdTe`
+| CIS-Dünnschicht | `CIS`
+| CIGS-Dünnschicht | `CIGS`
+| polykristallin | `multiSi`
+| amorph | `Amorphous`
+|====================
+[[fig_Kommandozeile]]
 .Kommandozeilenaufruf:
 ====
 pvenergy.exe 31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi 298.15 200
 ====
 
-### Ausführung für Zeitreihenwerte
+#### Ausführung für Zeitreihenwerte
 
 Für die Berechnung des Stromertrags für ein PV-Modul und Zeitreihen für Temperatur und Strahlung müssen die Ergebnisse der Temperatur und Strahlung in einer d6o-Datei (DELPHIN-Ausgabeformat) mit folgenden Namen in einem Unterordner (mit dem Namen "results") vorliegen:
 
@@ -165,4 +180,31 @@ Beide Zeitreihen müssen exakt die gleichen Zeitpunkte enthalten. Für den Komma
 pvenergy.exe 31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi -f="C:/temp/pvtool/project1-disc"
 ====
 
+### Alternatives Ausführen über Abrufen der Dateipfade
 
+Vor dem Ausführen müssen zwei Dokumente erstellt werden:
+
+* Messdaten als tsv-Datei
+* Moduldaten als txt-Datei
+
+Die Datei mit den Messdaten besteht aus folgenden Spalten:
+
+.Aufbau der einzulesenden Datei
+[options="header",cols="10%,50%,20%,20",width="100%"]
+|====================
+|Spalte | Datenname | Einheit| Verwendung
+|1 | time | [min]/[h] | _benötigt_
+|2 | Einstrahlung aufs Modul | [W/m2] |_benötigt_
+|3 | Modultemperatur | [C] | _benötigt_
+|4 | Ertrag aus Messdaten | [W] | _optional_
+|====================
+Dabei ist die erste Zeile als Header-Zeile reserviert.
+
+In den Moduldaten müssen die Parameter die gleiche Reihenfolge wie bei der Eingabe in die Kommandozeile (vlg. <<fig_Kommandozeile>>). Die Werte werden immer aus der zweiten Zeile eingelesen. Die erse Zeile ist eine Header-Zeile.
+
+Sind beide Dokumente im richtigen Format erstellt, kann die `pvenergy.exe` mit folgenden Befehl in der Kommandozeile ausgeführt werden:
+
+.Kommandozeilenaufruf
+====
+pvenergy.exe -s "_DateipfadMessdaten.tsv_""_DateipfadModuldaten.txt_"
+====
