@@ -50,6 +50,8 @@ private slots:
 
 	void onButtonBarQuitClicked();
 
+	void on_pushButtonLoadProfile_clicked();
+
 private:
 
 	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given
@@ -119,14 +121,16 @@ private:
 	std::vector<IBK::UnitVector>	m_purchaseEnergy;
 	std::vector<IBK::UnitVector>	m_saleEnergy;
 	double							m_tempProgress;
-	unsigned int					m_moduleCount=1;
+	int					m_moduleCount;
 
 	/*! Cost Data*/
 	double							m_costPvModule;
 	double							m_costCasing;
 	double							m_costPCM;
-	double							m_costElectrEnergy;
-	double							m_escalationElectrEnergy;
+	double							m_increasePriceElectricity;
+	double							m_costElectrEnergyPurchase;
+	double							m_costElectrEnergySale;
+	int								m_lcaDuration;
 
 	IBK::Path						m_filenameLoadProfile;
 

@@ -49,7 +49,7 @@
       <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="label_uMPP_2">
         <property name="text">
-         <string>Neigung ... 0-Dach; 90-Wand [Deg]</string>
+         <string>Neigung ... 0-Dach; 90-Wand [Deg]:</string>
         </property>
        </widget>
       </item>
@@ -59,7 +59,7 @@
       <item row="0" column="3">
        <widget class="QLabel" name="label_tempCoeffU_2">
         <property name="text">
-         <string>Orientierung 0-Nord; 90-Ost; ... [Deg]</string>
+         <string>Orientierung 0-Nord; 90-Ost; ... [Deg]:</string>
         </property>
        </widget>
       </item>
@@ -86,7 +86,7 @@
       <item row="2" column="1">
        <widget class="QLabel" name="label_uMPP">
         <property name="text">
-         <string>Nennspannung (MPP) in V</string>
+         <string>Nennspannung (MPP) in V:</string>
         </property>
        </widget>
       </item>
@@ -96,7 +96,7 @@
       <item row="2" column="3">
        <widget class="QLabel" name="label_tempCoeffU">
         <property name="text">
-         <string>Temperaturkoeffizient Uoc in %/K</string>
+         <string>Temperaturkoeffizient Uoc in %/K:</string>
         </property>
        </widget>
       </item>
@@ -106,7 +106,7 @@
       <item row="3" column="1">
        <widget class="QLabel" name="label_iMPP_2">
         <property name="text">
-         <string>Nennstromstärke (MPP) in A</string>
+         <string>Nennstromstärke (MPP) in A:</string>
         </property>
        </widget>
       </item>
@@ -116,7 +116,7 @@
       <item row="3" column="3">
        <widget class="QLabel" name="label_tempCoeffI">
         <property name="text">
-         <string>Temperaturkoeffizient Isc in %/K</string>
+         <string>Temperaturkoeffizient Isc in %/K:</string>
         </property>
        </widget>
       </item>
@@ -126,7 +126,7 @@
       <item row="4" column="1">
        <widget class="QLabel" name="label_uOC">
         <property name="text">
-         <string>Leerlaufspannung in V</string>
+         <string>Leerlaufspannung in V:</string>
         </property>
        </widget>
       </item>
@@ -136,7 +136,7 @@
       <item row="4" column="3">
        <widget class="QLabel" name="label_tempCoeffP">
         <property name="text">
-         <string>Temperaturkoeffizient PMPP in %/K</string>
+         <string>Temperaturkoeffizient PMPP in %/K:</string>
         </property>
        </widget>
       </item>
@@ -146,7 +146,7 @@
       <item row="5" column="1">
        <widget class="QLabel" name="label_iSC">
         <property name="text">
-         <string>Kurzschlussstrom in A</string>
+         <string>Kurzschlussstrom in A:</string>
         </property>
        </widget>
       </item>
@@ -156,7 +156,7 @@
       <item row="5" column="3">
        <widget class="QLabel" name="label_nSer">
         <property name="text">
-         <string>Zellanzahl</string>
+         <string>Zellanzahl:</string>
         </property>
        </widget>
       </item>
@@ -166,12 +166,26 @@
       <item row="6" column="1">
        <widget class="QLabel" name="label_iSC_2">
         <property name="text">
-         <string>Type</string>
+         <string>Type:</string>
         </property>
        </widget>
       </item>
       <item row="6" column="2">
        <widget class="QComboBox" name="comboBoxCellType"/>
+      </item>
+      <item row="6" column="3">
+       <widget class="QLabel" name="label_numberOfModules">
+        <property name="text">
+         <string>Anzahl der Module:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="4">
+       <widget class="QLineEdit" name="lineEdit_numberOfModules">
+        <property name="text">
+         <string>1</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -246,14 +260,14 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_iSC_3">
+       <widget class="QLabel" name="label_ElectricLoad">
         <property name="text">
          <string>Lastprofil:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1" colspan="5">
-       <widget class="QLineEdit" name="lineEditLoadProfile"/>
+       <widget class="QLineEdit" name="lineEdit_LoadProfile"/>
       </item>
       <item row="0" column="6">
        <widget class="QPushButton" name="pushButtonLoadProfile">
@@ -263,42 +277,42 @@
        </widget>
       </item>
       <item row="1" column="0" colspan="2">
-       <widget class="QLabel" name="labelAddCostPV">
+       <widget class="QLabel" name="label_AddCostPV">
         <property name="text">
-         <string>Zusatzkosten pro Modul in €:</string>
+         <string>Kosten pro Modul in €:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="2">
-       <widget class="QLineEdit" name="lineEditAddCostPV">
+       <widget class="QLineEdit" name="lineEdit_AddCostPV">
         <property name="text">
          <string>130</string>
         </property>
        </widget>
       </item>
       <item row="1" column="4">
-       <widget class="QLabel" name="label_9">
+       <widget class="QLabel" name="label_CostElectricityPurchase">
         <property name="text">
-         <string>Strompreis in ¢:</string>
+         <string>Strompreis Einkauf in ¢/kWh:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="5" colspan="2">
-       <widget class="QLineEdit" name="lineEditCostElectrEnergy">
+       <widget class="QLineEdit" name="lineEdit_CostElectrEnergyPurchase">
         <property name="text">
          <string>30,04</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0" colspan="2">
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="label_CostPCM">
         <property name="text">
          <string>Zusatzkosten pro cm PCM in €:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="2">
-       <widget class="QLineEdit" name="lineEditAddCostPCM">
+       <widget class="QLineEdit" name="lineEdit_AddCostPCM">
         <property name="text">
          <string>10</string>
         </property>
@@ -318,28 +332,42 @@
        </spacer>
       </item>
       <item row="2" column="4">
-       <widget class="QLabel" name="label_10">
+       <widget class="QLabel" name="label_PriceIncrease">
         <property name="text">
          <string>Strompreissteigerung in %:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="5" colspan="2">
-       <widget class="QLineEdit" name="lineEditElectrEnegieEscalation">
+       <widget class="QLineEdit" name="lineEdit_ElectrEnergyPriceIncrease">
         <property name="text">
          <string>3</string>
         </property>
        </widget>
       </item>
       <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="label_8">
+       <widget class="QLabel" name="label_PCMCasing">
         <property name="text">
-         <string>Zusatzkosten PCM-Kapsel in €:</string>
+         <string>Zusatzkosten PCM-Kapsel pro Modul in €:</string>
         </property>
        </widget>
       </item>
       <item row="3" column="2">
-       <widget class="QLineEdit" name="lineEditAddCostPCMCasing">
+       <widget class="QLineEdit" name="lineEdit_AddCostPCMCasing">
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QLabel" name="label_CostElectricitySale">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Strompreis Verkauf ¢/kWh:&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="5" colspan="2">
+       <widget class="QLineEdit" name="lineEdit_CostElectrEnergySale">
         <property name="text">
          <string>10</string>
         </property>
@@ -357,7 +385,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>spez. Wärmekapazität in J/kgK</string>
+         <string>spez. Wärmekapazität in J/kgK:</string>
         </property>
        </widget>
       </item>
@@ -409,7 +437,7 @@
       <item row="3" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>Dicke in cm</string>
+         <string>Dicke in cm:</string>
         </property>
        </widget>
       </item>
@@ -445,14 +473,14 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Wärmeleitfähigkeit in W/mK</string>
+         <string>Wärmeleitfähigkeit in W/mK:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Dichte in kg/m3</string>
+         <string>Dichte in kg/m3:</string>
         </property>
        </widget>
       </item>

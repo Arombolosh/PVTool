@@ -275,6 +275,7 @@ void PVToolWidget::on_radioButton_PVDatabase_toggled(bool checked) {
 
 	m_ui->lineEdit_Inclination->setEnabled(true);
 	m_ui->lineEdit_Orientation->setEnabled(true);
+	m_ui->lineEdit_numberOfModules->setEnabled(true);
 }
 
 
@@ -448,15 +449,21 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	//Get cost and load profile data
 	{
-		//TODO Mira
-		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
-		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
-		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
-		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
-		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_AddCostPV, m_ui->lineEdit_AddCostPV, m_costPvModule)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_CostPCM, m_ui->lineEdit_AddCostPCM, m_costPCM)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_PCMCasing, m_ui->lineEdit_AddCostPCMCasing, m_costCasing)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_CostElectricitySale, m_ui->lineEdit_CostElectrEnergySale, m_costElectrEnergySale)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_CostElectricityPurchase, m_ui->lineEdit_CostElectrEnergyPurchase, m_costElectrEnergyPurchase)) return;
+		if (!convertLineEditintoDouble(this, m_ui->label_PriceIncrease, m_ui->lineEdit_ElectrEnergyPriceIncrease, m_increasePriceElectricity)) return;
+		if (!convertLineEditintoInt(this, m_ui->label_numberOfModules, m_ui->lineEdit_numberOfModules, m_moduleCount)) return;
+		//unit conversion
 
-		if(!m_ui->lineEditLoadProfile->text().isEmpty()){
-			m_filenameLoadProfile = IBK::Path(m_ui->lineEditLoadProfile->text().toStdString());
+		m_costElectrEnergySale *= 0.01;
+		m_costElectrEnergyPurchase *= 0.01;
+		m_increasePriceElectricity *= 0.01;
+
+		if(!m_ui->lineEdit_LoadProfile->text().isEmpty()){
+			m_filenameLoadProfile = IBK::Path(m_ui->lineEdit_LoadProfile->text().toStdString());
 			if(!m_filenameLoadProfile.exists()){
 				QMessageBox::critical(this, QString(), tr("Die angegebenen Datei '%1' kann nicht gefunden werden.").arg(m_filenameLoadProfile.c_str()));
 				return;
@@ -464,7 +471,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		}
 		//check read load profile
 		readLoadProfile(IBK::Path(m_filenameLoadProfile));
-		m_moduleCount = 50;
+		//m_moduleCount = 50;
 
 	}
 
@@ -1038,6 +1045,7 @@ void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
 }
 
 void PVToolWidget::showResults(){
+	FUNCID(PVToolWidget::showResults);
 	//sum up all value of one vector
 	std::vector<double> summedValues;//(m_pvEnergy.size(),0);
 	std::vector<double> summedOwnUse, summedPurchase, summedSale;
@@ -1118,17 +1126,26 @@ void PVToolWidget::showResults(){
 	}
 
 	/* Cost functions */
+	// write file
+	std::ofstream out(PVTDirectories::userDataDir().toStdString()+"/cost.tsv");
 
-	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_escalationElectrEnergy, m_lcaDuration);
+	//konvertierung der Unitvectoren?
+
+	out << "Variantenname"<< "\t" << "Investkosten [€]"<< "\t" <<
+		   "Betriebskosten [€]"<< "\t" << "Gesamtkosten [€]" << "\n";
+	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration);
+	out << "Ausgangsituation\t0\t"<< operationCosts <<"\t"<< operationCosts<<"\n";
 	//Invest
 	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
-		double invest = (m_costPvModule + (m_costPCM + m_costCasing) * i) * m_moduleCount;
+		double invest = (m_costPvModule + (m_costPCM * i)+ (i>0 ? m_costCasing : 0)) * m_moduleCount;
 		// kWh * €/kWh * (1+Preissteigerung)^Jahre
 		//das sind die Kosten ohne eine Veränderung
-		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_escalationElectrEnergy, m_lcaDuration);
+		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration);
 		//8 ¢/kWh
-		double salePV = summedSale[i] * m_costElectrEnergySale; //TODO Mira neuen Werte da Verkauf nicht gleich Einkauf
+		double salePV = summedSale[i] * m_costElectrEnergySale;
 		double operationCostsWithPV = operationCosts - costRed - salePV;
+		out<<"mit PV " << (i>0 ? "ohne PCM" :"mit "+IBK::val2string(i)+" cm PCM") << "\t" <<
+			invest << "\t" << operationCostsWithPV <<"\t"<< invest + operationCostsWithPV << "\n";
 	}
 
 	// Variante 1 operationCosts
@@ -1136,8 +1153,12 @@ void PVToolWidget::showResults(){
 	// Variante 3 operationCostsWithPV[1] + invest[1] (1 cm PCM)
 	// Variante 4 operationCostsWithPV[2] + invest[2] (2 cm PCM)
 
-	writeResults(IBK::Path("/home/dirk/git/PVTool/data/pcm0.tsv"), 0); //TODO filename nicht hardcoden
+	if (!out)
+		throw IBK::Exception("Error writing file.", FUNC_ID);
 
+	writeResults(IBK::Path(PVTDirectories::userDataDir().toStdString()+"/pcm0.tsv"), 0);
+	writeResults(IBK::Path(PVTDirectories::userDataDir().toStdString()+"/pcm1.tsv"), 1);
+	writeResults(IBK::Path(PVTDirectories::userDataDir().toStdString()+"/pcm2.tsv"), 2);
 
 	std::vector<std::string>	results;
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
@@ -1159,5 +1180,7 @@ void PVToolWidget::on_pushButtonLoadProfile_clicked(){
 	QString fpath = QFileDialog::getOpenFileName(this,tr("Öffne Lastprofil"),QString(),tr("(*.tsv)"));
 	if(fpath.isEmpty())
 		return;
-	m_ui->lineEditLoadProfile->setText(fpath);
+	m_ui->lineEdit_LoadProfile->setText(fpath);
 }
+
+
