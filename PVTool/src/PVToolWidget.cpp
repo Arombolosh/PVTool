@@ -314,8 +314,9 @@ void PVToolWidget::startDiscProcess(const QString &cmdDiscPath,const QStringList
 
 void PVToolWidget::readLoadProfile(const IBK::Path &filename) {
 	FUNCID(PVToolWidget::readLoadProfile);
-	IBK::FileReader fileReader(filename);
+	IBK::FileReader fileReader(filename, 40960);
 	std::vector<std::string> lines;
+
 	fileReader.readAll(filename, lines, std::vector<std::string>{"\n"});
 
 	if(lines.empty())
@@ -331,9 +332,8 @@ void PVToolWidget::readLoadProfile(const IBK::Path &filename) {
 	pos1 = elements[1].find("[");
 	pos2 = elements[1].find("]");
 	std::string unit;
-	if (pos1 != std::string::npos && pos2 != std::string::npos && pos1 < pos2){
-		unit = elements[1].substr(pos1+1, pos2);
-	}
+	if (pos1 != std::string::npos && pos2 != std::string::npos && pos1 < pos2)
+		unit = elements[1].substr(pos1+1, pos2-pos1-1);
 
 	m_loadProfile.m_unit = IBK::Unit(unit);
 	m_loadProfile.m_name = "LoadProfile";
@@ -369,6 +369,8 @@ void PVToolWidget::readLoadProfile(const IBK::Path &filename) {
 }
 
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
+
+
 	// Climate data file
 	// we need a project directory/working directory
 	IBK::Path weatherDirectory( (PVTDirectories::resourcesRootDir() + "/DB_Climate").toStdString());
@@ -377,6 +379,9 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	IBK::Path workingDirectory( workingDir.toStdString() );
 
 	std::vector<IBK::Path> deleteDirs;
+
+	//check read load profile
+	readLoadProfile(IBK::Path("/home/dirk/git/PVTool/data/LoadProfile.tsv"));	//TODO filename nicht hardcoden
 
 	deleteDirs.push_back( workingDirectory + "/project1-0-disc" );
 	deleteDirs.push_back( workingDirectory + "/project1-1-disc" );
@@ -986,10 +991,34 @@ void PVToolWidget::runPVEnergy()
 
 }
 
+void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
+	FUNCID(PVToolWidget::writeResults);
+
+	// write file
+	std::ofstream out(filename.str());
+
+	Q_ASSERT(vectorIdx<0 || vectorIdx >= m_saleEnergy.size());
+
+	//konvertierung der Unitvectoren?
+
+	out << "Zeit [h]"<< "\t" << "PV (PCM 0 cm) Produktion [W]"<< "\t" << "Verbrauch (Lastpropfil) [W]"<< "\t" << "Eigennutzung [W]"<< "\t" << "Stromzukauf [W]"<< "\t" << "Stromüberschuss [W]";
+	for (unsigned int i=0; i<m_saleEnergy[vectorIdx].m_data.size(); ++i){
+		out << i ;
+		out << "\t" << m_pvEnergy[vectorIdx].m_data[i];
+		out << "\t" << m_loadProfile.m_data[i];
+		out << "\t" << m_ownUseEnergy[vectorIdx].m_data[i];
+		out << "\t" << m_purchaseEnergy[vectorIdx].m_data[i];
+		out << "\t" << m_saleEnergy[vectorIdx].m_data[i];
+
+	}
+	if (!out)
+		throw IBK::Exception("Error writing file.", FUNC_ID);
+}
+
 void PVToolWidget::showResults(){
 	//sum up all value of one vector
 	std::vector<double> summedValues;//(m_pvEnergy.size(),0);
-	std::vector<double> summedOwnUse, summedPurchase;
+	std::vector<double> summedOwnUse, summedPurchase, summedSale;
 
 	bool isOwnUse = !m_loadProfile.empty();
 	//Wenn ein Lastprofil vorhanden ist werden Auswertungen vorgenommen
@@ -997,8 +1026,10 @@ void PVToolWidget::showResults(){
 		//Vorinitialsierung der Vektoren
 		m_ownUseEnergy = std::vector<IBK::UnitVector> (m_pvEnergy.size());
 		m_purchaseEnergy = std::vector<IBK::UnitVector> (m_pvEnergy.size());
+		m_saleEnergy = std::vector<IBK::UnitVector> (m_pvEnergy.size());
 		summedOwnUse = std::vector<double>(m_pvEnergy.size(),0);
 		summedPurchase = std::vector<double>(m_pvEnergy.size(),0);
+		summedSale = std::vector<double>(m_pvEnergy.size(),0);
 	}
 	//pvE ist das Ertragsprofil
 	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
@@ -1045,12 +1076,18 @@ void PVToolWidget::showResults(){
 
 				m_ownUseEnergy[i].m_data.push_back(ownUse);
 				m_purchaseEnergy[i].m_data.push_back(load - ownUse);
+				m_saleEnergy[i].m_data.push_back(val - ownUse);
+
 				summedOwnUse[i] += ownUse;
 				summedPurchase[i] += m_purchaseEnergy[i].m_data.back();
+				summedSale[i] += m_saleEnergy[i].m_data.back();
 			}
 		}
 		summedValues.push_back(res);
 	}
+
+	writeResults(IBK::Path("/home/dirk/git/PVTool/data/pcm0.tsv"), 0); //TODO filename nicht hardcoden
+
 
 	std::vector<std::string>	results;
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());

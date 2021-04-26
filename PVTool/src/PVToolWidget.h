@@ -91,6 +91,9 @@ private:
 	/*! Import the load profile from file (filename) in m_loadProfile. */
 	void readLoadProfile(const IBK::Path& filename);
 
+	/*! Write results to the file. VectorIdx is the index of the vector element of calculation.*/
+	void writeResults(const IBK::Path &filename, int vectorIdx);
+
 	Ui::PVToolWidget	*m_ui;
 
 	QProgressDialog		*m_progressDlg;
@@ -114,6 +117,7 @@ private:
 	IBK::UnitVector					m_loadProfile;
 	std::vector<IBK::UnitVector>	m_ownUseEnergy;
 	std::vector<IBK::UnitVector>	m_purchaseEnergy;
+	std::vector<IBK::UnitVector>	m_saleEnergy;
 	double							m_tempProgress;
 
 };
