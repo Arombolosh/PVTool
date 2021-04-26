@@ -88,6 +88,9 @@ private:
 	/*! */
 	void startDiscProcess(const QString &cmdDiscPath,const QStringList &discCmdLine, QWidget *parent);
 
+	/*! Import the load profile from file (filename) in m_loadProfile. */
+	void readLoadProfile(const IBK::Path& filename);
+
 	Ui::PVToolWidget	*m_ui;
 
 	QProgressDialog		*m_progressDlg;
@@ -108,6 +111,9 @@ private:
 	std::vector<IBK::UnitVector>	m_temperature;
 	std::vector<IBK::UnitVector>	m_radiation;
 	std::vector<IBK::UnitVector>	m_pvEnergy;
+	IBK::UnitVector					m_loadProfile;
+	std::vector<IBK::UnitVector>	m_ownUseEnergy;
+	std::vector<IBK::UnitVector>	m_purchaseEnergy;
 	double							m_tempProgress;
 
 };
