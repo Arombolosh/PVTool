@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1382</width>
-    <height>719</height>
+    <height>716</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,7 +19,7 @@
      <property name="title">
       <string>Directory</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_6">
+     <layout class="QGridLayout" name="gridLayout_7">
       <item row="0" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
@@ -36,169 +36,6 @@
          <string>...</string>
         </property>
        </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="0" column="1" rowspan="4">
-    <widget class="QGroupBox" name="groupBox_Insulation">
-     <property name="title">
-      <string>Insulation</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>spez. Wärmekapazität in J/kgK</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_Conductivity">
-        <property name="decimals">
-         <number>4</number>
-        </property>
-        <property name="minimum">
-         <double>0.000100000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.030000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_SpecHeatCapa">
-        <property name="decimals">
-         <number>0</number>
-        </property>
-        <property name="minimum">
-         <double>200.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>4000.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>1500.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_InsulationThickness">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>6.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Dicke in cm</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="doubleSpinBox_Density">
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>1.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>8000.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>35.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>367</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Wärmeleitfähigkeit in W/mK</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Dichte in kg/m3</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QPushButton" name="pushButton_RunSimu">
-        <property name="text">
-         <string>Run Simulation</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox_Weather">
-     <property name="title">
-      <string>Weather</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="radioButton_WeatherComboBox">
-        <property name="text">
-         <string>Weather File</string>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-        <property name="autoRepeat">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QRadioButton" name="radioButton_EPW">
-        <property name="text">
-         <string>EPW-File</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="lineEdit_EPWFile"/>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="pushButton_EPW">
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QComboBox" name="comboBox_WeatherFile"/>
       </item>
      </layout>
     </widget>
@@ -344,7 +181,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>200</height>
+       <height>0</height>
       </size>
      </property>
      <property name="title">
@@ -354,18 +191,277 @@
       <item row="1" column="0">
        <widget class="QComboBox" name="comboBox_PCMMaterials"/>
       </item>
-      <item row="2" column="0">
-       <spacer name="verticalSpacer_2">
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox_Weather">
+     <property name="title">
+      <string>Weather</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radioButton_WeatherComboBox">
+        <property name="text">
+         <string>Weather File</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="radioButton_EPW">
+        <property name="text">
+         <string>EPW-File</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lineEdit_EPWFile"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QPushButton" name="pushButton_EPW">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="comboBox_WeatherFile"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Lastprofil und Kosten</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_iSC_3">
+        <property name="text">
+         <string>Lastprofil:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="5">
+       <widget class="QLineEdit" name="lineEditLoadProfile"/>
+      </item>
+      <item row="0" column="6">
+       <widget class="QPushButton" name="pushButtonLoadProfile">
+        <property name="text">
+         <string>...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="labelAddCostPV">
+        <property name="text">
+         <string>Zusatzkosten pro Modul in €:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLineEdit" name="lineEditAddCostPV">
+        <property name="text">
+         <string>130</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Strompreis in ¢:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5" colspan="2">
+       <widget class="QLineEdit" name="lineEditCostElectrEnergy">
+        <property name="text">
+         <string>30,04</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Zusatzkosten pro cm PCM in €:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="lineEditAddCostPCM">
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>225</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="2" column="4">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Strompreissteigerung in %:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5" colspan="2">
+       <widget class="QLineEdit" name="lineEditElectrEnegieEscalation">
+        <property name="text">
+         <string>3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Zusatzkosten PCM-Kapsel in €:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="lineEditAddCostPCMCasing">
+        <property name="text">
+         <string>10</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1" rowspan="5">
+    <widget class="QGroupBox" name="groupBox_Insulation">
+     <property name="title">
+      <string>Insulation</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>spez. Wärmekapazität in J/kgK</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_Conductivity">
+        <property name="decimals">
+         <number>4</number>
+        </property>
+        <property name="minimum">
+         <double>0.000100000000000</double>
+        </property>
+        <property name="maximum">
+         <double>10.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.010000000000000</double>
+        </property>
+        <property name="value">
+         <double>0.030000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_SpecHeatCapa">
+        <property name="decimals">
+         <number>0</number>
+        </property>
+        <property name="minimum">
+         <double>200.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>4000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1500.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_InsulationThickness">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>6.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Dicke in cm</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_Density">
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>1.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>8000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>35.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
           <width>20</width>
-          <height>40</height>
+          <height>367</height>
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Wärmeleitfähigkeit in W/mK</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Dichte in kg/m3</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QPushButton" name="pushButton_RunSimu">
+        <property name="text">
+         <string>Run Simulation</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

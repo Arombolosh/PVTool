@@ -363,7 +363,7 @@ void PVToolWidget::readLoadProfile(const IBK::Path &filename) {
 		m_loadProfile.m_data.push_back(val);
 	}
 
-	if(m_loadProfile.m_data.size() != 8760)
+	if(m_loadProfile.m_data.size() != 8761)
 		throw IBK::Exception(IBK::FormatString("Load profile is not valid! There are not exactly 8760 value lines."), FUNC_ID);
 
 }
@@ -380,8 +380,6 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	std::vector<IBK::Path> deleteDirs;
 
-	//check read load profile
-	readLoadProfile(IBK::Path("/home/dirk/git/PVTool/data/LoadProfile.tsv"));	//TODO filename nicht hardcoden
 
 	deleteDirs.push_back( workingDirectory + "/project1-0-disc" );
 	deleteDirs.push_back( workingDirectory + "/project1-1-disc" );
@@ -446,6 +444,28 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 
 		m_pvtool.m_manuData.m_name = "UserGeneratedPVModule";
+	}
+
+	//Get cost and load profile data
+	{
+		//TODO Mira
+		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
+		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
+		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
+		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
+		if (!convertLineEditintoDouble(this, m_ui->labelAddCostPV, m_ui->lineEditAddCostPV, m_costPvModule)) return;
+
+		if(!m_ui->lineEditLoadProfile->text().isEmpty()){
+			m_filenameLoadProfile = IBK::Path(m_ui->lineEditLoadProfile->text().toStdString());
+			if(!m_filenameLoadProfile.exists()){
+				QMessageBox::critical(this, QString(), tr("Die angegebenen Datei '%1' kann nicht gefunden werden.").arg(m_filenameLoadProfile.c_str()));
+				return;
+			}
+		}
+		//check read load profile
+		readLoadProfile(IBK::Path(m_filenameLoadProfile));
+		m_moduleCount = 50;
+
 	}
 
 	// now pre-calculate manufacturing parameter set
@@ -997,11 +1017,13 @@ void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
 	// write file
 	std::ofstream out(filename.str());
 
-	Q_ASSERT(vectorIdx<0 || vectorIdx >= m_saleEnergy.size());
+	Q_ASSERT(!(vectorIdx<0 || vectorIdx >= m_saleEnergy.size()));
 
 	//konvertierung der Unitvectoren?
 
-	out << "Zeit [h]"<< "\t" << "PV (PCM 0 cm) Produktion [W]"<< "\t" << "Verbrauch (Lastpropfil) [W]"<< "\t" << "Eigennutzung [W]"<< "\t" << "Stromzukauf [W]"<< "\t" << "Stromüberschuss [W]";
+	out << "Zeit [h]"<< "\t" << "PV (PCM 0 cm) Produktion [W]"<< "\t" <<
+		   "Verbrauch (Lastpropfil) [W]"<< "\t" << "Eigennutzung [W]"<< "\t" <<
+		   "Stromzukauf [W]"<< "\t" << "Stromüberschuss [W]" << "\n";
 	for (unsigned int i=0; i<m_saleEnergy[vectorIdx].m_data.size(); ++i){
 		out << i ;
 		out << "\t" << m_pvEnergy[vectorIdx].m_data[i];
@@ -1009,7 +1031,7 @@ void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
 		out << "\t" << m_ownUseEnergy[vectorIdx].m_data[i];
 		out << "\t" << m_purchaseEnergy[vectorIdx].m_data[i];
 		out << "\t" << m_saleEnergy[vectorIdx].m_data[i];
-
+		out << "\n";
 	}
 	if (!out)
 		throw IBK::Exception("Error writing file.", FUNC_ID);
@@ -1019,6 +1041,7 @@ void PVToolWidget::showResults(){
 	//sum up all value of one vector
 	std::vector<double> summedValues;//(m_pvEnergy.size(),0);
 	std::vector<double> summedOwnUse, summedPurchase, summedSale;
+	double summedLoad;
 
 	bool isOwnUse = !m_loadProfile.empty();
 	//Wenn ein Lastprofil vorhanden ist werden Auswertungen vorgenommen
@@ -1031,13 +1054,19 @@ void PVToolWidget::showResults(){
 		summedPurchase = std::vector<double>(m_pvEnergy.size(),0);
 		summedSale = std::vector<double>(m_pvEnergy.size(),0);
 	}
+
+	//TODO Einheitenkonvertierung prüfen alle Vektoren
+	//m_pvEnergy
+	//m_loadProfile.convert(IBK::Unit("W"));
+
 	//pvE ist das Ertragsprofil
 	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
 		IBK::UnitVector &pvE =  m_pvEnergy[i];
 
 		double res =0;
 		for(unsigned int j=0; j<pvE.m_data.size(); ++j){
-			double val = pvE.m_data[j];
+			double &val = pvE.m_data[j];
+			val *= m_moduleCount;
 			res += val;
 			if(isOwnUse){
 				double ownUse;
@@ -1081,10 +1110,31 @@ void PVToolWidget::showResults(){
 				summedOwnUse[i] += ownUse;
 				summedPurchase[i] += m_purchaseEnergy[i].m_data.back();
 				summedSale[i] += m_saleEnergy[i].m_data.back();
+				if(!m_filenameLoadProfile.str().empty())
+					summedLoad += m_loadProfile.m_data[j];
 			}
 		}
 		summedValues.push_back(res);
 	}
+
+	/* Cost functions */
+
+	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_escalationElectrEnergy, m_lcaDuration);
+	//Invest
+	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
+		double invest = (m_costPvModule + (m_costPCM + m_costCasing) * i) * m_moduleCount;
+		// kWh * €/kWh * (1+Preissteigerung)^Jahre
+		//das sind die Kosten ohne eine Veränderung
+		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_escalationElectrEnergy, m_lcaDuration);
+		//8 ¢/kWh
+		double salePV = summedSale[i] * m_costElectrEnergySale; //TODO Mira neuen Werte da Verkauf nicht gleich Einkauf
+		double operationCostsWithPV = operationCosts - costRed - salePV;
+	}
+
+	// Variante 1 operationCosts
+	// Variante 2 operationCostsWithPV[0] + invest[0] (ohne PCM)
+	// Variante 3 operationCostsWithPV[1] + invest[1] (1 cm PCM)
+	// Variante 4 operationCostsWithPV[2] + invest[2] (2 cm PCM)
 
 	writeResults(IBK::Path("/home/dirk/git/PVTool/data/pcm0.tsv"), 0); //TODO filename nicht hardcoden
 
@@ -1104,3 +1154,10 @@ void PVToolWidget::showResults(){
 
 
 
+
+void PVToolWidget::on_pushButtonLoadProfile_clicked(){
+	QString fpath = QFileDialog::getOpenFileName(this,tr("Öffne Lastprofil"),QString(),tr("(*.tsv)"));
+	if(fpath.isEmpty())
+		return;
+	m_ui->lineEditLoadProfile->setText(fpath);
+}

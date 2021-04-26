@@ -119,6 +119,18 @@ private:
 	std::vector<IBK::UnitVector>	m_purchaseEnergy;
 	std::vector<IBK::UnitVector>	m_saleEnergy;
 	double							m_tempProgress;
+	unsigned int					m_moduleCount=1;
+
+	/*! Cost Data*/
+	double							m_costPvModule;
+	double							m_costCasing;
+	double							m_costPCM;
+	double							m_costElectrEnergy;
+	double							m_escalationElectrEnergy;
+
+	IBK::Path						m_filenameLoadProfile;
+
+
 
 };
 
