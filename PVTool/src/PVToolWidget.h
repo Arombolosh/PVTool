@@ -109,6 +109,8 @@ private:
 	QStringList			m_completedProjects;
 	size_t				m_finishedProjects = 0;		///< finished projects to set progressBar
 
+	IBK::Path			m_workingDirectory;
+
 	/*! PV module data. */
 	PVTOOL::Energy					m_pvtool;
 

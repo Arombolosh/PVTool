@@ -377,23 +377,23 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	IBK::Path weatherDirectory( (PVTDirectories::resourcesRootDir() + "/DB_Climate").toStdString());
 	IBK::Path weatherPath;
 	QString workingDir = m_ui->lineEdit_Directory->text();
-	IBK::Path workingDirectory( workingDir.toStdString() );
+	m_workingDirectory = IBK::Path( workingDir.toStdString() );
 
 	std::vector<IBK::Path> deleteDirs;
 
 
-	deleteDirs.push_back( workingDirectory + "/project1-0-disc" );
-	deleteDirs.push_back( workingDirectory + "/project1-1-disc" );
-	deleteDirs.push_back( workingDirectory + "/project1-2-disc" );
-	deleteDirs.push_back( workingDirectory + "/project2-0-disc" );
-	deleteDirs.push_back( workingDirectory + "/project2-1-disc" );
-	deleteDirs.push_back( workingDirectory + "/project2-2-disc" );
-	deleteDirs.push_back( workingDirectory + "/projectWithoutPCM-0-disc" );
-	deleteDirs.push_back( workingDirectory + "/projectWithoutPCM-1-disc" );
-	deleteDirs.push_back( workingDirectory + "/projectWithoutPCM-2-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/project1-0-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/project1-1-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/project1-2-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/project2-0-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/project2-1-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/project2-2-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/projectWithoutPCM-0-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/projectWithoutPCM-1-disc" );
+	deleteDirs.push_back( m_workingDirectory + "/projectWithoutPCM-2-disc" );
 
 	for (size_t i=0; i<deleteDirs.size(); ++i)
-		workingDirectory.remove(deleteDirs[i]);
+		m_workingDirectory.remove(deleteDirs[i]);
 
 	if (m_ui->radioButton_WeatherComboBox->isChecked()){
 		weatherPath = weatherDirectory / m_ui->comboBox_WeatherFile->itemText(m_ui->comboBox_WeatherFile->currentIndex()).toStdString() + ".c6b";
@@ -409,7 +409,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		}
 	}
 	IBK::Path weatherName =  weatherPath.filename();
-	IBK::Path weatherTargetDir = workingDirectory / "climate";
+	IBK::Path weatherTargetDir = m_workingDirectory / "climate";
 	if( !weatherTargetDir.exists())
 		IBK::Path::makePath(weatherTargetDir);
 	if( !weatherTargetDir.exists()){
@@ -563,20 +563,20 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
 	IBK::Path templateDirectory( (PVTDirectories::resourcesRootDir() + "/project_template").toStdString());
 
-	success = IBK::Path::copy(templateDirectory, workingDirectory);
+	success = IBK::Path::copy(templateDirectory, m_workingDirectory);
 	if (!success) {
 		QMessageBox::critical(this, QString(), tr("Konnte Projektverzeichnis nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
 		return;
 	}
 	// copy power drain template
-	success = IBK::Path::copy( IBK::Path((PVTDirectories::resourcesRootDir() + "/file_templates/no_drain.tsv").toStdString()), workingDirectory / "power");
+	success = IBK::Path::copy( IBK::Path((PVTDirectories::resourcesRootDir() + "/file_templates/no_drain.tsv").toStdString()), m_workingDirectory / "power");
 	if (!success) {
 		QMessageBox::critical(this, QString(), tr("Konnte 'no_drain.tsv' nicht ins Arbeitsverzeichnis '%1' kopieren.").arg(workingDir));
 		return;
 	}
 
 	// adjust template insulation material and write to target directory
-	IBK::Path insulationM6Path( workingDirectory / "materials/InsulationMat.m6");
+	IBK::Path insulationM6Path( m_workingDirectory / "materials/InsulationMat.m6");
 
 	createM6File(m6Template, insulationM6Path, m_ui->doubleSpinBox_Density->value(),
 				 m_ui->doubleSpinBox_SpecHeatCapa->value(),
@@ -587,7 +587,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	double insuThick = m_ui->doubleSpinBox_InsulationThickness->value()/100;
 	const unsigned int MAX_WRM_ITERS = 3;
 	for (unsigned int WRMCount=0; WRMCount<MAX_WRM_ITERS; ++WRMCount) {
-		IBK::Path d6pWithoutPCM(IBK::FormatString( "%1/projectWithoutPCM-%2.d6p").arg(workingDirectory).arg(WRMCount).str());
+		IBK::Path d6pWithoutPCM(IBK::FormatString( "%1/projectWithoutPCM-%2.d6p").arg(m_workingDirectory).arg(WRMCount).str());
 		std::string powerDrainFilePath = "no_drain.tsv";
 		// for all but first use counter
 		if (WRMCount > 0) {
@@ -613,7 +613,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	for (size_t i=1; i<m_thicknessPCM.size(); ++i) {
 		for (unsigned int WRMCount=0; WRMCount<MAX_WRM_ITERS; ++WRMCount) {
 
-			IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2-%3.d6p").arg(workingDirectory).arg(i).arg(WRMCount).str());
+			IBK::Path d6ProjectPath(IBK::FormatString( "%1/project%2-%3.d6p").arg(m_workingDirectory).arg(i).arg(WRMCount).str());
 			std::string powerDrainFilePath = "no_drain.tsv";
 			// for all but first use counter
 			if (WRMCount > 0) {
@@ -1049,7 +1049,7 @@ void PVToolWidget::showResults(){
 	//sum up all value of one vector
 	std::vector<double> summedValues;//(m_pvEnergy.size(),0);
 	std::vector<double> summedOwnUse, summedPurchase, summedSale;
-	double summedLoad;
+	double summedLoad = 0;
 
 	bool isOwnUse = !m_loadProfile.empty();
 	//Wenn ein Lastprofil vorhanden ist werden Auswertungen vorgenommen
@@ -1127,7 +1127,7 @@ void PVToolWidget::showResults(){
 
 	/* Cost functions */
 	// write file
-	std::ofstream out(PVTDirectories::userDataDir().toStdString()+"/cost.tsv");
+	std::ofstream out((m_workingDirectory / "cost.tsv").c_str());
 
 	//konvertierung der Unitvectoren?
 
@@ -1156,9 +1156,9 @@ void PVToolWidget::showResults(){
 	if (!out)
 		throw IBK::Exception("Error writing file.", FUNC_ID);
 
-	writeResults(IBK::Path(PVTDirectories::userDataDir().toStdString()+"/pcm0.tsv"), 0);
-	writeResults(IBK::Path(PVTDirectories::userDataDir().toStdString()+"/pcm1.tsv"), 1);
-	writeResults(IBK::Path(PVTDirectories::userDataDir().toStdString()+"/pcm2.tsv"), 2);
+	writeResults(IBK::Path(m_workingDirectory / "pcm0.tsv"), 0);
+	writeResults(IBK::Path(m_workingDirectory / "pcm1.tsv"), 1);
+	writeResults(IBK::Path(m_workingDirectory / "pcm2.tsv"), 2);
 
 	std::vector<std::string>	results;
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
