@@ -456,6 +456,7 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 		if (!convertLineEditintoDouble(this, m_ui->label_CostElectricityPurchase, m_ui->lineEdit_CostElectrEnergyPurchase, m_costElectrEnergyPurchase)) return;
 		if (!convertLineEditintoDouble(this, m_ui->label_PriceIncrease, m_ui->lineEdit_ElectrEnergyPriceIncrease, m_increasePriceElectricity)) return;
 		if (!convertLineEditintoInt(this, m_ui->label_numberOfModules, m_ui->lineEdit_numberOfModules, m_moduleCount)) return;
+		if (!convertLineEditintoInt(this, m_ui->label_LccDuration, m_ui->lineEdit_LccDuration, m_lccDuration)) return;
 		//unit conversion
 
 		m_costElectrEnergySale *= 0.01;
@@ -1126,7 +1127,6 @@ void PVToolWidget::showResults(){
 		for(unsigned int j=0; j<m_loadProfile.size(); ++j)
 			summedLoad += m_loadProfile.m_data[j];
 
-	m_lcaDuration = 20;		//TODO Mira Einbau in die GUI
 
 	/* Cost functions */
 	// write file
@@ -1135,15 +1135,15 @@ void PVToolWidget::showResults(){
 	//konvertierung der Unitvectoren?
 
 	out << "Variantenname"<< "\t" << "Investkosten [€]"<< "\t" <<
-		   "Betriebskosten [€]"<< "\t" << "Gesamtkosten [€]" << "\n";
-	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration) * 0.01;
-	out << "Ausgangsituation\t0\t"<< operationCosts <<"\t"<< operationCosts<<"\n";
+		   "Betriebskosten [€]"<< "\t" << "Gesamtkosten [€] nach "<< IBK::val2string(m_lccDuration) <<" Jahren Betriebszeit" << "\n";
+	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lccDuration) * 0.01;
+	out << "Ausgangsituation ohne PV\t0\t"<< operationCosts <<"\t"<< operationCosts<<"\n";
 	//Invest
 	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
 		double invest = (m_costPvModule + (m_costPCM * i)+ (i>0 ? m_costCasing : 0)) * m_moduleCount;
 		// kWh * €/kWh * (1+Preissteigerung)^Jahre
 		//das sind die Kosten ohne eine Veränderung
-		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration) * 0.01;
+		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lccDuration) * 0.01;
 		//8 ¢/kWh
 		double salePV = summedSale[i] * m_costElectrEnergySale * 0.01;
 		double operationCostsWithPV = operationCosts - costRed - salePV;
