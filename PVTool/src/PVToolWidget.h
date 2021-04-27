@@ -132,7 +132,7 @@ private:
 	double							m_increasePriceElectricity;
 	double							m_costElectrEnergyPurchase;		///< €/kWh
 	double							m_costElectrEnergySale;
-	int								m_lcaDuration;
+	int								m_lccDuration;
 
 	IBK::Path						m_filenameLoadProfile;
 
