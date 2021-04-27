@@ -300,7 +300,7 @@
       <item row="1" column="5" colspan="2">
        <widget class="QLineEdit" name="lineEdit_CostElectrEnergyPurchase">
         <property name="text">
-         <string>30,04</string>
+         <string>30.04</string>
         </property>
        </widget>
       </item>

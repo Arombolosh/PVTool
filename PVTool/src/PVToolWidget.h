@@ -130,7 +130,7 @@ private:
 	double							m_costCasing;
 	double							m_costPCM;
 	double							m_increasePriceElectricity;
-	double							m_costElectrEnergyPurchase;
+	double							m_costElectrEnergyPurchase;		///< €/kWh
 	double							m_costElectrEnergySale;
 	int								m_lcaDuration;
 

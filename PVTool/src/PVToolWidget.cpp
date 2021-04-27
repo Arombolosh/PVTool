@@ -1118,12 +1118,15 @@ void PVToolWidget::showResults(){
 				summedOwnUse[i] += ownUse;
 				summedPurchase[i] += m_purchaseEnergy[i].m_data.back();
 				summedSale[i] += m_saleEnergy[i].m_data.back();
-				if(!m_filenameLoadProfile.str().empty())
-					summedLoad += m_loadProfile.m_data[j];
 			}
 		}
 		summedValues.push_back(res);
 	}
+	if(!m_filenameLoadProfile.str().empty())
+		for(unsigned int j=0; j<m_loadProfile.size(); ++j)
+			summedLoad += m_loadProfile.m_data[j];
+
+	m_lcaDuration = 20;		//TODO Mira Einbau in die GUI
 
 	/* Cost functions */
 	// write file
@@ -1133,18 +1136,18 @@ void PVToolWidget::showResults(){
 
 	out << "Variantenname"<< "\t" << "Investkosten [€]"<< "\t" <<
 		   "Betriebskosten [€]"<< "\t" << "Gesamtkosten [€]" << "\n";
-	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration);
+	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration) * 0.01;
 	out << "Ausgangsituation\t0\t"<< operationCosts <<"\t"<< operationCosts<<"\n";
 	//Invest
 	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
 		double invest = (m_costPvModule + (m_costPCM * i)+ (i>0 ? m_costCasing : 0)) * m_moduleCount;
 		// kWh * €/kWh * (1+Preissteigerung)^Jahre
 		//das sind die Kosten ohne eine Veränderung
-		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration);
+		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lcaDuration) * 0.01;
 		//8 ¢/kWh
-		double salePV = summedSale[i] * m_costElectrEnergySale;
+		double salePV = summedSale[i] * m_costElectrEnergySale * 0.01;
 		double operationCostsWithPV = operationCosts - costRed - salePV;
-		out<<"mit PV " << (i>0 ? "ohne PCM" :"mit "+IBK::val2string(i)+" cm PCM") << "\t" <<
+		out<<"PV " << (i==0 ? "ohne PCM" :"mit "+IBK::val2string(i)+" cm PCM") << "\t" <<
 			invest << "\t" << operationCostsWithPV <<"\t"<< invest + operationCostsWithPV << "\n";
 	}
 
