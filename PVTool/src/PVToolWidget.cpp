@@ -1060,11 +1060,11 @@ void PVToolWidget::showResults(){
 		summedOwnUse = std::vector<double>(m_pvEnergy.size(),0);
 		summedPurchase = std::vector<double>(m_pvEnergy.size(),0);
 		summedSale = std::vector<double>(m_pvEnergy.size(),0);
+		m_loadProfile.convert(IBK::Unit("W"));
 	}
 
 	//TODO Einheitenkonvertierung prüfen alle Vektoren
 	//m_pvEnergy
-	//m_loadProfile.convert(IBK::Unit("W"));
 
 	//pvE ist das Ertragsprofil
 	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
