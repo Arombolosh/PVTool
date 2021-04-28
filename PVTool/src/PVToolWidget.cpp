@@ -172,9 +172,6 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBoxCellType->addItem("CIGS", PVTOOL::Energy::ManufactureData::CellType::CIGS);
 	m_ui->comboBoxCellType->addItem("Amorphous", PVTOOL::Energy::ManufactureData::CellType::Amorphous);
 
-
-
-	//todo schleife mit weather
 	for(auto &p : m_pvModule)
 		m_ui->comboBox_PVModule->addItem(QString().fromStdString(p.m_name));
 
@@ -204,7 +201,6 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	//abschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(true);
 
-	//todo schleife mit weather
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP26"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP30"));
 	//einschalten von updates
@@ -345,6 +341,8 @@ void PVToolWidget::readLoadProfile(const IBK::Path &filename) {
 		throw IBK::Exception(IBK::FormatString("Load profile has no valid unit! Line: #%1").arg(0), FUNC_ID);
 
 	//Prüfe zeiteinheit TODO Mira
+	if(elements[0].find("[h]") == std::string::npos)
+		throw  IBK::Exception(IBK::FormatString("Load profile requires hourly time stamp."), FUNC_ID);
 
 	//skip header line
 	for(unsigned int i=1; i<lines.size(); ++i){
@@ -1123,47 +1121,60 @@ void PVToolWidget::showResults(){
 		}
 		summedValues.push_back(res);
 	}
-	if(!m_filenameLoadProfile.str().empty())
+	if(isOwnUse)
 		for(unsigned int j=0; j<m_loadProfile.size(); ++j)
 			summedLoad += m_loadProfile.m_data[j];
+	std::vector<std::string>	results;
+	if(isOwnUse)
+	{
+		/* Cost functions */
+		// write file
+		std::ofstream out((m_workingDirectory / "cost.tsv").c_str());
 
 
-	/* Cost functions */
-	// write file
-	std::ofstream out((m_workingDirectory / "cost.tsv").c_str());
+		//konvertierung der Unitvectoren?
 
-	//konvertierung der Unitvectoren?
+		results.push_back("Variantenname\tInvestkosten [€]\tBetriebskosten [€]\tGesamtkosten [€] nach "+ IBK::val2string(m_lccDuration) +" Jahren Betriebszeit\n");
+		out << results.back();
+		double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lccDuration) * 0.01;
+		results.push_back(IBK::FormatString("Ausgangsituation ohne PV\t0\t%1\t%2")
+						  .arg(operationCosts, 8, 'f', 2, ' ', std::ios_base::right)
+						  .arg(operationCosts, 8, 'f', 2, ' ', std::ios_base::right).str());
 
-	out << "Variantenname"<< "\t" << "Investkosten [€]"<< "\t" <<
-		   "Betriebskosten [€]"<< "\t" << "Gesamtkosten [€] nach "<< IBK::val2string(m_lccDuration) <<" Jahren Betriebszeit" << "\n";
-	double operationCosts = summedLoad * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lccDuration) * 0.01;
-	out << "Ausgangsituation ohne PV\t0\t"<< operationCosts <<"\t"<< operationCosts<<"\n";
-	//Invest
-	for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
-		double invest = (m_costPvModule + (m_costPCM * i)+ (i>0 ? m_costCasing : 0)) * m_moduleCount;
-		// kWh * €/kWh * (1+Preissteigerung)^Jahre
-		//das sind die Kosten ohne eine Veränderung
-		double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lccDuration) * 0.01;
-		//8 ¢/kWh
-		double salePV = summedSale[i] * m_costElectrEnergySale * 0.01;
-		double operationCostsWithPV = operationCosts - costRed - salePV;
-		out<<"PV " << (i==0 ? "ohne PCM" :"mit "+IBK::val2string(i)+" cm PCM") << "\t" <<
-			invest << "\t" << operationCostsWithPV <<"\t"<< invest + operationCostsWithPV << "\n";
+		out << results.back() <<"\n";
+		//Invest
+		for(unsigned int i=0; i<m_pvEnergy.size(); ++i){
+			double invest = (m_costPvModule + (m_costPCM * i)+ (i>0 ? m_costCasing : 0)) * m_moduleCount;
+			// kWh * €/kWh * (1+Preissteigerung)^Jahre
+			//das sind die Kosten ohne eine Veränderung
+			double costRed = summedOwnUse[i] * m_costElectrEnergyPurchase * std::pow(1+m_increasePriceElectricity, m_lccDuration) * 0.01;
+			//8 ¢/kWh
+			double salePV = summedSale[i] * m_costElectrEnergySale * 0.01;
+			double operationCostsWithPV = operationCosts - costRed - salePV;
+			std::string text ="PV ";
+			text += (i==0 ? "ohne PCM" :"mit "+IBK::val2string(i)+" cm PCM");
+			results.push_back(IBK::FormatString("%1\t%2\t%3\t%4").arg(text)
+							  .arg(invest, 8, 'f', 2, ' ', std::ios_base::right)
+							  .arg(operationCostsWithPV, 8, 'f', 2, ' ', std::ios_base::right)
+							  .arg(invest + operationCostsWithPV, 8, 'f', 2, ' ', std::ios_base::right).str());
+
+			out << results.back() << "\n";
+		}
+		results.push_back("\n");
+
+		// Variante 1 operationCosts
+		// Variante 2 operationCostsWithPV[0] + invest[0] (ohne PCM)
+		// Variante 3 operationCostsWithPV[1] + invest[1] (1 cm PCM)
+		// Variante 4 operationCostsWithPV[2] + invest[2] (2 cm PCM)
+
+		if (!out)
+			throw IBK::Exception("Error writing file.", FUNC_ID);
+
+		writeResults(IBK::Path(m_workingDirectory / "pcm0.tsv"), 0);
+		writeResults(IBK::Path(m_workingDirectory / "pcm1.tsv"), 1);
+		writeResults(IBK::Path(m_workingDirectory / "pcm2.tsv"), 2);
 	}
 
-	// Variante 1 operationCosts
-	// Variante 2 operationCostsWithPV[0] + invest[0] (ohne PCM)
-	// Variante 3 operationCostsWithPV[1] + invest[1] (1 cm PCM)
-	// Variante 4 operationCostsWithPV[2] + invest[2] (2 cm PCM)
-
-	if (!out)
-		throw IBK::Exception("Error writing file.", FUNC_ID);
-
-	writeResults(IBK::Path(m_workingDirectory / "pcm0.tsv"), 0);
-	writeResults(IBK::Path(m_workingDirectory / "pcm1.tsv"), 1);
-	writeResults(IBK::Path(m_workingDirectory / "pcm2.tsv"), 2);
-
-	std::vector<std::string>	results;
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
 	for(size_t i=0; i<summedValues.size(); ++i)
 		results.push_back( IBK::FormatString("%1 %2").arg(m_thicknessPCM[i]*100,5)
