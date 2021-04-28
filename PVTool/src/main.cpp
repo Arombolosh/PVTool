@@ -22,8 +22,16 @@ void qDebugMsgHandler(QtMsgType type, const QMessageLogContext &context, const Q
 	std::cout << msg.toStdString() << std::endl;
 }
 
+void testDirk(){
+	std::string txt = IBK::val2string(12345678.12, 12);
+	txt = IBK::val2string(12345678.12, 10, 12, '0');
+	txt= "";
+}
+
 int main(int argc, char *argv[]) {
 //	const char * const FUNC_ID = "[main]";
+
+	//testDirk();
 
 	PVTDebugApplication a(argc, argv);
 	a.setApplicationName(PROGRAM_NAME);
