@@ -12,7 +12,7 @@ Das Programm PVTool wurde für die Auslegung von PCMs in Baukonstruktionen mit i
 ## GUI
 
 .Die Programmoberfläche vom _PVTool_
-image::GUIAndNumbers.png[width=1095,pdfwidth=17.65cm]
+image::GUInew.png[width=1095,pdfwidth=17.65cm]
 
 Das Programm gliedert sich in folgende Bereiche Bereiche:
 
@@ -20,8 +20,9 @@ Das Programm gliedert sich in folgende Bereiche Bereiche:
 * Bestimmung Klimadatensatz [B]
 * PV-Moduleigenschaften [C]
 * PCM-Eigenschaften [D]
-* Material-Eigenschaften der Dämmebene [E]
-* Run-Simulation-Button [F]
+* Angaben zum Lastprofil und den Kosten [E]
+* Material-Eigenschaften der Dämmebene [F]
+* Run-Simulation-Button [G]
 
 ### Ausführungspfad
 
@@ -47,6 +48,10 @@ Es ist eine Datenbank bestehender PCMs hinterlegt, welche durch Nutzervorgaben e
 [NOTE] 
 In der Entwicklungsphase wurde nur das PCM SP26 von https://www.rubitherm.eu/index.php/produktkategorie/anorganische-pcm-sp[Rubitherm] unterstützt.
 
+### Lastprofil und Kosten
+
+An dieser Stelle kann ein Lastprofil eingeladen werden. Im Moment muss es eine tsv-Datei mit einer Spalte Time [h] und eine weiter Spalte für den Verbrauch [W]. In den weiteren Feldern können konkrete Angaben über die Kosten für die PV-Module und gegebenenfalls der PCM gemacht werden, sowie zu dem aktuellen Strompreis für Ein- und Verkauf. Mit diesen Angaben wird eine Kostenberechnung durchgeführt.
+
 ### Insulation
 
 Für die Dämmschicht, welche hinter dem PCM anschließt, werden hier die Materialeigenschaften (Dichte, Speicherkapazität und Wärmeleitfähigkeit) sowie die Schichtdicke definiert.
@@ -71,7 +76,14 @@ Der Stromertrag wird für die oben erwähnten Varianten tabellarisch dargestellt
 
 ## Zusatzprogramm PVEnergy
 
-Falls berechnete Daten für die mittlere Modultemperatur und die Strahlung vorliegen kann direkt der Stromertrag berechnet werden. Dazu muss das Kommandozeilenprogramm PVEnergy ausgeführt werden. 
+Falls berechnete Daten für die mittlere Modultemperatur und die Strahlung vorliegen kann direkt der Stromertrag berechnet werden. Dazu muss das Kommandozeilenprogramm PVEnergy ausgeführt werden. Die Ausführung kann wie folgt ausgeführt werden:
+
+* Ausführung mit Batch-Datei
+** für genau einen Zeitpunkt
+** für Zeitreihenwerte
+* Ausführung über Abrufen der Dateipfade
+
+Das Vorgehen wird in den folgenden Abschnitten erläutert.
 
 ### Ausführung mit Batch-Datei
 
@@ -113,7 +125,7 @@ pause
 
 Damit werden im `Temp`-Ordner die Ergebnisse der Berechnung mit PVEnergy gespeichert.
 
-Die Parameter für die Berchnung werden anschließend erläutert. Folgende Ausführungsvariante sind möglich:
+Die Parameter für die Berchnung werden anschließend erläutert. Folgende Ausführungsvarianten sind möglich:
 
 #### Ausführung für genau einen Zeitpunkt
 
@@ -208,3 +220,7 @@ Sind beide Dokumente im richtigen Format erstellt, kann die `pvenergy.exe` mit f
 ====
 pvenergy.exe -s "_DateipfadMessdaten.tsv_""_DateipfadModuldaten.txt_"
 ====
+
+## Kostenkalkulation
+Aufgrund der eingegeben Preise werden für die verschiedenen Varianten jeweils die Investkosten [€], die Betriebskosten [€] und die Gesamtkosten [€] nach dem angegebenen Betrachtungszeitraum berechnet. Die Investitionskosten setzten sich aus den Kosten der Module und den Kosten für die PCM samt Kapseln zusammen. Die Betriebskosten sind die reinen Kosten für den laufenden Betrieb, nach Abzug der Eigennutzung des erzeugten Stroms und der Kosten, die durch den Verkauf von Überschuss eingenommen werden.
+Die Ergebnisse sind der Ausgabedatei "cost.tsv" zu entnehmen.
