@@ -52,6 +52,12 @@ private slots:
 
 	void on_pushButtonLoadProfile_clicked();
 
+	void on_pushButton_HelpTutorial_clicked();
+
+	void on_pushButton_About_clicked();
+
+	void on_pushButton_Licence_clicked();
+
 private:
 
 	/*! Modifies the m6template file content with the given parameters and stores the new file in place of given

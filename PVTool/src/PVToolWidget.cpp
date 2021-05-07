@@ -25,6 +25,8 @@
 #include "PVTConstants.h"
 #include "PVTDirectories.h"
 #include "PVTResultDialog.h"
+#include "PVTLicenceDialog.h"
+#include "PVTAboutDialog.h"
 
 bool convertDoubleFromText(const QString & text, double & value) {
 	// try converting using the current locale
@@ -201,8 +203,15 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	//abschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(true);
 
+	m_ui->comboBox_PCMMaterials->addItem(tr("SP21EK"));
+	m_ui->comboBox_PCMMaterials->addItem(tr("SP24E"));
+	m_ui->comboBox_PCMMaterials->addItem(tr("SP25E2"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP26"));
+	m_ui->comboBox_PCMMaterials->addItem(tr("SP29Eu"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP30"));
+	m_ui->comboBox_PCMMaterials->addItem(tr("SP31"));
+	m_ui->comboBox_PCMMaterials->addItem(tr("SP50"));
+
 	//einschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(false);
 
@@ -1236,3 +1245,24 @@ void PVToolWidget::on_pushButtonLoadProfile_clicked(){
 }
 
 
+
+void PVToolWidget::on_pushButton_HelpTutorial_clicked()
+{
+	//Öffne Ascidoc Tutorial PDF Datei
+}
+
+void PVToolWidget::on_pushButton_About_clicked()
+{
+	PVTAboutDialog * PVAbout = new PVTAboutDialog();
+	PVAbout->setAboutText();
+	PVAbout->setModal(true);
+	PVAbout->exec();
+}
+
+void PVToolWidget::on_pushButton_Licence_clicked()
+{
+   PVTLicenceDialog * PVLicence = new PVTLicenceDialog();
+   PVLicence->setLicenceText();
+   PVLicence->setModal(true);
+   PVLicence->exec();
+}
