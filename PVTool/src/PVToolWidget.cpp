@@ -150,6 +150,7 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_WeatherFile->addItem("13_Muehldorf-Inn");
 	m_ui->comboBox_WeatherFile->addItem("14_Stoetten");
 	m_ui->comboBox_WeatherFile->addItem("15_Garmisch_withoutRain");
+	m_ui->comboBox_WeatherFile->setCurrentIndex(3);
 	//einschalten von updates
 	m_ui->comboBox_WeatherFile->blockSignals(false);
 
@@ -202,7 +203,7 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	//Data PV modules
 	//abschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(true);
-
+	m_ui->comboBox_PCMMaterials->addItem("None");
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP21EK"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP24E"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP25E2"));
@@ -211,7 +212,7 @@ PVToolWidget::PVToolWidget(QWidget *parent) :
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP30"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP31"));
 	m_ui->comboBox_PCMMaterials->addItem(tr("SP50"));
-
+	m_ui->comboBox_PCMMaterials->setCurrentIndex(4);
 	//einschalten von updates
 	m_ui->comboBox_PCMMaterials->blockSignals(false);
 
@@ -660,7 +661,8 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	//			QMessageBox::critical(this, QString(), tr("Fehler bei der Ausführung des CmdDiscretize-Tools."));
 	//			return;
 	//		}
-			m_waitingProjects.append(QString::fromStdString((d6ProjectPath.parentPath() / discFilename).str()));
+			if(m_ui->comboBox_PCMMaterials->currentText() != "None")
+				m_waitingProjects.append(QString::fromStdString((d6ProjectPath.parentPath() / discFilename).str()));
 		} // WRM loop
 	}
 
