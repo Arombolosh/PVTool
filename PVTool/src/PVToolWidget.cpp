@@ -467,9 +467,9 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 				QMessageBox::critical(this, QString(), tr("Die angegebenen Datei '%1' kann nicht gefunden werden.").arg(m_filenameLoadProfile.c_str()));
 				return;
 			}
+			//check read load profile
+			readLoadProfile(IBK::Path(m_filenameLoadProfile));
 		}
-		//check read load profile
-		readLoadProfile(IBK::Path(m_filenameLoadProfile));
 		//m_moduleCount = 50;
 
 	}
