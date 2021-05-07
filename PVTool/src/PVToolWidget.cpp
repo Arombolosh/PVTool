@@ -367,9 +367,16 @@ void PVToolWidget::readLoadProfile(const IBK::Path &filename) {
 
 }
 
+void PVToolWidget::clearObjects(){
+	m_cmdLineProcess = nullptr;
+	m_progressDlg = nullptr;
+	m_thicknessPCM.clear();
+	m_finishedProjects = 0;
+}
+
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
 
-
+	clearObjects();
 	// Climate data file
 	// we need a project directory/working directory
 	IBK::Path weatherDirectory( (PVTDirectories::resourcesRootDir() + "/DB_Climate").toStdString());
@@ -931,6 +938,7 @@ void PVToolWidget::evaluateResults(IBK::Path &filename){
 }
 
 void PVToolWidget::evaluateResults() {
+#if 0 //erstmal nicht genutzt
 	// process ready results
 	//m_completedProjects.
 
@@ -971,10 +979,11 @@ void PVToolWidget::evaluateResults() {
 		}
 	}
 	runPVEnergy();
+#endif
 }
 
-void PVToolWidget::runPVEnergy()
-{
+void PVToolWidget::runPVEnergy() {
+#if 0 // erstmal nicht genutzt
 	std::vector<std::vector<double>> energyRes(m_temperature.size());
 	try {
 		int incrementValue = m_progressDlg->maximum()/m_temperature.size()/2;
@@ -1014,7 +1023,7 @@ void PVToolWidget::runPVEnergy()
 
 	//m_progressDlg = new QProgressDialog(tr("Simuliere Geometrievarianten..."), tr("Abbrechen"), 0, m_waitingProjects.count(), this);
 	//connect(&m_simProgressTimer, &QTimer::timeout, this, &PVToolWidget::onSimProgressTimerTimeout);
-
+#endif
 }
 
 void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
@@ -1027,7 +1036,7 @@ void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
 
 	//konvertierung der Unitvectoren?
 
-	out << "Zeit [h]"<< "\t" << "PV (PCM 0 cm) Produktion [W]"<< "\t" <<
+	out << "Zeit [h]"<< "\t" << "PV (PCM " << vectorIdx << " cm) Produktion [W]"<< "\t" <<
 		   "Verbrauch (Lastpropfil) [W]"<< "\t" << "Eigennutzung [W]"<< "\t" <<
 		   "Stromzukauf [W]"<< "\t" << "Stromüberschuss [W]" << "\n";
 	for (unsigned int i=0; i<m_saleEnergy[vectorIdx].m_data.size(); ++i){
@@ -1037,6 +1046,33 @@ void PVToolWidget::writeResults(const IBK::Path &filename, int vectorIdx){
 		out << "\t" << m_ownUseEnergy[vectorIdx].m_data[i];
 		out << "\t" << m_purchaseEnergy[vectorIdx].m_data[i];
 		out << "\t" << m_saleEnergy[vectorIdx].m_data[i];
+		out << "\n";
+	}
+	if (!out)
+		throw IBK::Exception("Error writing file.", FUNC_ID);
+}
+
+void PVToolWidget::writeResultsPV(const IBK::Path &filename){
+	FUNCID(PVToolWidget::writeResultsPV);
+
+	// write file
+	std::ofstream out(filename.str());
+
+	//konvertierung der Unitvectoren?
+
+	if(m_pvEnergy.empty())
+		return;
+	out << "Zeit [h]";
+	for(unsigned int j=0; j<m_pvEnergy.size(); ++j){
+		out << "\t" << "PV (PCM" << j << " cm) Produktion [W]";
+	}
+	out << "\n";
+
+	for (unsigned int i=0; i<m_pvEnergy[0].size(); ++i){
+		out << i ;
+		for(unsigned int j=0; j<m_pvEnergy.size(); ++j){
+			out << "\t" << m_pvEnergy[j].m_data[i];
+		}
 		out << "\n";
 	}
 	if (!out)
@@ -1174,6 +1210,8 @@ void PVToolWidget::showResults(){
 		writeResults(IBK::Path(m_workingDirectory / "pcm1.tsv"), 1);
 		writeResults(IBK::Path(m_workingDirectory / "pcm2.tsv"), 2);
 	}
+
+	writeResultsPV(IBK::Path(m_workingDirectory / "pvEnergyAllVariants.tsv"));
 
 	results.push_back(IBK::FormatString("Das Ergebnis jeder Variante wird dargestellt über die Schichtdicke in cm des PCM´s und dem erzeugten Stromertrag in kWh/a : \n %1 %2").arg("Dicke").arg("Ertrag").str());
 	for(size_t i=0; i<summedValues.size(); ++i)

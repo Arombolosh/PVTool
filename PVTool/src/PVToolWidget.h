@@ -96,6 +96,12 @@ private:
 	/*! Write results to the file. VectorIdx is the index of the vector element of calculation.*/
 	void writeResults(const IBK::Path &filename, int vectorIdx);
 
+	/*! Write results pv energy to the file. */
+	void writeResultsPV(const IBK::Path &filename);
+
+	/*! reset all. */
+	void clearObjects();
+
 	Ui::PVToolWidget	*m_ui;
 
 	QProgressDialog		*m_progressDlg;
@@ -123,7 +129,7 @@ private:
 	std::vector<IBK::UnitVector>	m_purchaseEnergy;
 	std::vector<IBK::UnitVector>	m_saleEnergy;
 	double							m_tempProgress;
-	int					m_moduleCount;
+	int								m_moduleCount;
 
 	/*! Cost Data*/
 	double							m_costPvModule;
