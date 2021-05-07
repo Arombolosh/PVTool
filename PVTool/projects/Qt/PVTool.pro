@@ -32,22 +32,28 @@ RESOURCES += \
 
 SOURCES += \
 	../../../PVEnergy/src/PVTool_Energy.cpp \
+	../../src/PVTAboutDialog.cpp \
 	../../src/PVTConstants.cpp \
 	../../src/PVTDebugApplication.cpp \
 	../../src/PVTDirectories.cpp \
+	../../src/PVTLicenceDialog.cpp \
 		../../src/PVTResultDialog.cpp \
 	../../src/PVToolWidget.cpp \
 	../../src/main.cpp
 
 HEADERS += \
 	../../../PVEnergy/src/PVTool_Energy.h \
+	../../src/PVTAboutDialog.h \
 	../../src/PVTConstants.h \
 	../../src/PVTDebugApplication.h \
 	../../src/PVTDirectories.h \
+	../../src/PVTLicenceDialog.h \
 		../../src/PVToolWidget.h \
 		../../src/PVTResultDialog.h
 
 FORMS += \
+	../../src/PVTAboutDialog.ui \
+	../../src/PVTLicenceDialog.ui \
 		../../src/PVTResultDialog.ui \
 	../../src/PVToolWidget.ui
 
