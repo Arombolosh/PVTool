@@ -27,6 +27,7 @@
 #include "PVTResultDialog.h"
 #include "PVTLicenceDialog.h"
 #include "PVTAboutDialog.h"
+#include "PVTPostProcDialog.h"
 
 bool convertDoubleFromText(const QString & text, double & value) {
 	// try converting using the current locale

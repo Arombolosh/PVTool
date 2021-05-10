@@ -38,6 +38,7 @@ SOURCES += \
 	../../src/PVTDebugApplication.cpp \
 	../../src/PVTDirectories.cpp \
 	../../src/PVTLicenceDialog.cpp \
+	../../src/PVTPostProcDialog.cpp \
 		../../src/PVTResultDialog.cpp \
 	../../src/PVToolWidget.cpp \
 	../../src/main.cpp
@@ -50,12 +51,14 @@ HEADERS += \
 	../../src/PVTDebugApplication.h \
 	../../src/PVTDirectories.h \
 	../../src/PVTLicenceDialog.h \
+	../../src/PVTPostProcDialog.h \
 		../../src/PVToolWidget.h \
 		../../src/PVTResultDialog.h
 
 FORMS += \
 	../../src/PVTAboutDialog.ui \
 	../../src/PVTLicenceDialog.ui \
+	../../src/PVTPostProcDialog.ui \
 		../../src/PVTResultDialog.ui \
 	../../src/PVToolWidget.ui
 
