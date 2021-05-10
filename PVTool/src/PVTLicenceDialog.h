@@ -15,7 +15,7 @@ public:
 	explicit PVTLicenceDialog(QWidget *parent = nullptr);
 	~PVTLicenceDialog();
 
-	void setLicenceText();
+	void setText();
 
 private slots:
 	void on_pushButtonClose_clicked();

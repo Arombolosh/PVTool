@@ -24,7 +24,7 @@ PVTLicenceDialog::~PVTLicenceDialog()
 	delete m_ui;
 }
 
-void PVTLicenceDialog::setLicenceText() {
+void PVTLicenceDialog::setText() {
 
 	//	ui->plainTextEditResults->appendPlainText(line);
 	std::string	licence;

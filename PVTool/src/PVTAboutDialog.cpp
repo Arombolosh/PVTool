@@ -24,7 +24,7 @@ PVTAboutDialog::~PVTAboutDialog()
 	delete m_ui;
 }
 
-void PVTAboutDialog::setAboutText() {
+void PVTAboutDialog::setText() {
 
 	//	ui->plainTextEditResults->appendPlainText(line);
 	std::string	about;
