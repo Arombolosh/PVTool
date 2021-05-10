@@ -2,7 +2,7 @@
 <PostProc version="2.2.2">
 	<!--All mappers.-->
 	<Mappers>
-		<Mapper name="PV (PCM0 cm) Produktion|PV (PCM1 cm) Produktion|PV (PCM2 cm) Produktion [$filename]">
+		<Mapper name="PV Produktion (PCM 0;1;2 cm) [$filename]">
 			<Extractors>
 				<Extractor>
 					<DataIOFileName>pvEnergyAllVariants.tsv?1|2|3</DataIOFileName>
@@ -52,7 +52,7 @@
 						<DateTimeEnabled>1</DateTimeEnabled>
 					</Axis>
 					<Axis index="1">
-						<TitleText>$quantity [$unit]</TitleText>
+						<TitleText>PV Produktion [$unit]</TitleText>
 						<IBK:Unit name="AxisUnit">W</IBK:Unit>
 						<Maximum>92.427923675699077</Maximum>
 						<Minimum>39.390891223943413</Minimum>
@@ -64,7 +64,50 @@
 					</Axis>
 				</AxisProperties>
 				<ChartProperties>
-					<TitleText>PV (PCM0 cm) Produktion|PV (PCM1 cm) Produktion|PV (PCM2 cm) Produktion [$filename]</TitleText>
+					<TitleText>PV Produktion</TitleText>
+					<Legend />
+				</ChartProperties>
+			</ChartModel>
+		</Mapper>
+		<Mapper name="PV Produktion ohne PCM [$filename]">
+			<Extractors>
+				<Extractor>
+					<DataIOFileName>pvEnergyAllVariants.tsv?1</DataIOFileName>
+					<CutType>NoCut</CutType>
+					<DataFormat>DF_2D</DataFormat>
+					<DataType>T_REFERENCE</DataType>
+					<ColumnIndex>0</ColumnIndex>
+				</Extractor>
+			</Extractors>
+			<ChartModel chartType="2D">
+				<SeriesProperties>
+					<Series>
+						<TitleText>$quantity</TitleText>
+						<MarkerColor>#000000</MarkerColor>
+					</Series>
+				</SeriesProperties>
+				<AxisProperties>
+					<Axis index="0">
+						<TitleText>Zeit [$unit]</TitleText>
+						<IBK:Unit name="AxisUnit">h</IBK:Unit>
+						<Maximum>955676138515.41821</Maximum>
+						<Minimum>954222854155.63342</Minimum>
+						<DateTimeEnabled>1</DateTimeEnabled>
+					</Axis>
+					<Axis index="1">
+						<TitleText>PV Produktion [$unit]</TitleText>
+						<IBK:Unit name="AxisUnit">W</IBK:Unit>
+						<Maximum>92.427923675699077</Maximum>
+						<Minimum>39.390891223943413</Minimum>
+					</Axis>
+					<Axis index="2" enabled="0">
+						<TitleText>$quantity [$unit]</TitleText>
+						<Maximum>462.20674691418367</Maximum>
+						<Minimum>194.05911746695904</Minimum>
+					</Axis>
+				</AxisProperties>
+				<ChartProperties>
+					<TitleText>PV Produktion</TitleText>
 					<Legend />
 				</ChartProperties>
 			</ChartModel>
