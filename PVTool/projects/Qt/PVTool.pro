@@ -32,6 +32,7 @@ RESOURCES += \
 
 SOURCES += \
 	../../../PVEnergy/src/PVTool_Energy.cpp \
+	../../src/MainWindow.cpp \
 	../../src/PVTAboutDialog.cpp \
 	../../src/PVTConstants.cpp \
 	../../src/PVTDebugApplication.cpp \
@@ -43,6 +44,7 @@ SOURCES += \
 
 HEADERS += \
 	../../../PVEnergy/src/PVTool_Energy.h \
+	../../src/MainWindow.h \
 	../../src/PVTAboutDialog.h \
 	../../src/PVTConstants.h \
 	../../src/PVTDebugApplication.h \
