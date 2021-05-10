@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<PostProc version="2.1.1">
-	<!--List of all directories-->
-
-	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
+<PostProc version="2.2.2">
 	<!--All mappers.-->
 	<Mappers>
 		<Mapper name="PV (PCM0 cm) Produktion|PV (PCM1 cm) Produktion|PV (PCM2 cm) Produktion [$filename]">
@@ -34,30 +30,37 @@
 				<SeriesProperties>
 					<Series>
 						<TitleText>$quantity</TitleText>
+						<PenColor>#ff0000</PenColor>
+						<MarkerColor>#ff0000</MarkerColor>
+					</Series>
+					<Series>
+						<TitleText>$quantity</TitleText>
+						<PenColor>#ffaa00</PenColor>
+						<MarkerColor>#ffaa00</MarkerColor>
+					</Series>
+					<Series>
+						<TitleText>$quantity</TitleText>
 						<MarkerColor>#000000</MarkerColor>
-					</Series>
-					<Series>
-						<TitleText>$quantity</TitleText>
-						<PenColor>#ff420e</PenColor>
-						<MarkerColor>#ff420e</MarkerColor>
-					</Series>
-					<Series>
-						<TitleText>$quantity</TitleText>
-						<PenColor>#004586</PenColor>
-						<MarkerColor>#004586</MarkerColor>
 					</Series>
 				</SeriesProperties>
 				<AxisProperties>
 					<Axis index="0">
 						<TitleText>Zeit [$unit]</TitleText>
 						<IBK:Unit name="AxisUnit">h</IBK:Unit>
+						<Maximum>955676138515.41821</Maximum>
+						<Minimum>954222854155.63342</Minimum>
+						<DateTimeEnabled>1</DateTimeEnabled>
 					</Axis>
 					<Axis index="1">
 						<TitleText>$quantity [$unit]</TitleText>
 						<IBK:Unit name="AxisUnit">W</IBK:Unit>
+						<Maximum>92.427923675699077</Maximum>
+						<Minimum>39.390891223943413</Minimum>
 					</Axis>
 					<Axis index="2" enabled="0">
 						<TitleText>$quantity [$unit]</TitleText>
+						<Maximum>462.20674691418367</Maximum>
+						<Minimum>194.05911746695904</Minimum>
 					</Axis>
 				</AxisProperties>
 				<ChartProperties>
@@ -68,5 +71,14 @@
 		</Mapper>
 	</Mappers>
 
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+	<!--Split window state.-->
+	<Splitting>
+		<Widget id="1" parent="0" viewTable="0" mapperIndex="0" size1="1" size2="1" orientation="2" />
+		<FocusedWidget>0</FocusedWidget>
+	</Splitting>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 </PostProc>
