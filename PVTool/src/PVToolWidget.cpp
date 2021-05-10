@@ -550,7 +550,6 @@ void PVToolWidget::on_pushButton_RunSimu_clicked() {
 	IBK::Path d6pTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/template_simple.d6p").toStdString());
 	IBK::Path d6pTemplateWithoutPCMPath( (PVTDirectories::resourcesRootDir() + "/file_templates/templateWithoutPCM_simple.d6p").toStdString());
 	IBK::Path m6TemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/InsulationMatTemplate.m6").toStdString());
-
 	// Wenn Radiobutton für Kamm eingebaut, dann hier Variable setzen ToDo Dirk
 	bool withComb=false;
 	if(withComb)
@@ -775,6 +774,7 @@ void PVToolWidget::createM6File(const std::string & m6Template, const IBK::Path 
 }
 
 
+
 void PVToolWidget::createDelphinProject(const std::string & d6Template,
 										const IBK::Path & d6ProjectFilePath,
 										double pcmThickness,
@@ -796,6 +796,15 @@ void PVToolWidget::createDelphinProject(const std::string & d6Template,
 	// write file
 	std::ofstream out(d6ProjectFilePath.str());
 	out << d6str << std::endl;
+
+}
+
+void PVToolWidget::createPostProcSession(const std::string &templateFile, const IBK::Path &currentFolder) {
+	//std::string d6str = IBK::replace_string(d6Template, "${PCMThick}", IBK::val2string(pcmThickness));
+	m_postProcSession = m_workingDirectory / "AllVariantsResult.p2";
+	// write file
+	std::ofstream out(m_postProcSession.str());
+	out << templateFile << std::endl;
 
 }
 
@@ -1246,25 +1255,34 @@ void PVToolWidget::on_pushButtonLoadProfile_clicked(){
 	m_ui->lineEdit_LoadProfile->setText(fpath);
 }
 
-
-
-void PVToolWidget::on_pushButton_HelpTutorial_clicked()
+void PVToolWidget::on_pushButtonResult_clicked()
 {
-	//Öffne Ascidoc Tutorial PDF Datei
-}
+	/* hole den postprocpfad aus dem postproc dialog
+		TODO Heiko wie komm ich hier an die variable vom pfad?
+	*/
 
-void PVToolWidget::on_pushButton_About_clicked()
-{
-	PVTAboutDialog * PVAbout = new PVTAboutDialog();
-	PVAbout->setAboutText();
-	PVAbout->setModal(true);
-	PVAbout->exec();
-}
+	QString workingDir = m_ui->lineEdit_Directory->text();
+	m_workingDirectory = IBK::Path( workingDir.toStdString() );
 
-void PVToolWidget::on_pushButton_Licence_clicked()
-{
-   PVTLicenceDialog * PVLicence = new PVTLicenceDialog();
-   PVLicence->setLicenceText();
-   PVLicence->setModal(true);
-   PVLicence->exec();
+	IBK::Path ppPath ("/home/dirk/Software/PostProc-2.2/bin/PostProcApp");
+
+	//hole template postproc session
+	IBK::Path postProcTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/AllVariantsResults.p2").toStdString());
+	std::string postProcTemplate;
+	{
+		std::ifstream in(postProcTemplatePath.str());
+		std::stringstream strm;
+		strm << in.rdbuf();
+		postProcTemplate = strm.str();
+	}
+	//create Postproc session file
+	createPostProcSession(postProcTemplate, m_workingDirectory);
+
+	//starte postproc.exe und sessiondatei
+
+	QProcess *proc = new QProcess(this);
+
+	QStringList args;
+	args << m_postProcSession.absolutePath().c_str();
+	proc->start(QString::fromStdString(ppPath.str()), args);
 }

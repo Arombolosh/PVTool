@@ -10,7 +10,7 @@
 
 #include "PVTDebugApplication.h"
 #include "PVToolWidget.h"
-
+#include "MainWindow.h"
 #include "PVTConstants.h"
 
 #include <memory>
@@ -125,7 +125,13 @@ int main(int argc, char *argv[]) {
 	int res;
 	try { // open scope to control lifetime of main window, ensure that main window instance dies before settings or project handler
 
+#if 0
 		PVToolWidget w;
+#else
+		MainWindow w;
+#endif
+
+
 
 		// add user settings related window resize at program start
 #if defined(Q_OS_WIN)

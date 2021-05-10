@@ -52,11 +52,7 @@ private slots:
 
 	void on_pushButtonLoadProfile_clicked();
 
-	void on_pushButton_HelpTutorial_clicked();
-
-	void on_pushButton_About_clicked();
-
-	void on_pushButton_Licence_clicked();
+	void on_pushButtonResult_clicked();
 
 private:
 
@@ -74,6 +70,9 @@ private:
 							  const std::string & pcmMaterialFileName,
 							  const std::string & climateDataFileName,
 							  const std::string & powerDrainFilePath, const std::string & inclination, const std::string & orientation);
+
+	/*! Generate a Postproc2 session file. */
+	void createPostProcSession(const std::string &templateFile, const IBK::Path &currentFolder);
 
 	/*! Takes the next waiting job from m_waitingProjects and starts the process in slave mode.
 	*/
@@ -122,6 +121,7 @@ private:
 	size_t				m_finishedProjects = 0;		///< finished projects to set progressBar
 
 	IBK::Path			m_workingDirectory;
+	IBK::Path			m_postProcSession;
 
 	/*! PV module data. */
 	PVTOOL::Energy					m_pvtool;
