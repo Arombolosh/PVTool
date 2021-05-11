@@ -2,6 +2,7 @@
 #define MainWindowH
 
 #include <QMainWindow>
+#include "PVTPostProcDialog.h"
 
 
 class MainWindow : public QMainWindow
@@ -10,6 +11,8 @@ class MainWindow : public QMainWindow
 
 public:
 	MainWindow();
+
+	PVTPostProcDialog	*ppDialog = new PVTPostProcDialog();
 
 private:
 	void createMenus();
@@ -20,6 +23,8 @@ private:
 	void openPostProcSettingsDailog();
 
 	QMenu *m_fileMenu;
+
+	QString m_postProcPath;
 };
 
 #endif // MainWindowH

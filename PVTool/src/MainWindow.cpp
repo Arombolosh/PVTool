@@ -44,7 +44,7 @@ MainWindow::MainWindow()
 
 //    setWindowTitle(tr("Menus"));
 //    setMinimumSize(160, 160);
-//    resize(480, 320);
+	//    resize(480, 320);
 }
 
 void MainWindow::openAboutDialog(){
@@ -68,20 +68,20 @@ void MainWindow::openPostProcSettingsDailog(){
 	Textfeld
 	Button ...
 	*/
+	if(ppDialog == nullptr) {
+		ppDialog = new PVTPostProcDialog();
+	}
+	//ppDialog->setModal(true);
+	ppDialog->exec();
 }
 
 void MainWindow::createMenus(){
-
-
 	/*
 	 - A		Ebene1
 	 -- A2		Ebene2
 	 -- B2
 	 -- C2
 	*/
-
-
-
 	QAction *aboutAct, *licenceAct, *tutorialAct, *postProcAct;
 
 	aboutAct = new QAction("&Über", this);
