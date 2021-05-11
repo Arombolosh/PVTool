@@ -17,6 +17,8 @@ public:
 
 	void setText();
 
+	std::string text();
+
 private slots:
 
 

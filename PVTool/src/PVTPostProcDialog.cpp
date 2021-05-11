@@ -19,8 +19,7 @@ PVTPostProcDialog::PVTPostProcDialog(QWidget *parent) :
 //	m_ui->plainTextEditPostProc->setFont(f);
 }
 
-PVTPostProcDialog::~PVTPostProcDialog()
-{
+PVTPostProcDialog::~PVTPostProcDialog(){
 	delete m_ui;
 }
 
@@ -31,9 +30,13 @@ void PVTPostProcDialog::setText() {
 
 }
 
+std::string PVTPostProcDialog::text(){
+	return m_ui->lineEditPostProcPath->text().toStdString();
+}
 
-
-void PVTPostProcDialog::on_pushButtonDirectory_clicked()
-{
-
+void PVTPostProcDialog::on_pushButtonDirectory_clicked(){
+	QString fpath = QFileDialog::getOpenFileName(this,tr("PostProc"),QString(),tr("*"));
+	if(fpath.isEmpty())
+		return;
+	m_ui->lineEditPostProcPath->setText(fpath);
 }
