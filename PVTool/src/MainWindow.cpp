@@ -6,9 +6,14 @@
 #include "PVTLicenceDialog.h"
 
 //! [0]
-MainWindow::MainWindow()
+MainWindow::MainWindow() :
+	ppDialog(new PVTPostProcDialog())
 {
 	PVToolWidget *widget = new PVToolWidget;
+
+	readPostProcPath();
+
+	connect(this, SIGNAL(postProcPathChanged(QString)), widget, SLOT(on_postProcPathChanged(QString)));
 
 	setCentralWidget(widget);
 
@@ -47,17 +52,46 @@ MainWindow::MainWindow()
 	//    resize(480, 320);
 }
 
+MainWindow::~MainWindow(){
+	writePostProcPath();
+	delete ppDialog;
+}
+
+void MainWindow::readPostProcPath(){
+	QFile file("config");
+
+	if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
+
+	QTextStream in(&file);
+	if(!in.atEnd())
+		m_postProcPath = in.readLine();
+
+	ppDialog->setText(m_postProcPath);
+
+}
+
+void MainWindow::writePostProcPath(){
+	QFile file("config");
+
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+
+	QTextStream out(&file);
+	out << m_postProcPath;
+}
+
 void MainWindow::openAboutDialog(){
-	PVTAboutDialog * PVAbout = new PVTAboutDialog();
-	PVAbout->setText();
-	PVAbout->setModal(true);
-	PVAbout->exec();
+	PVTAboutDialog PVAbout;
+	PVAbout.setText();
+	PVAbout.setModal(true);
+	PVAbout.exec();
 }
 void MainWindow::openLicenceDialog(){
-	PVTLicenceDialog * PVLic = new PVTLicenceDialog();
-	PVLic->setText();
-	PVLic->setModal(true);
-	PVLic->exec();
+	PVTLicenceDialog PVLic;
+	PVLic.setText();
+	PVLic.setModal(true);
+	PVLic.exec();
 }
 void MainWindow::openTutorial(){
 // TODO Katja hier muss dann das pdf rein
@@ -68,11 +102,11 @@ void MainWindow::openPostProcSettingsDailog(){
 	Textfeld
 	Button ...
 	*/
-	if(ppDialog == nullptr) {
-		ppDialog = new PVTPostProcDialog();
-	}
+
 	//ppDialog->setModal(true);
 	ppDialog->exec();
+	m_postProcPath = QString::fromStdString(ppDialog->text());
+	emit postProcPathChanged(m_postProcPath);
 }
 
 void MainWindow::createMenus(){

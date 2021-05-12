@@ -11,10 +11,19 @@ class MainWindow : public QMainWindow
 
 public:
 	MainWindow();
+	~MainWindow() override;
 
-	PVTPostProcDialog	*ppDialog = new PVTPostProcDialog();
+	PVTPostProcDialog	*ppDialog;// = new PVTPostProcDialog();
+
+signals:
+	void postProcPathChanged(QString );
 
 private:
+
+	void readPostProcPath();
+
+	void writePostProcPath();
+
 	void createMenus();
 
 	void openAboutDialog();
