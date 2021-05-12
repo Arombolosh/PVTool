@@ -224,6 +224,10 @@ PVToolWidget::~PVToolWidget() {
 	delete m_ui;
 }
 
+void PVToolWidget::on_postProcPathChanged(QString path) {
+	m_postProcPath = path;
+}
+
 
 // *** protected
 
@@ -1239,10 +1243,10 @@ void PVToolWidget::showResults(){
 		results.push_back( IBK::FormatString("%1 %2").arg(m_thicknessPCM[i]*100,5)
 							 .arg(summedValues[i]/1000,8, 'f', 2, ' ', std::ios_base::right).str() );
 
-	PVTResultDialog * PVResults = new PVTResultDialog();
-	PVResults->setResultText(results);
-	PVResults->setModal(true);
-	PVResults->exec();
+	PVTResultDialog PVResults ;//= new PVTResultDialog();
+	PVResults.setResultText(results);
+	PVResults.setModal(true);
+	PVResults.exec();
 	clearResultVecs();
 }
 
@@ -1265,7 +1269,7 @@ void PVToolWidget::on_pushButtonResult_clicked()
 	QString workingDir = m_ui->lineEdit_Directory->text();
 	m_workingDirectory = IBK::Path( workingDir.toStdString() );
 
-	IBK::Path ppPath ("/home/dirk/Software/PostProc-2.2/bin/PostProcApp");
+	IBK::Path ppPath ( m_postProcPath.toStdString() );//"/home/dirk/Software/PostProc-2.2/bin/PostProcApp");
 
 	//hole template postproc session
 	IBK::Path postProcTemplatePath( (PVTDirectories::resourcesRootDir() + "/file_templates/AllVariantsResults.p2").toStdString());

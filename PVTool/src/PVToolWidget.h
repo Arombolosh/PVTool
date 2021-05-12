@@ -26,6 +26,11 @@ public:
 
 	std::vector<PVTOOL::Energy::ManufactureData>	m_pvModule;
 
+public slots:
+
+	void on_postProcPathChanged(QString);
+
+
 protected:
 
 	void closeEvent(QCloseEvent *event) override;
@@ -122,6 +127,7 @@ private:
 
 	IBK::Path			m_workingDirectory;
 	IBK::Path			m_postProcSession;
+	QString			m_postProcPath;
 
 	/*! PV module data. */
 	PVTOOL::Energy					m_pvtool;
