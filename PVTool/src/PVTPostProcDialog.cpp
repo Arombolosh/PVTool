@@ -23,10 +23,10 @@ PVTPostProcDialog::~PVTPostProcDialog(){
 	delete m_ui;
 }
 
-void PVTPostProcDialog::setText() {
+void PVTPostProcDialog::setText(const QString &path) {
 
 	//	ui->plainTextEditResults->appendPlainText(line);
-
+	m_ui->lineEditPostProcPath->setText(path);
 
 }
 

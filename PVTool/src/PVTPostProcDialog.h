@@ -15,7 +15,7 @@ public:
 	explicit PVTPostProcDialog(QWidget *parent = nullptr);
 	~PVTPostProcDialog();
 
-	void setText();
+	void setText(const QString &path);
 
 	std::string text();
 
