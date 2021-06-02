@@ -387,6 +387,7 @@ void PVToolWidget::clearObjects(){
 	m_progressDlg = nullptr;
 	m_thicknessPCM.clear();
 	m_finishedProjects = 0;
+	m_loadProfile.clear();
 }
 
 void PVToolWidget::on_pushButton_RunSimu_clicked() {
@@ -1232,8 +1233,10 @@ void PVToolWidget::showResults(){
 			throw IBK::Exception("Error writing file.", FUNC_ID);
 
 		writeResults(IBK::Path(m_workingDirectory / "pcm0.tsv"), 0);
-		writeResults(IBK::Path(m_workingDirectory / "pcm1.tsv"), 1);
-		writeResults(IBK::Path(m_workingDirectory / "pcm2.tsv"), 2);
+		if(m_ui->comboBox_PCMMaterials->currentText() != "None"){
+			writeResults(IBK::Path(m_workingDirectory / "pcm1.tsv"), 1);
+			writeResults(IBK::Path(m_workingDirectory / "pcm2.tsv"), 2);
+		}
 	}
 
 	writeResultsPV(IBK::Path(m_workingDirectory / "pvEnergyAllVariants.tsv"));
