@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 
 #include <QtWidgets>
+#include <QDir>
+#include <QDesktopServices>
 #include "PVToolWidget.h"
 #include "PVTAboutDialog.h"
 #include "PVTLicenceDialog.h"
@@ -94,8 +96,14 @@ void MainWindow::openLicenceDialog(){
 	PVLic.exec();
 }
 void MainWindow::openTutorial(){
-// TODO Katja hier muss dann das pdf rein
+	QDesktopServices::openUrl(QUrl("../../doc/readMe.pdf"));
+	return;
+	QProcess p;
+	p.start("../../doc/readMe.pdf");
+	QString path = QDir::currentPath();
+	int a = QProcess::execute("../../doc/readMe.pdf");
 }
+
 void MainWindow::openPostProcSettingsDailog(){
 /* TODO Katja
 	Label = PostProc2
