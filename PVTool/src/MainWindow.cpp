@@ -97,11 +97,6 @@ void MainWindow::openLicenceDialog(){
 }
 void MainWindow::openTutorial(){
 	QDesktopServices::openUrl(QUrl("../../doc/readMe.pdf"));
-	return;
-	QProcess p;
-	p.start("../../doc/readMe.pdf");
-	QString path = QDir::currentPath();
-	int a = QProcess::execute("../../doc/readMe.pdf");
 }
 
 void MainWindow::openPostProcSettingsDailog(){
