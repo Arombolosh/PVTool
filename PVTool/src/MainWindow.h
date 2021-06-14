@@ -28,6 +28,7 @@ private:
 
 	void openAboutDialog();
 	void openLicenceDialog();
+	void openPartnerDialog();
 	void openTutorial();
 	void openPostProcSettingsDailog();
 

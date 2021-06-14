@@ -6,6 +6,7 @@
 #include "PVToolWidget.h"
 #include "PVTAboutDialog.h"
 #include "PVTLicenceDialog.h"
+#include "PVTPartner.h"
 
 //! [0]
 MainWindow::MainWindow() :
@@ -95,6 +96,11 @@ void MainWindow::openLicenceDialog(){
 	PVLic.setModal(true);
 	PVLic.exec();
 }
+void MainWindow::openPartnerDialog(){
+	PVTPartner partner;
+	partner.setModal(true);
+	partner.exec();
+}
 void MainWindow::openTutorial(){
 	QDesktopServices::openUrl(QUrl("../../doc/readMe.pdf"));
 }
@@ -119,7 +125,7 @@ void MainWindow::createMenus(){
 	 -- B2
 	 -- C2
 	*/
-	QAction *aboutAct, *licenceAct, *tutorialAct, *postProcAct;
+	QAction *aboutAct, *licenceAct, *tutorialAct, *postProcAct, *partner;
 
 	aboutAct = new QAction("&Über", this);
 	connect(aboutAct, &QAction::triggered, this, &MainWindow::openAboutDialog);
@@ -129,12 +135,14 @@ void MainWindow::createMenus(){
 	connect(tutorialAct, &QAction::triggered, this, &MainWindow::openTutorial);
 	postProcAct = new QAction("&Einstellungen", this);
 	connect(postProcAct, &QAction::triggered, this, &MainWindow::openPostProcSettingsDailog);
-
+	partner = new QAction("&Partner", this);
+	connect(partner, &QAction::triggered, this, &MainWindow::openPartnerDialog);
 
 	m_fileMenu = menuBar()->addMenu("&Hilfe");
 	m_fileMenu->addAction(aboutAct);
 	m_fileMenu->addAction(licenceAct);
 	m_fileMenu->addAction(tutorialAct);
+	m_fileMenu->addAction(partner);
 
 	m_fileMenu = menuBar()->addMenu("&PostProc");
 	m_fileMenu->addAction(postProcAct);
