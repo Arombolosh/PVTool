@@ -25,11 +25,11 @@ PVTPartner::PVTPartner(QWidget *parent) :
 	str += "\n\nTU Dresden Institut für Baukonstruktion\nAnsprechpartner Christian Popp\nTel.: +49 351 463 32306\nEmail: christian.popp@tu-dresden.de\nWebseite: YYY";
 
 	m_ui->plainTextEditTUD->appendPlainText(str);
-	str = "PAZDERA AG\nAnsprechpartner: XXX\nHinterer Floßanger 14\nD-96450 Coburg\nTel.: +49 (0)9561 516-0\nWebseite: www.pazdera.de";
+	str = "PAZDERA AG\nAnsprechpartner: XXX\nHinterer Floßanger 14\nD-96450 Coburg\nTel.: +49 (0)9561 516-0\nEmail: YYYY@yyy.de\nWebseite: www.pazdera.de";
 	m_ui->plainTextEditPazdera->appendPlainText(str);
-	str = "Rubitherm Technologies GmbH\nAnsprechpartner: XXX\nImhoffweg 6\n12307 Berlin\nTel.:  +49 (30) 7109622-0\nWebseite: www.rubitherm.eu";
+	str = "Rubitherm Technologies GmbH\nAnsprechpartner: Andreas Lärz\nImhoffweg 6\n12307 Berlin\nTel.:  +49 (30) 7109622-0\nEmail: andreas.laerz@rubitherm.com\nWebseite: www.rubitherm.eu";
 	m_ui->plainTextEditRubitherm->appendPlainText(str);
-	str = "ADO-Metall GmbH\nAnsprechpartner: XXX\nÖlwerkstrasse 66\nD-49744 Geeste\nTel.: +49(0)5937 - 8121\nWebseite: www.ado-metall.de";
+	str = "ADO-Metall GmbH\nAnsprechpartner: Monika Domnick\nÖlwerkstrasse 66\nD-49744 Geeste\nTel.: +49(0)5937 - 8121\nEmail: info@ado-metall.de\nWebseite: www.ado-metall.de";
 	m_ui->plainTextEditADOMetall->appendPlainText(str);
 }
 
