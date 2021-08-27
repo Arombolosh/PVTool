@@ -7,7 +7,7 @@
 
 ## Einleitung
 
-Das Programm PVTool wurde für die Auslegung von PCMs in Baukonstruktionen mit integrierten PV-Paneelen entwickelt. Es können damit Fassadenkonstruktionen sowie Dachkonstruktionen (Neigung derzeit zwischen 0° Dach und 90° - senkrechte Wand) mit integrierten PV-Modul und einer PCM-Schicht bemessen werden. Als Ergebnis wird der zu erwartende Stromertrag über ein Jahr geliefert und in Varianten gegenübergestellt.
+Das Programm PVTool wurde für die Auslegung von PCMs in Baukonstruktionen mit integrierten PV-Paneelen entwickelt. Es können damit Fassadenkonstruktionen sowie Dachkonstruktionen mit integrierten PV-Modul und einer PCM-Schicht bemessen werden. Als Ergebnis wird der zu erwartende Stromertrag über ein Jahr geliefert und in Varianten gegenübergestellt.
 
 ## GUI
 
@@ -40,6 +40,8 @@ Möglichkeit 2:
 
 Per Nutzereingabe wird ein Klimadatensatz ausgewählt. Hierbei werden derzeit nur EPW-Formate unterstützt. "EPW-File" muss aktiviert sein, um die Berechnung mit dem selbstgewählten Klimadatensatz zu starten.
 
+Eigene Wetterdaten können mit dem https://www.bauklimatik-dresden.de/downloads.php[CCM-Editor] erstellt werden.
+
 ### PCM
 
 Hier kann ein PCM ausgwählt werden, welches bei der Berechnung verwendet wird.
@@ -50,7 +52,7 @@ In der Entwicklungsphase wurde nur das PCM SP26 von https://www.rubitherm.eu/ind
 
 ### Lastprofil und Kosten
 
-An dieser Stelle kann ein Lastprofil eingeladen werden. Im Moment muss es eine tsv-Datei mit einer Spalte Time [h] und eine weiter Spalte für den Verbrauch [W]. In den weiteren Feldern können konkrete Angaben über die Kosten für die PV-Module und gegebenenfalls der PCM gemacht werden, sowie zu dem aktuellen Strompreis für Ein- und Verkauf. Mit diesen Angaben wird eine Kostenberechnung durchgeführt.
+An dieser Stelle kann ein Lastprofil eingeladen werden. Im Moment muss es eine tsv-Datei mit einer Spalte Time [h] und eine weiter Spalte für den Verbrauch [W]. In der folgenden https://www.bauklimatik-dresden.de/postproc/help/de/index.html[PostProc Dokumentation] wird die Erstellung einer tsv-Datei detailliert beschrieben. In den weiteren Feldern können konkrete Angaben über die Kosten für die PV-Module und gegebenenfalls der PCM gemacht werden, sowie zu dem aktuellen Strompreis für Ein- und Verkauf. Mit diesen Angaben wird eine Kostenberechnung durchgeführt.
 
 ### Insulation
 
@@ -72,7 +74,7 @@ Ebenso wurde die IBK-Bibliothek für die Umsetzung der Berechnungsmethodik genut
 
 ## Auswertung
 
-Der Stromertrag wird für die oben erwähnten Varianten tabellarisch dargestellt.
+Der Stromertrag wird für die oben erwähnten Varianten tabellarisch dargestellt. Zum Anzeigen kann das Programm https://www.bauklimatik-dresden.de/postproc/index.php[PostProc2] der Bauklimatik Dresden Software GmbH genutzt werden.
 
 ## Zusatzprogramm PVEnergy
 
@@ -143,7 +145,7 @@ Der pvenergy.exe müssen dazu folgende Parameter in dieser Reihenfolge in die Ko
 * Zellenanzahl pro Modul [-]
 * Referenztemperatur [K]; Annahme meist 298.15
 * Zelltyp
-** Derzeit die in <<tab_PVTool_celltypes>> gelisteten Zelltypen möglich. Keyword: monoSi
+** Derzeit sind die in <<tab_PVTool_celltypes>> gelisteten Zelltypen möglich. Keyword: monoSi
 * Mittlere Modultemperatur [K]
 * Strahlung senkrecht aufs Modul [W/m2]
 
@@ -168,7 +170,7 @@ pvenergy.exe 31.4 8.44 38.3 8.91 0.05 -0.30 -0.43 60 298.15 monoSi 298.15 200
 #### Ausführung für Zeitreihenwerte
 
 Für die Berechnung des Stromertrags für ein PV-Modul und Zeitreihen für Temperatur und Strahlung müssen die Ergebnisse der Temperatur und Strahlung in einer d6o-Datei (DELPHIN-Ausgabeformat) mit folgenden Namen in einem Unterordner (mit dem Namen "results") vorliegen:
-
+1
 * TMean.d6o
 * GlobalRadiation.d6o
 
@@ -224,3 +226,9 @@ pvenergy.exe -s "_DateipfadMessdaten.tsv_""_DateipfadModuldaten.txt_"
 ## Kostenkalkulation
 Aufgrund der eingegeben Preise werden für die verschiedenen Varianten jeweils die Investkosten [€], die Betriebskosten [€] und die Gesamtkosten [€] nach dem angegebenen Betrachtungszeitraum berechnet. Die Investitionskosten setzten sich aus den Kosten der Module und den Kosten für die PCM samt Kapseln zusammen. Die Betriebskosten sind die reinen Kosten für den laufenden Betrieb, nach Abzug der Eigennutzung des erzeugten Stroms und der Kosten, die durch den Verkauf von Überschuss eingenommen werden.
 Die Ergebnisse sind der Ausgabedatei "cost.tsv" zu entnehmen.
+
+## Support
+
+Der Support ist kostenpflichtig. Dazu kontaktieren Sie bitte mailto:dirk.weiss@tu-dresden.de[Dirk Weiß] oder mailto:heiko.fechner@tu-dresden.de[Heiko Fechner].
+
+

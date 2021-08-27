@@ -1,3 +1,3 @@
-Time [h]	Radiation [W/m2]	Temperature [C]	Power PV [W]	Power PV [W]
-1	0	0	0	0
-2	100	10	81.5609	81.5609
+Time [h]	Radiation [W/m2]	Temperature [C]	Power PV [W]	Power PV [W]	Power PV [W]
+1	0	0	0	0	0
+2	100	10	81.5609	81.5609	28.4586
