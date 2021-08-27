@@ -50,6 +50,7 @@ Source: VC16_x64\styles\qwindowsvistastyle.dll; DestDir: {app}\styles
 Source: ..\..\PVTool\resources\translations\*.qm; DestDir: {app}\resources\translations
 
 ; Documentation
+Source: ..\..\doc\readMe.pdf; DestDir: {app}\doc
 
 ; Database files
 Source: ..\..\data\binaries\win64\*; DestDir: {app}\resources\binaries\win64; Flags: recursesubdirs
