@@ -7,6 +7,7 @@
 #include "PVTAboutDialog.h"
 #include "PVTLicenceDialog.h"
 #include "PVTPartner.h"
+#include "PVTDirectories.h"
 
 //! [0]
 MainWindow::MainWindow() :
@@ -102,7 +103,12 @@ void MainWindow::openPartnerDialog(){
 	partner.exec();
 }
 void MainWindow::openTutorial(){
-	QDesktopServices::openUrl(QUrl("../../doc/readMe.pdf"));
+	QString docDir = PVTDirectories::resourcesRootDir()+"/../doc/readMe.pdf";
+//	QMessageBox::information(this, tr("Pfad"),docDir);
+//	QFileInfo info(docDir);
+//	if(!info.exists())
+//		QMessageBox::information(this, tr("Gibts nicht"),docDir);
+	QDesktopServices::openUrl(QUrl::fromLocalFile(docDir));
 }
 
 void MainWindow::openPostProcSettingsDailog(){
