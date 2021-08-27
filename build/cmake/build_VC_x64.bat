@@ -1,7 +1,10 @@
 @echo off
+set QTDIR=C:\Qt\Qt5.11.3\5.15.2\msvc2019_64
+set PATH=C:\Qt\Qt5.11.3\5.15.2\msvc2019_64\bin;%PATH%
 
 :: setup VC environment variables
-set VCVARSALL_PATH="c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+set VCVARSALL_PATH="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+:: set VCVARSALL_PATH="c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
 call %VCVARSALL_PATH%
 
 :: For different Qt installations, please set the environment variables JOM_PATH and CMAKE_PREFIX_PATH
@@ -17,7 +20,8 @@ if not defined JOM_PATH (
 )
 
 if not defined CMAKE_PREFIX_PATH (
-	set CMAKE_PREFIX_PATH=c:\Qt\5.11.3\msvc2015_64
+::	set CMAKE_PREFIX_PATH=c:\Qt\5.11.3\msvc2015_64
+	set CMAKE_PREFIX_PATH=C:\Qt\Qt5.11.3\5.15.1\msvc2019_64
 )
 
 :: add search path for jom.exe
@@ -37,10 +41,12 @@ popd
 
 :: copy executable to bin/release dir
 xcopy /Y .\bb_VC_x64\PVTool\PVTool.exe ..\..\bin\release_x64
+xcopy /Y .\bb_VC_x64\PVEnergy\PVEnergy.exe ..\..\bin\release_x64
 
 exit /b 0
 
 :fail
+pause
 exit /b 1
 
 

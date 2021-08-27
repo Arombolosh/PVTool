@@ -105,4 +105,5 @@ add_subdirectory( ../../externals/SAM/projects/cmake_local SAM )
 # -------------------------------------------------------------
 
 add_subdirectory( ../../PVTool/projects/cmake_local PVTool)
+add_subdirectory( ../../PVEnergy/projects/cmake_local PVEnergy)
 

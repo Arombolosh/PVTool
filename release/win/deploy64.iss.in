@@ -31,15 +31,20 @@ ArchitecturesInstallIn64BitMode=x64
 
 ; Program files
 Source: ..\..\bin\release_x64\PVTool.exe; DestDir: {app}
-Source: VC14_x64\msvcp140.dll; DestDir: {app}
-Source: VC14_x64\vcruntime140.dll; DestDir: {app}
+Source: ..\..\bin\release_x64\PVEnergy.exe; DestDir: {app}
+Source: VC16_x64\vc_redist.x64.exe; DestDir: {app}
+Source: VC16_x64\d3dcompiler_47.dll; DestDir: {app}
+Source: VC16_x64\libEGL.dll; DestDir: {app}
+Source: VC16_x64\libGLESv2.dll; DestDir: {app}
+Source: VC16_x64\opengl32sw.dll; DestDir: {app}
 
-Source: VC14_x64\Qt5Core.dll; DestDir: {app}
-Source: VC14_x64\Qt5Gui.dll; DestDir: {app}
-Source: VC14_x64\Qt5Widgets.dll; DestDir: {app}
+Source: VC16_x64\Qt5Core.dll; DestDir: {app}
+Source: VC16_x64\Qt5Gui.dll; DestDir: {app}
+Source: VC16_x64\Qt5Svg.dll; DestDir: {app}
+Source: VC16_x64\Qt5Widgets.dll; DestDir: {app}
 
-Source: VC14_x64\platforms\qwindows.dll; DestDir: {app}\platforms
-Source: VC14_x64\styles\qwindowsvistastyle.dll; DestDir: {app}\styles
+Source: VC16_x64\platforms\qwindows.dll; DestDir: {app}\platforms
+Source: VC16_x64\styles\qwindowsvistastyle.dll; DestDir: {app}\styles
 
 ; Translation files
 Source: ..\..\PVTool\resources\translations\*.qm; DestDir: {app}\resources\translations
@@ -49,7 +54,7 @@ Source: ..\..\PVTool\resources\translations\*.qm; DestDir: {app}\resources\trans
 ; Database files
 Source: ..\..\data\binaries\win64\*; DestDir: {app}\resources\binaries\win64; Flags: recursesubdirs
 Source: ..\..\data\DB_Climate\*; DestDir: {app}\resources\DB_Climate; Flags: recursesubdirs
-Source: ..\..\data\DB_PCMMaterials\*; DestDir: {app}\resources\DB_PCMMaterials; Flags: recursesubdirs
+;Source: ..\..\data\DB_PCMMaterials\*; DestDir: {app}\resources\DB_PCMMaterials; Flags: recursesubdirs
 Source: ..\..\data\file_templates\*; DestDir: {app}\resources\file_templates; Flags: recursesubdirs
 Source: ..\..\data\project_template\*; DestDir: {app}\resources\project_template; Flags: recursesubdirs
 
